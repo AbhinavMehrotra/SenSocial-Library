@@ -1,0 +1,74 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.sensocial"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+     <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="15" />
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BATTERY_STATS" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.UPDATE_DEVICE_STATS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        
+         <!-- Following TAG SHOULD BE PLACED IN YOUR MINIFEST BELOW YOUR FACEBOOK ACTIVITY, 
+        JUST CREATE "app_id" IN YOUR STRING.XML AND ASSIGN IT WITH YOUR FACEBOOK ID-->
+        <!--
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/app_id" />
+
+        <activity
+            android:name="com.facebook.LoginActivity"
+            android:label="@string/app_name" >
+        -->
+        
+        <!-- THIS INTENT FILTER SHOULD BE PLACED IN YOUR MINIFEST INSIDE YOUR TWITTER ACTIVITY, 
+        JUST CHANGE THE HOST AND SCHEME ACCORDING TO YOUR CALLBACK URL IF YOU HAVE CHANGED IT.
+        FOR THIS CALLBACK URL IS :  callback://tweetactivity  -->
+        <!--  intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="tweetactivity"
+                    android:scheme="callback" />
+            </intent-filter-->
+        
+        <!-- THIS RECIEVER SHOULD BE PLACED IN YOUR MINIFEST JUST ABOVE THE APPLICATION CLOSING TAG -->
+        <receiver       
+            android:name="com.sensocial.manager.SenSocialServiceReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:label="BootListener" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
+    </application>
+    
+    
+
+</manifest>
