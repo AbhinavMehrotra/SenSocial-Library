@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<sensorconfiguration>
+	<sensor name="accelerometer">
+		<server required="true"
+		data="classified" />
+		<client required="true"
+		data="classified" />
+	</sensor>
+	<sensor name="location">
+		<server required="true"
+		data="raw" />
+		<client required="true"
+		data="raw" />
+	</sensor>
+	<sensor name="microphone"> 
+		<server required="false" />                     
+		<client required="true"
+		data="classified" />
+	</sensor>
+	<sensor name="bluetooth">
+		<server required="false" />              
+		<client required="true"
+		data="raw"  />
+	</sensor>
+</sensorconfiguration>
