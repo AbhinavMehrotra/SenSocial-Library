@@ -17,6 +17,7 @@ import android.util.Log;
 import com.ubhave.sensocial.filters.GetNewFilterFromServerr;
 import com.ubhave.sensocial.listener.SocialNetworkListenerManager;
 import com.ubhave.sensocial.listener.SocialNetworkListner;
+import com.ubhave.sensocial.manager.SenSocialManager;
 import com.ubhave.sensocial.sensormanager.StartPullSensors;
 import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
@@ -111,7 +112,13 @@ public class HTTPService extends Service {
 		 */
 		char ch= newUpdate.charAt(0);
 		if(ch=='y' || ch=='Y'){
+			//unsubscribe all sensing
 			Editor ed=sp.edit();
+			ed.putBoolean("streamsensing", false);
+			ed.commit();
+			new StartPullSensors(getApplicationContext()).stopIndependentContinuousStreamSensing();
+			
+			//get new filter and subscribe sensors
 			ed.putBoolean("Filter", true);
 			ed.commit();
 			new GetNewFilterFromServerr().downloadFilter(getApplicationContext());
@@ -127,7 +134,7 @@ public class HTTPService extends Service {
 		char ch= newUpdate.charAt(1);
 		switch (ch){
 		case ('0'):
-			Log.d(TAG, "No configuration for this client.");
+			Log.d(TAG, "No new configuration for this client.");
 		case ('1'):
 			if(newUpdate.startsWith("1Y")&& sp.getBoolean("sensing", false)==false){
 				Log.d(TAG, "Sensing configured for for OSN update only. \nFound a new update.");

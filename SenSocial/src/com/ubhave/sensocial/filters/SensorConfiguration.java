@@ -84,7 +84,7 @@ public class SensorConfiguration {
 	 * @param sensors Set<String> of all sensor names which needs to be subscribed
 	 */
 	protected void subscribeSensors(Set<String> sensors){
-		unsubscribeAllSensors();
+		unsubscribeAllSensors(); 
 		Editor ed=sp.edit();
 		for(String sensor:sensors){
 			ed.putBoolean(sensor, true);
