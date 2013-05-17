@@ -4,11 +4,14 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.util.Log;
 
 import com.ubhave.sensocial.http.IdSenderToEnableTrigger;
 
 public class SenSocialService {
 
+	private static final String TAG = "SNnMB";
 	private String SERVICE_CLASSNAME;
 	
 	/**
@@ -23,11 +26,16 @@ public class SenSocialService {
 			new IdSenderToEnableTrigger(sp.getString("fbusername", "null"), sp.getString("new_access_token", "null"),
 					sp.getString("twitterusername", "null"), sp.getString("uuid", "null"), sp.getString("server", "null"))
 					.sendIdToServer();
+			Editor ed=sp.edit();
+			ed.putBoolean("sendId", true);
+			ed.commit();
 		}		
 		if(sp.getString("mqtt","null").equals("null")){
+			Log.e(TAG, "starting http service");
 			Intent myIntent = new Intent(context, com.ubhave.sensocial.http.HTTPService.class);
 			context.startService(myIntent);
 		}else{
+			Log.e(TAG, "starting mqtt service");
 			Intent myIntent = new Intent(context, com.ubhave.sensocial.mqtt.MQTTService.class);
 			context.startService(myIntent);
 		}

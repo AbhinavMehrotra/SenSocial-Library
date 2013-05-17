@@ -38,7 +38,7 @@ public class CheckUpdate {
             myString = new String (baf.toByteArray());
             return myString;
         }catch(Exception e){
-    		Log.i(TAG, "Error while checking for update!!\n"+e.toString());
+    		Log.e(TAG, "Error while checking for update!!\n"+e.toString());
         }
 		return myString;
 	}

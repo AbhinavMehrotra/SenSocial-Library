@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.1.2" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="false" nesting-relationships="true">  
+  <class id="1" language="java" name="com.ubhave.sensocial.manager.SenSocialManager" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/manager/SenSocialManager.java" binary="false" corner="TOP_LEFT">    
+    <position height="95" width="417" x="-972" y="-224"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="2" language="java" name="com.ubhave.sensocial.manager.SenSocialService" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/manager/SenSocialService.java" binary="false" corner="TOP_LEFT">    
+    <position height="-1" width="-1" x="-677" y="-474"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="com.ubhave.sensocial.manager.SenSocialBroadcastReceiver" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/manager/SenSocialBroadcastReceiver.java" binary="false" corner="TOP_LEFT">    
+    <position height="-1" width="-1" x="-862" y="-548"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="com.ubhave.sensocial.listener.SensorDataListenerManager" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/listener/SensorDataListenerManager.java" binary="false" corner="TOP_LEFT">    
+    <position height="-1" width="-1" x="-78" y="-193"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <interface id="5" language="java" name="com.ubhave.sensocial.listener.SensorDataListener" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/listener/SensorDataListener.java" binary="false" corner="TOP_LEFT">    
+    <position height="-1" width="-1" x="-248" y="-103"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <class id="6" language="java" name="com.ubhave.sensocial.listener.SocialNetworkListenerManager" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/listener/SocialNetworkListenerManager.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-965" y="-391"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <interface id="7" language="java" name="com.ubhave.sensocial.listener.SocialNetworkListner" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/listener/SocialNetworkListner.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-1110" y="-181"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <class id="8" language="java" name="com.ubhave.sensocial.configuration.FacebookConfiguration" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/configuration/FacebookConfiguration.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="53" width="171" x="-1017" y="-22"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="9" language="java" name="com.ubhave.sensocial.configuration.MQTTServerConfiguration" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/configuration/MQTTServerConfiguration.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="53" width="176" x="-436" y="2"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="10" language="java" name="com.ubhave.sensocial.filters.SensorConfiguration" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/filters/SensorConfiguration.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-495" y="-296"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="11" language="java" name="com.ubhave.sensocial.configuration.ServerConfiguration" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/configuration/ServerConfiguration.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="53" width="161" x="-546" y="-70"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="12" language="java" name="com.ubhave.sensocial.filters.SensorDataFilterManager" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/filters/SensorDataFilterManager.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-77" y="-571"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="13" language="java" name="com.ubhave.sensocial.filters.SensorDataForClient" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/filters/SensorDataForClient.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-1110" y="13"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="14" language="java" name="com.ubhave.sensocial.filters.SensorDataForServer" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/filters/SensorDataForServer.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-1108" y="97"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="15" language="java" name="com.ubhave.sensocial.filters.PrivacyPolicyDescriptorParser" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/filters/PrivacyPolicyDescriptorParser.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-1054" y="-78"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="16" language="java" name="com.ubhave.sensocial.http.CheckUpdate" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/http/CheckUpdate.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-618" y="-564"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="17" language="java" name="com.ubhave.sensocial.http.HTTPService" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/http/HTTPService.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-769" y="-628"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="18" language="java" name="com.ubhave.sensocial.http.IdSenderToDisableTrigger" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/http/IdSenderToDisableTrigger.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-581" y="18"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="19" language="java" name="com.ubhave.sensocial.http.IdSenderToEnableTrigger" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/http/IdSenderToEnableTrigger.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-575" y="-379"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="20" language="java" name="com.ubhave.sensocial.http.SendSensorDataToServer" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/http/SendSensorDataToServer.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-77" y="-700"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="21" language="java" name="com.ubhave.sensocial.mqtt.MQTTService" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/mqtt/MQTTService.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-865" y="-473"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="22" language="java" name="com.ubhave.sensocial.mqtt.PushCallback" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/mqtt/PushCallback.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-1110" y="-471"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="23" language="java" name="com.ubhave.sensocial.sensordata.classifier.AnalyzeMicrophoneData" 
+    project="SenSocial" file="/SenSocial/src/com/ubhave/sensocial/sensordata/classifier/AnalyzeMicrophoneData.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-355" y="-369"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="24" language="java" name="com.ubhave.sensocial.sensordata.classifier.ClassifyAccelerometerData" 
+    project="SenSocial" file="/SenSocial/src/com/ubhave/sensocial/sensordata/classifier/ClassifyAccelerometerData.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-242" y="-281"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="25" language="java" name="com.ubhave.sensocial.sensordata.classifier.SensorDataClassifierManager" 
+    project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/sensordata/classifier/SensorDataClassifierManager.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-179" y="-445"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="26" language="java" name="com.ubhave.sensocial.sensormanager.AllPullSensors" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/sensormanager/AllPullSensors.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-441" y="-599"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="27" language="java" name="com.ubhave.sensocial.sensormanager.OneOffSensing" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/sensormanager/OneOffSensing.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-378" y="-712"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="28" language="java" name="com.ubhave.sensocial.sensormanager.StartPullSensors" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/sensormanager/StartPullSensors.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-845" y="-712"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="29" language="java" name="com.ubhave.sensocial.socialnetworks.AuthenticateFacebook" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/socialnetworks/AuthenticateFacebook.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="53" width="184" x="-777" y="82"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="30" language="java" name="com.ubhave.sensocial.socialnetworks.AuthenticateFacebook.FacebookExtendedToken" 
+    project="SenSocial" file="/SenSocial/src/com/ubhave/sensocial/socialnetworks/AuthenticateFacebook.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="53" width="168" x="-517" y="81"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="31" language="java" name="com.ubhave.sensocial.socialnetworks.AuthenticateTwitter" project="SenSocial" 
+    file="/SenSocial/src/com/ubhave/sensocial/socialnetworks/AuthenticateTwitter.java" binary="false" 
+    corner="BOTTOM_LEFT">    
+    <position height="53" width="168" x="-958" y="81"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <dependency id="32">    
+    <end type="SOURCE" refId="17"/>    
+    <end type="TARGET" refId="28"/>  
+  </dependency>  
+  <dependency id="33">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="8"/>  
+  </dependency>  
+  <dependency id="34">    
+    <end type="SOURCE" refId="25"/>    
+    <end type="TARGET" refId="26"/>  
+  </dependency>  
+  <dependency id="35">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="7"/>  
+  </dependency>  
+  <dependency id="36">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="11"/>  
+  </dependency>  
+  <dependency id="37">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="20"/>  
+  </dependency>  
+  <dependency id="38">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="15"/>  
+  </dependency>  
+  <association id="39">    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="40" name="listeners">        
+        <position height="18" width="49" x="-1036" y="-229"/>      
+      </attribute>      
+      <multiplicity id="41" minimum="0" maximum="2147483647">        
+        <position height="16" width="21" x="-1026" y="-208"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <nesting id="42">    
+    <end type="SOURCE" refId="29"/>    
+    <end type="TARGET" refId="30"/>  
+  </nesting>  
+  <dependency id="43">    
+    <end type="SOURCE" refId="17"/>    
+    <end type="TARGET" refId="16"/>  
+  </dependency>  
+  <dependency id="44">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="17"/>  
+  </dependency>  
+  <association id="45">    
+    <end type="SOURCE" refId="12" navigable="false">      
+      <attribute id="46" name="sdcm"/>      
+      <multiplicity id="47" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="25" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="48">    
+    <end type="SOURCE" refId="28"/>    
+    <end type="TARGET" refId="26"/>  
+  </dependency>  
+  <dependency id="49">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="12"/>  
+  </dependency>  
+  <dependency id="50">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="21"/>  
+  </dependency>  
+  <dependency id="51">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="18"/>  
+  </dependency>  
+  <dependency id="52">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="53">    
+    <end type="SOURCE" refId="21"/>    
+    <end type="TARGET" refId="22"/>  
+  </dependency>  
+  <association id="54">    
+    <end type="SOURCE" refId="26" navigable="false">      
+      <attribute id="55" name="SC"/>      
+      <multiplicity id="56" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="57">    
+    <end type="SOURCE" refId="28"/>    
+    <end type="TARGET" refId="27"/>  
+  </dependency>  
+  <dependency id="58">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="19"/>  
+  </dependency>  
+  <dependency id="59">    
+    <bendpoint x="-957" y="-626"/>    
+    <end type="SOURCE" refId="17"/>    
+    <end type="TARGET" refId="6"/>  
+  </dependency>  
+  <association id="60">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="61" name="listeners"/>      
+      <multiplicity id="62" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="63">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="6"/>  
+  </dependency>  
+  <association id="64">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="65" name="AF"/>      
+      <multiplicity id="66" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="29" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="67">    
+    <end type="SOURCE" refId="25"/>    
+    <end type="TARGET" refId="23"/>  
+  </dependency>  
+  <dependency id="68">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="21"/>  
+  </dependency>  
+  <association id="69">    
+    <end type="SOURCE" refId="22" navigable="false">      
+      <attribute id="70" name="listeners"/>      
+      <multiplicity id="71" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="72">    
+    <bendpoint x="-1105" y="-713"/>    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="28"/>  
+  </dependency>  
+  <dependency id="73">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="74">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <dependency id="75">    
+    <end type="SOURCE" refId="25"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="76">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="6"/>  
+  </dependency>  
+  <dependency id="77">    
+    <end type="SOURCE" refId="25"/>    
+    <end type="TARGET" refId="24"/>  
+  </dependency>  
+  <dependency id="78">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="9"/>  
+  </dependency>  
+  <association id="79">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="80" name="AT"/>      
+      <multiplicity id="81" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="31" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="82">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="5"/>  
+  </dependency>  
+  <dependency id="83">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="17"/>  
+  </dependency>  
+  <association id="84">    
+    <end type="SOURCE" refId="12" navigable="false">      
+      <attribute id="85" name="aps"/>      
+      <multiplicity id="86" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="26" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="87">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="2"/>  
+  </dependency>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="true" package="true" protected="true" private="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

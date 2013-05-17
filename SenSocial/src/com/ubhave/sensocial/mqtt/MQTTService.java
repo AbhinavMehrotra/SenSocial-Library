@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -29,9 +30,16 @@ public class MQTTService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		sp=getSharedPreferences("SNnMB", 0);
-		BROKER_URL= "tcp://"+sp.getString("mqtt", "")+":1883";
+		BROKER_URL= "tcp://broker.mqttdashboard.com:1883";//"tcp://"+sp.getString("mqtt", "")+":1883";
+		Log.i(TAG, BROKER_URL);
 		clientId=sp.getString("uuid", "null");
+		//connectIt();
+		StrictMode.ThreadPolicy old = StrictMode.getThreadPolicy();
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(old)
+		.permitNetwork()
+		.build());
 		connectIt();
+        StrictMode.setThreadPolicy(old);
 		return START_STICKY;
 	}
 

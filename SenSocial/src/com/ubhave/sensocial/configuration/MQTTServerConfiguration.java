@@ -34,8 +34,8 @@ public class MQTTServerConfiguration {
 	 * Method to get the server IP where the MQTT broker is running.
 	 * @return String
 	 */
-	protected String getMQTTServerIP(){
-		return this.ip;
+	public String getMQTTServerIP(){
+		return ip;
 	}
 	
 	

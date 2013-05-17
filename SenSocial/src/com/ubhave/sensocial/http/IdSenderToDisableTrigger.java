@@ -35,7 +35,7 @@ public class IdSenderToDisableTrigger {
     		public void run(){
     			try{
     				HttpClient httpclient = new DefaultHttpClient();
-    				String uri=serverUrl+"removeemailid.php?userName="+userName+"&uuid="+uuId;
+    				String uri=serverUrl+"DeleteUser.php?uuid="+uuId;
     				Log.d(TAG, "Sending names to: "+uri);
     				HttpPost httppost = new   HttpPost(uri);  
     				HttpResponse response = httpclient.execute(httppost);

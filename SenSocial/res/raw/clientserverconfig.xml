@@ -2,9 +2,9 @@
 <sensorconfiguration>
 	<sensor name="accelerometer">
 		<server required="true"
-		data="classified" />
+		data="raw" />
 		<client required="true"
-		data="classified" />
+		data="raw" />
 	</sensor>
 	<sensor name="location">
 		<server required="true"
@@ -13,13 +13,21 @@
 		data="raw" />
 	</sensor>
 	<sensor name="microphone"> 
-		<server required="false" />                     
+		<server required="true"
+		data="raw" />
 		<client required="true"
-		data="classified" />
+		data="raw" />
 	</sensor>
 	<sensor name="bluetooth">
-		<server required="false" />              
+		<server required="true"
+		data="raw" />
 		<client required="true"
-		data="raw"  />
+		data="raw" />
+	</sensor>
+	<sensor name="wifi">
+		<server required="true"
+		data="raw" />
+		<client required="true"
+		data="raw" />
 	</sensor>
 </sensorconfiguration>

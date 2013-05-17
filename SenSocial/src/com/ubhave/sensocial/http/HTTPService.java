@@ -14,9 +14,14 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.ubhave.sensocial.filters.GetNewFilterFromServerr;
 import com.ubhave.sensocial.listener.SocialNetworkListenerManager;
 import com.ubhave.sensocial.listener.SocialNetworkListner;
 import com.ubhave.sensocial.sensormanager.StartPullSensors;
+import com.ubhave.sensormanager.ESException;
+import com.ubhave.sensormanager.ESSensorManager;
+import com.ubhave.sensormanager.SensorDataListener;
+import com.ubhave.sensormanager.data.SensorData;
 
 public class HTTPService extends Service {
 
@@ -37,7 +42,7 @@ public class HTTPService extends Service {
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		sp=getSharedPreferences("snmbData",0);  //PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		sp=getApplicationContext().getSharedPreferences("snmbData",0);  //PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		Log.e(TAG, "Starting HTTP service.\n Refresh Interval: "+sp.getInt("refreshInterval", 60000));
 		UPDATE_INTERVAL=10000;//sp.getInt("refreshInterval", 60000);
 	    timer = new Timer();
@@ -88,6 +93,7 @@ public class HTTPService extends Service {
 		String newUpdate=checkIt.checkNow();
 		Log.d(TAG, "Latest update available: "+newUpdate);
 		SharedPreferences sp=getSharedPreferences("snmbData",0);
+/*		<<Working code>>
 		if(newUpdate.contains("1") && sp.getBoolean("sensing", false)==false){
 			Log.d(TAG, "Found a new update");
 			Editor ed=sp.edit();
@@ -95,7 +101,82 @@ public class HTTPService extends Service {
 			ed.commit();
 			SocialNetworkListenerManager.newUpdateArrived(getApplicationContext(),newUpdate);	
 			new StartPullSensors(getApplicationContext(), newUpdate).StartSensing();
-		}	
+		}
+*/		
+		
+		/* The newUpdate is the trigger message received from server.
+		 * First char refers to the new filter set by the developer, it can be Y or N.
+		 * Second char can  be 1,2, or 3. 1:sense for OSN update, 2: independent one-off sensing, 3: independent continuous sensing.
+		 * Third char refers to the new update from OSN, 1 means new update and 0 means no update.	
+		 */
+		char ch= newUpdate.charAt(0);
+		if(ch=='y' || ch=='Y'){
+			Editor ed=sp.edit();
+			ed.putBoolean("Filter", true);
+			ed.commit();
+			new GetNewFilterFromServerr().downloadFilter(getApplicationContext());
+		}
+		
+		if(sp.getBoolean("Filter", false) && sp.getBoolean("SensorsConfigured", false)){
+			sensingType(newUpdate);
+		}
+		
+	}
+	
+	private void sensingType(String newUpdate){
+		char ch= newUpdate.charAt(1);
+		switch (ch){
+		case ('0'):
+			Log.d(TAG, "No configuration for this client.");
+		case ('1'):
+			if(newUpdate.startsWith("1Y")&& sp.getBoolean("sensing", false)==false){
+				Log.d(TAG, "Sensing configured for for OSN update only. \nFound a new update.");
+				Editor ed=sp.edit();
+				ed.putBoolean("sensing", true);
+				ed.commit();
+				SocialNetworkListenerManager.newUpdateArrived(getApplicationContext(),newUpdate);	
+				new StartPullSensors(getApplicationContext()).startOneOffSensingWithOSN(newUpdate);
+			}
+			else{
+				Log.d(TAG, "Sensing configured for for OSN update only. \nBut no new update found.");	
+			}
+			break;
+		case ('2'):
+			if(newUpdate.startsWith("2Y")&& sp.getBoolean("oneoffsensing", false)==false){
+				Log.d(TAG, "Independent one-off sensing configured.");
+				Editor ed=sp.edit();
+				ed.putBoolean("oneoffsensing", true);
+				ed.commit();
+				SocialNetworkListenerManager.newUpdateArrived(getApplicationContext(),newUpdate);
+				new StartPullSensors(getApplicationContext()).startIndependentOneOffSensing();
+			}
+			else{
+				Log.d(TAG, "Independent one-off sensing configured./nBut null trigger for oneoff.");
+				Editor ed=sp.edit();
+				ed.putBoolean("oneoffsensing", false);
+				ed.commit();
+			}
+			break;
+		case ('3'):
+			if(newUpdate.startsWith("3Y")&& sp.getBoolean("streamsensing", false)==false){
+				Log.d(TAG, "Independent continuous-stream sensing configured.");
+				Editor ed=sp.edit();
+				ed.putBoolean("streamsensing", true);
+				ed.commit();
+				SocialNetworkListenerManager.newUpdateArrived(getApplicationContext(),newUpdate);
+				new StartPullSensors(getApplicationContext()).startIndependentContinuousStreamSensing();
+			}
+			else if(newUpdate.startsWith("3N")){
+				Log.d(TAG, "Independent continuous-stream sensing unconfigured.");
+				Editor ed=sp.edit();
+				ed.putBoolean("streamsensing", false);
+				ed.commit();
+				new StartPullSensors(getApplicationContext()).stopIndependentContinuousStreamSensing();
+			}
+			break;
+		default:
+			Log.e(TAG, "Error on server-side configuration (i.e. - first character is not 1,2,3, or 4).");			
+		}
 	}
 	
 	/**

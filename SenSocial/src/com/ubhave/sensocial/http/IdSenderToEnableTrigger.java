@@ -39,7 +39,7 @@ public class IdSenderToEnableTrigger {
     		public void run(){
     			try{
     				HttpClient httpclient = new DefaultHttpClient();
-    				String uri=serverUrl+"getemailid.php?fb="+fbName+"&fbtoken="+fbToken+"&twitter="+twitterName+"&uuid="+uuId;
+    				String uri=serverUrl+"getemailid.php?fb_id="+fbName+"&fbtoken="+fbToken+"&twitter="+twitterName+"&uuid="+uuId;
     				Log.d(TAG, "Sending names to: "+uri);
     				HttpPost httppost = new   HttpPost(uri);  
     				HttpResponse response = httpclient.execute(httppost);

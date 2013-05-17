@@ -19,7 +19,7 @@ import com.ubhave.sensocial.exceptions.InvalidSensorException;
 import com.ubhave.sensocial.exceptions.XMLFileException;
 
 
-public class XMLRefinerForClientServerConfiguration {
+public class PrivacyPolicyDescriptorParser {
 
 	private final String TAG="SNnMB";
 	private SharedPreferences sp;
@@ -27,18 +27,20 @@ public class XMLRefinerForClientServerConfiguration {
 	private Context context;
 	private String sensor, sConfig,cConfig;
 
-	public XMLRefinerForClientServerConfiguration(Context context){
+	public PrivacyPolicyDescriptorParser(Context context){
 		this.context=context;
 		sp=context.getSharedPreferences("snmbData",0);
 		ed=sp.edit();
 	}
+	
+	/**
+	 * Method to parse the XML file called Privacy Policy Descriptor
+	 * @throws InvalidSensorException
+	 * @throws XMLFileException
+	 */
 	public void refineXML() throws InvalidSensorException, XMLFileException{
 		try {
 			
-//			File fXmlFile = new File("clientserverconfig.xml");
-//			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-//			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-//			Document doc = dBuilder.parse(fXmlFile);
 			
 			InputStream in=context.getResources().openRawResource(R.raw.clientserverconfig);
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -58,23 +60,23 @@ public class XMLRefinerForClientServerConfiguration {
 						}
 						if(((Element) eElement.getElementsByTagName("server").item(0)).getAttribute("required").equals("true")){
 							if(((Element) eElement.getElementsByTagName("server").item(0)).getAttribute("data").equals("raw")){
-								sConfig="str";
+								sConfig="SYR";
 							}else{
-								sConfig="stc";
+								sConfig="SYC";
 							}
 						}
 						else{
-							sConfig="sf";
+							sConfig="SNO";
 						}
 						if(((Element) eElement.getElementsByTagName("client").item(0)).getAttribute("required").equals("true")){
 							if(((Element) eElement.getElementsByTagName("client").item(0)).getAttribute("data").equals("raw")){
-								cConfig="ctr";
+								cConfig="CTR";
 							}else{
-								cConfig="ctc";
+								cConfig="CTC";
 							}
 						}
 						else{
-							cConfig="cf";
+							cConfig="CNO";
 						}
 						insertConfig(sensor,cConfig+sConfig);
 					}
@@ -82,8 +84,12 @@ public class XMLRefinerForClientServerConfiguration {
 			}
 			else{
 				Log.e(TAG,"No root node found as: <sensorconfiguration> .....s </sensorconfiguration>");
+				//If no Descriptor found then set all as NO (no data will be provided)
+				deactivateAll();
 			}
 		} catch (Exception e) {
+			//If no Descriptor found then set all as NO (no data will be provided)
+			deactivateAll();
 			throw new XMLFileException(e.toString());
 		}
 	}
@@ -97,11 +103,43 @@ public class XMLRefinerForClientServerConfiguration {
 		ed.commit();
 	}
 	
+	private void deactivateAll(){
+		String config="SNOCNO";
+		ed.putString("accelerometerconfig", config);
+		ed.putString("bluetoothconfig", config);
+		ed.putString("wificonfig", config);
+		ed.putString("locationconfig", config);
+		ed.putString("microphoneconfig", config);
+		ed.commit();
+	}
+	
 	private Boolean isSensor(String sName){
 		if(sName.equals("accelerometer") ||sName.equals("bluetooth") ||sName.equals("wifi") ||sName.equals("location") ||sName.equals("microphone")){
 			return true;
 		}
 		return false;
+	}
+	
+	protected Boolean isAllowed(String sensorName, String serverDataType, String clientDataType ){
+		Boolean flag=false;
+		String config=sp.getString(sensorName+"config", "");
+		char serverType=config.charAt(2);
+		char clientType=config.charAt(5);
+		if(config!=null && serverDataType!=null){
+			if((serverDataType.toLowerCase()).charAt(0)==serverType){
+				flag=true;
+			}
+		}
+		if(config!=null && clientDataType!=null){
+			if((clientDataType.toLowerCase()).charAt(0)==clientType){
+				flag=true;
+			}
+		}
+		return flag;		
+	}
+	
+	protected Boolean isAllowed(String sensorName, String config ){
+		return(config.equalsIgnoreCase(sp.getString(sensorName+"config", "")));		
 	}
 
 }

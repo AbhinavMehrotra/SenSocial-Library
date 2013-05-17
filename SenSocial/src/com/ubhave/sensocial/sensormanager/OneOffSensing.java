@@ -20,7 +20,7 @@ import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
 import com.ubhave.sensormanager.data.SensorData;
 
-public class SampleAllConfiguredSensors extends AsyncTask<Void, Void, ArrayList<SensorData>>
+public class OneOffSensing extends AsyncTask<Void, Void, ArrayList<SensorData>>
 {
 	final private String TAG = "SNnMB";
 	private final ESSensorManager sensorManager;
@@ -28,7 +28,7 @@ public class SampleAllConfiguredSensors extends AsyncTask<Void, Void, ArrayList<
 	private ArrayList<Integer> SensorIds;
 	private String message;
 
-	public SampleAllConfiguredSensors(Context context, ArrayList<Integer> SensorIds, String message) throws ESException
+	public OneOffSensing(Context context, ArrayList<Integer> SensorIds, String message) throws ESException
 	{
 		this.context=context;
 		this.SensorIds=SensorIds;

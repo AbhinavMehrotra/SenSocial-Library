@@ -2,7 +2,7 @@ package com.ubhave.sensocial.sensormanager;
 
 import java.util.ArrayList;
 
-import com.ubhave.sensocial.configuration.SensorConfiguration;
+import com.ubhave.sensocial.filters.SensorConfiguration;
 
 import android.content.Context;
 import android.content.SharedPreferences;

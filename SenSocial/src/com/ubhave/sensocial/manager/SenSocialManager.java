@@ -13,7 +13,6 @@ import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import com.ubhave.sensocial.configuration.FacebookConfiguration;
-import com.ubhave.sensocial.configuration.SensorConfiguration;
 import com.ubhave.sensocial.configuration.ServerConfiguration;
 import com.ubhave.sensocial.configuration.TwitterConfiguration;
 import com.ubhave.sensocial.exceptions.InvalidSensorException;
@@ -21,7 +20,8 @@ import com.ubhave.sensocial.exceptions.InvalidSensorNameException;
 import com.ubhave.sensocial.exceptions.NullPointerException;
 import com.ubhave.sensocial.exceptions.UnauthorizedUserException;
 import com.ubhave.sensocial.exceptions.XMLFileException;
-import com.ubhave.sensocial.filters.XMLRefinerForClientServerConfiguration;
+import com.ubhave.sensocial.filters.PrivacyPolicyDescriptorParser;
+import com.ubhave.sensocial.filters.SensorConfiguration;
 import com.ubhave.sensocial.http.HTTPService;
 import com.ubhave.sensocial.http.IdSenderToDisableTrigger;
 import com.ubhave.sensocial.listener.SensorDataListener;
@@ -58,7 +58,7 @@ public class SenSocialManager{
 		else{
 			uuId=sp.getString("uuid", "null");
 		}
-		new XMLRefinerForClientServerConfiguration(context).refineXML();
+		new PrivacyPolicyDescriptorParser(context).refineXML();
 	}
 
 	/**
@@ -158,16 +158,34 @@ public class SenSocialManager{
 		}
 	}
 
+//	<<<Removed this method as it uses the ServerConfiguration, which is now automated (See the method below).>>>
+//	/**
+//	 * Method to start the android background-service. It will automatically start HTTP or MQTT service according to the
+//	 * configuration set in the ServerConfiguration. It is mandatory to set 
+//	 * @param sensorConfig SensorConfiguration object.
+//	 * @param serverConfig ServerConfiguration object.
+//	 * @throws NullPointerException If SensorConfiguration or ServerConfiguration is not initialized and configured.
+//	 */
+//	public void startService(SensorConfiguration sensorConfig,	ServerConfiguration serverConfig) throws NullPointerException{
+//		if(sensorConfig==null || serverConfig==null ){
+//			Log.e(TAG, "Service can not be started");
+//			throw new NullPointerException("Objects are not initialized");
+//		}
+//		else{
+//			Log.d(TAG, "Starting the service");
+//			new SenSocialService().startService(context);			
+//		}
+//	}
+	
 	/**
 	 * Method to start the android background-service. It will automatically start HTTP or MQTT service according to the
-	 * configuration set in the ServerConfiguration. It is mandatory to set 
-	 * @param sensorConfig SensorConfiguration object.
+	 * configuration set in the ServerConfiguration. It is mandatory to set ServerConfiguration.
 	 * @param serverConfig ServerConfiguration object.
-	 * @throws NullPointerException If SensorConfiguration or ServerConfiguration is not initialized and configured.
+	 * @throws NullPointerException If ServerConfiguration is not configured.
 	 */
-	public void startService(SensorConfiguration sensorConfig,	ServerConfiguration serverConfig) throws NullPointerException{
-		if(sensorConfig==null || serverConfig==null ){
-			Log.d(TAG, "Service can not be started");
+	public void startService(ServerConfiguration serverConfig) throws NullPointerException{
+		if(serverConfig==null ){
+			Log.e(TAG, "Service can not be started");
 			throw new NullPointerException("Objects are not initialized");
 		}
 		else{

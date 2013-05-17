@@ -29,7 +29,7 @@ public class FacebookConfiguration {
 	}
 	
 	/**
-	 * 'Getter for Facebook app's client secret id
+	 * Getter for Facebook app's client secret id
 	 * @return String Facebook app's client secret id
 	 */
 	public String getFacebookClientSecretId() {
