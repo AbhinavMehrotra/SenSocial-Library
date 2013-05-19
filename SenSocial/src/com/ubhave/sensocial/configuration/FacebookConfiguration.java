@@ -41,7 +41,7 @@ public class FacebookConfiguration {
 	 * @param clientId String Facebook app's client id
 	 * @param clientSecretId String Facebook app's client secret id
 	 */
-	public void subscribeToFacebook(String clientId, String clientSecretId) {
+	public void setFacebookId(String clientId, String clientSecretId) {
 		Editor ed=sp.edit();
 		ed.putBoolean("facebook", true);
 		ed.putString("fbClientId", clientId);

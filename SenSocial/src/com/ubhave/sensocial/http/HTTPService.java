@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.ubhave.sensocial.filters.GetNewFilterFromServerr;
+import com.ubhave.sensocial.filters.SensorConfiguration;
 import com.ubhave.sensocial.listener.SocialNetworkListenerManager;
 import com.ubhave.sensocial.listener.SocialNetworkListner;
 import com.ubhave.sensocial.manager.SenSocialManager;
@@ -106,22 +107,45 @@ public class HTTPService extends Service {
 */		
 		
 		/* The newUpdate is the trigger message received from server.
-		 * First char refers to the new filter set by the developer, it can be Y or N.
+		 * First char refers to the new filter set by the developer, it can be 0, 1 or 2.
+		 * 0:no filter
+		 * 1:delete and set new filter
+		 * 2:append filter
+		 * 3:delete configuration
 		 * Second char can  be 1,2, or 3. 1:sense for OSN update, 2: independent one-off sensing, 3: independent continuous sensing.
 		 * Third char refers to the new update from OSN, 1 means new update and 0 means no update.	
 		 */
 		char ch= newUpdate.charAt(0);
-		if(ch=='y' || ch=='Y'){
-			//unsubscribe all sensing
+		if(ch!=0){
+			//unsubscribe if stream-sensing is ON
 			Editor ed=sp.edit();
-			ed.putBoolean("streamsensing", false);
-			ed.commit();
-			new StartPullSensors(getApplicationContext()).stopIndependentContinuousStreamSensing();
+			if(sp.getBoolean("streamsensing", false)){
+				ed.putBoolean("streamsensing", false);
+				ed.commit();
+				new StartPullSensors(getApplicationContext()).stopIndependentContinuousStreamSensing();
+			}
 			
-			//get new filter and subscribe sensors
+			
 			ed.putBoolean("Filter", true);
 			ed.commit();
-			new GetNewFilterFromServerr().downloadFilter(getApplicationContext());
+			if(ch=='1' || ch=='2'){
+				if(ch=='1'){
+					for(String configuration:sp.getStringSet("FilterSet", null)){
+						for(String condition:sp.getStringSet(configuration,null)){
+							ed.remove(condition);
+						}
+						ed.remove(configuration);
+					}
+					ed.remove("FilterSet");
+					ed.commit();
+				}
+				//get new filter and subscribe sensors
+				new GetNewFilterFromServerr().downloadFilter(getApplicationContext());
+			}		
+			else if(ch=='3'){
+				new SensorConfiguration(getApplicationContext()).unsubscribeConfiguration(newUpdate.substring(4, newUpdate.indexOf("CONFIG")));
+			}
+			
 		}
 		
 		if(sp.getBoolean("Filter", false) && sp.getBoolean("SensorsConfigured", false)){

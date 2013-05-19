@@ -1,15 +1,18 @@
 package com.ubhave.sensocial.filters;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.ubhave.sensocial.exceptions.InvalidSensorException;
 import com.ubhave.sensocial.sensormanager.AllPullSensors;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+@SuppressLint("NewApi")
 public class SensorConfiguration {
 	private SharedPreferences sp;
 	private Context context;
@@ -92,6 +95,10 @@ public class SensorConfiguration {
 		ed.commit();
 	}
 	
+	/**
+	 * Method to unsubscribe all sensors.
+	 * This is called before setting a new filter.
+	 */
 	private void unsubscribeAllSensors(){
 		Editor ed=sp.edit();
 		ed.putBoolean("accelerometer", false);
@@ -100,6 +107,43 @@ public class SensorConfiguration {
 		ed.putBoolean("location", false);
 		ed.putBoolean("microphone", false);
 	}
+	
+		
+	/**
+	 * Method to unsubscribe a configuration 
+	 * @param configName String (Configuration Name)
+	 */
+	public void unsubscribeConfiguration(String configName){
+		Set<String> conditions= new HashSet<String>();
+		Set<String> sensors= new HashSet<String>();
+		Editor ed=sp.edit();
+		conditions= sp.getStringSet(configName, null);
+		if(conditions!=null){
+			for(String condition:conditions){
+				ed.remove(condition);
+			}
+		}
+		ed.remove(configName);
+		ed.commit();
+		//unsubscribe and then subscribe all the sensors for remaining configurations.
+		unsubscribeAllSensors();
+		for(String configuration:sp.getStringSet("FilterSet", null)){
+			for(String condition:sp.getStringSet(configuration,null)){
+				//not subscribing the sensor for required data, as after the condition 
+				//is satisfied we do oneoff sensing for this sensor
+				if(condition.startsWith("RD")){ 
+					continue;
+				}
+				sensors.clear();
+				for(String activity:sp.getStringSet(condition, null)){
+					sensors.add(getSensorNameForActivity(activity));
+				}
+				subscribeSensors(sensors);
+			}
+		}
+	}
+	
+	
 	
 	/**
 	 * Method to get the list of sensors ids which have been set as true.
@@ -113,6 +157,22 @@ public class SensorConfiguration {
 		if(sp.getBoolean("location", false)) sensorIds.add(AllPullSensors.SENSOR_TYPE_LOCATION);
 		if(sp.getBoolean("microphone", false)) sensorIds.add(AllPullSensors.SENSOR_TYPE_MICROPHONE);		
 		return sensorIds;
+	}
+	
+	/**
+	 * Method to find the sensor associated with the activity
+	 * @param activity name (String)
+	 * @return sensor name (String)
+	 */
+	protected static String getSensorNameForActivity(String activity){
+		String sensorName = null;
+		for( ActivitiesList activities:ActivitiesList.values()){
+			if(activities.getActivityName().equalsIgnoreCase(activity)){
+				sensorName=activities.getSensorName();
+				break;
+			}
+		}
+		return sensorName;		
 	}
 	
 }

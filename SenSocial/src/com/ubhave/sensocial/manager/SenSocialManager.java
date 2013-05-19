@@ -68,7 +68,7 @@ public class SenSocialManager{
 	 * @param activity Activity from which it is called.
 	 * @param FBConfig FacebookConfiguration object. 
 	 */
-	public void authenticateAndEnableFacebookTriggers(Activity activity, FacebookConfiguration FBConfig){
+	public void authenticateFacebook(Activity activity, FacebookConfiguration FBConfig){
 		AF=new AuthenticateFacebook(context, FBConfig.getFacebookClientId(), FBConfig.getFacebookClientSecretId());
 		AF.tryLogin(activity);
 	}
@@ -118,7 +118,7 @@ public class SenSocialManager{
 	 * @param activity Activity from which it is called.
 	 * @param TwitterConfig TwitterConfiguration object.
 	 */
-	public void authenticateAndEnableTwitterTriggers(Activity activity, TwitterConfiguration TwitterConfig){
+	public void authenticateTwitter(Activity activity, TwitterConfiguration TwitterConfig){
 		AT=new AuthenticateTwitter(context, TwitterConfig.getTwitterConsumerKey(), TwitterConfig.getTwitterConsumerSecretKey());
 		AT.tryLogin(activity);
 	}
@@ -202,16 +202,17 @@ public class SenSocialManager{
 		new SenSocialService().stopService(context);
 	}
 
-	public boolean serviceIsRunning() {
-		return new SenSocialService().isRunning(context);
-	}
+//	<<This method can be exposed to know if the service is running or not.>>
+//	public boolean serviceIsRunning() {
+//		return new SenSocialService().isRunning(context);
+//	}
 	
 	/**
 	 * Method to unsubscribe any sensor for the configured sensors.
 	 * @param sensor String Sensor Name: accelerometer, bluetooth, wifi, microphone, location.
 	 * @throws InvalidSensorNameException Caused when the sensor name is invalid.
 	 */
-	public void stopSensingFromThisSensor(String sensor) throws InvalidSensorNameException{
+	public void stopSensing(String sensor) throws InvalidSensorNameException{
 		Editor ed=sp.edit();
 		if(sensor.equals("accelerometer")) ed.putBoolean("accelerometer", false);
 		else if(sensor.equals("bluetooth")) ed.putBoolean("bluetooth", false);
@@ -221,36 +222,23 @@ public class SenSocialManager{
 		else throw new InvalidSensorNameException();
 	}
 
-	/**
-	 * Method to register a listener(SocialNetworkListner) to receive updates from social network.
-	 * @param listener SocialNetworkPostListner object
-	 */
-	public void registerSocialNetworkListener(SocialNetworkListner listener){
-		SocialNetworkListenerManager.add(listener);
-	}
+	
 
 	/**
-	 * Method to unregister a listener(SocialNetworkListner) to receive updates from social network.
-	 * @param listener SocialNetworkPostListner object
+	 * Method to register a listener(SensorListener) for the specific configuration to receive sensor data.
+	 * @param listener SensorListener Object
+	 * @param configuration Configuration name for which which listener will receive data
 	 */
-	public void unregisterSocialNetworkListener(SocialNetworkListner listener) {
-		SocialNetworkListenerManager.remove(listener);
-	}
-
-	/**
-	 * Method to register a listener(SensorDataListener) to receive sensor data.
-	 * @param listener SensorDataListener object
-	 */
-	public void registerSensorDataListener(SensorDataListener listener){
-		SensorDataListenerManager.add(listener);
+	public void registerSensorListener(SensorListener listener, String configuration){
+		SensorListenerManager.add(listener, configuration);
 	}
 
 	/**
 	 * Method to unregister a listener(SensorDataListener) to receive sensor data.
 	 * @param listener SensorDataListener object
 	 */
-	public void unregisterSensorDataListener(SensorDataListener listener) {
-		SensorDataListenerManager.remove(listener);
+	public void unregisterSensorListener(SensorListener listener) {
+		SensorListenerManager.remove(listener);
 	}
 
 }

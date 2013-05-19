@@ -77,4 +77,5 @@ public class SensorDataListenerManager {
 		if(data.get("wifi")==null) data.put("wifi", "not configured");
 		return data;		
 	}
+	
 }

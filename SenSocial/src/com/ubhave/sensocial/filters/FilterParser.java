@@ -74,7 +74,7 @@ public class FilterParser {
 										activity_name=((Element)eElement1.getChildNodes().item(j)).getAttribute("name");
 										System.out.println("Activity: "+activity_name);
 										condition.add(activity_name);
-										sensorList.add(getSensorNameForActivity(activity_name));
+										sensorList.add(SensorConfiguration.getSensorNameForActivity(activity_name));
 									}									
 								}
 								ed.putStringSet(condition_name, condition);
@@ -94,7 +94,7 @@ public class FilterParser {
 								for(int j=0;j<eElement2.getChildNodes().getLength();j++){
 									if(eElement2.getChildNodes().item(j).getNodeType()==Node.ELEMENT_NODE){
 										System.out.println("element: "+((Element)eElement2.getChildNodes().item(j)).getAttribute("name"));
-										rd=((Element)eElement2.getChildNodes().item(j)).getAttribute("name");
+										rd="RD"+((Element)eElement2.getChildNodes().item(j)).getAttribute("name");
 										
 										
 										if(((Element)((Element) eElement2.getChildNodes().item(j)).getElementsByTagName("server").item(0)).getAttribute("required").equals("true")){
@@ -166,19 +166,5 @@ public class FilterParser {
 		}
 	}
 	
-	/**
-	 * Method to find the sensor associated with the activity
-	 * @param activity name (String)
-	 * @return sensor name (String)
-	 */
-	private String getSensorNameForActivity(String activity){
-		String sensorName = null;
-		for( ActivitiesList activities:ActivitiesList.values()){
-			if(activities.getActivityName().equalsIgnoreCase(activity)){
-				sensorName=activities.getSensorName();
-				break;
-			}
-		}
-		return sensorName;		
-	}
+	
 }

@@ -43,7 +43,7 @@ public class TwitterConfiguration {
 	 * @param consumerKey Twitter app consumer key
 	 * @param consumerSecretKey Twitter app consumer secret key
 	 */
-	public void subscribeToTwitter(String consumerKey, String consumerSecretKey) {
+	public void setTwitterIds(String consumerKey, String consumerSecretKey) {
 		Editor ed=sp.edit();
 		ed.putBoolean("twitter", true);
 		ed.putString("consumerKey", consumerKey);
