@@ -39,5 +39,15 @@ public class AllPullSensors {
 		if(id==SENSOR_TYPE_WIFI) sensor="wifi";		
 		return sensor;
 	}
+	
+	public int getSensorIdByName(String sensor){
+		int id=0;
+		if(sensor.equalsIgnoreCase("accelerometer")) id = SENSOR_TYPE_ACCELEROMETER;
+		else if(sensor.equalsIgnoreCase("bluetooth")) id = SENSOR_TYPE_BLUETOOTH;
+		else if(sensor.equalsIgnoreCase("location")) id = SENSOR_TYPE_LOCATION;
+		else if(sensor.equalsIgnoreCase("microphone")) id = SENSOR_TYPE_MICROPHONE;
+		else if(sensor.equalsIgnoreCase("wifi")) id = SENSOR_TYPE_WIFI;
+		return id;
+	}
 
 }

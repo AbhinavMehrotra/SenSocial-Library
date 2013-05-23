@@ -2,7 +2,7 @@ package com.ubhave.sensocial.data;
 
 import com.ubhave.sensormanager.data.SensorData;
 
-public abstract class SocialEvent {
+public class SocialEvent {
 
 	private SocialData socialData;
 	

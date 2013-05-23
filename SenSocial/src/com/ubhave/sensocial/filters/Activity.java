@@ -2,14 +2,14 @@ package com.ubhave.sensocial.filters;
 
 import com.ubhave.sensocial.sensormanager.AllPullSensors;
 
-public enum ActivitiesList {
+public enum Activity {
 	act1("standing",getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER)),
 	act2("sitting",getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER));
 	
 	private final String activity;
 	private final String sensor;
 	
-	ActivitiesList(String activityName, String sensorName){
+	Activity(String activityName, String sensorName){
 		activity=activityName;
 		sensor=sensorName;
 	}

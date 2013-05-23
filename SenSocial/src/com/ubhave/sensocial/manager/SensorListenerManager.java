@@ -1,7 +1,10 @@
 package com.ubhave.sensocial.manager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.ubhave.sensocial.data.SocialEvent;
 
 public class SensorListenerManager {
 
@@ -26,15 +29,29 @@ public class SensorListenerManager {
 		listeners.remove(listener);
 	}
 	
+//	/**
+//	 * Method to fire updates to the registered SensorListeners on specific configuration.
+//	 * @param sensor_data Sensor Data for which the listener is configured
+//	 * @param configuration Configuration name
+//	 */
+//	protected static void fireUpdate(Object sensor_data, String configuration) {
+//		for (Map.Entry<SensorListener, String> listener: listeners.entrySet()) {
+//			if(listener.getValue().equalsIgnoreCase(configuration)){
+//				listener.getKey().onDataSensed(sensor_data);
+//			}
+//		}
+//	}
+	
 	/**
 	 * Method to fire updates to the registered SensorListeners on specific configuration.
-	 * @param sensor_data Sensor Data for which the listener is configured
-	 * @param configuration Configuration name
+	 * @param socialEvent ArrayList
 	 */
-	protected static void fireUpdate(Object sensor_data, String configuration) {
-		for (Map.Entry<SensorListener, String> listener: listeners.entrySet()) {
-			if(listener.getValue().equalsIgnoreCase(configuration)){
-				listener.getKey().onDataSensed(sensor_data);
+	public static void fireUpdate(ArrayList<SocialEvent> socialEvent){
+		for(int i=0;i<socialEvent.size();i++){
+			for (Map.Entry<SensorListener, String> listener: listeners.entrySet()) {
+				if(listener.getValue().equalsIgnoreCase(socialEvent.get(i).getFilteredSensorData().getConfigurationName())){
+					listener.getKey().onDataSensed(socialEvent.get(i));
+				}
 			}
 		}
 	}

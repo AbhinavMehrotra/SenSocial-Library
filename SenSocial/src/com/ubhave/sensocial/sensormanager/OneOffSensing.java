@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.ubhave.dataformatter.DataFormatter;
 import com.ubhave.dataformatter.json.JSONFormatter;
+import com.ubhave.sensocial.filters.FilterSensedData;
 import com.ubhave.sensocial.filters.SensorDataFilterManager;
 import com.ubhave.sensocial.http.SendSensorDataToServer;
 import com.ubhave.sensormanager.ESException;
@@ -64,7 +65,8 @@ public class OneOffSensing extends AsyncTask<Void, Void, ArrayList<SensorData>>
 	public void onPostExecute(ArrayList<SensorData> data){
 		Log.d(TAG,"Stopped sensing");
 		if(data!=null){
-			new SensorDataFilterManager(data, SensorIds, context, message).pushSensorDataAccordingToXML();
+//			new SensorDataFilterManager(data, SensorIds, context, message).pushSensorDataAccordingToXML();
+			new FilterSensedData(context).FilterAndFireData(data);			
 		}
 		
 	}

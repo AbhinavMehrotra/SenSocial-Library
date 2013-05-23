@@ -90,7 +90,9 @@ public class SensorConfiguration {
 		unsubscribeAllSensors(); 
 		Editor ed=sp.edit();
 		for(String sensor:sensors){
-			ed.putBoolean(sensor, true);
+			if(!sensor.equalsIgnoreCase("all")){  //not to subscribe any sensor if the condition is all 
+				ed.putBoolean(sensor, true);				
+			}
 		}
 		ed.commit();
 	}
@@ -108,6 +110,18 @@ public class SensorConfiguration {
 		ed.putBoolean("microphone", false);
 	}
 	
+	/**
+	 * Method to subscribe all sensors.
+	 * This is called before setting a new filter.
+	 */
+	private void subscribeAllSensors(){
+		Editor ed=sp.edit();
+		ed.putBoolean("accelerometer", true);
+		ed.putBoolean("bluetooth", true);
+		ed.putBoolean("wifi", true);
+		ed.putBoolean("location", true);
+		ed.putBoolean("microphone", true);
+	}
 		
 	/**
 	 * Method to unsubscribe a configuration 
@@ -166,7 +180,7 @@ public class SensorConfiguration {
 	 */
 	protected static String getSensorNameForActivity(String activity){
 		String sensorName = null;
-		for( ActivitiesList activities:ActivitiesList.values()){
+		for( Activity activities:Activity.values()){
 			if(activities.getActivityName().equalsIgnoreCase(activity)){
 				sensorName=activities.getSensorName();
 				break;

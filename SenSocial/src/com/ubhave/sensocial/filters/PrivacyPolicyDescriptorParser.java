@@ -42,7 +42,7 @@ public class PrivacyPolicyDescriptorParser {
 		try {
 			
 			
-			InputStream in=context.getResources().openRawResource(R.raw.clientserverconfig);
+			InputStream in=context.getResources().openRawResource(R.raw.ppd);
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(in);
@@ -59,7 +59,9 @@ public class PrivacyPolicyDescriptorParser {
 							throw new InvalidSensorException(sensor+" is not a valid sensor name.");
 						}
 						if(((Element) eElement.getElementsByTagName("server").item(0)).getAttribute("required").equals("true")){
-							if(((Element) eElement.getElementsByTagName("server").item(0)).getAttribute("data").equals("raw")){
+							if(((Element) eElement.getElementsByTagName("server").item(0)).getAttribute("data").equals("both")){
+								sConfig="SYA";
+							}else if(((Element) eElement.getElementsByTagName("server").item(0)).getAttribute("data").equals("raw")){
 								sConfig="SYR";
 							}else{
 								sConfig="SYC";
@@ -69,10 +71,12 @@ public class PrivacyPolicyDescriptorParser {
 							sConfig="SNO";
 						}
 						if(((Element) eElement.getElementsByTagName("client").item(0)).getAttribute("required").equals("true")){
-							if(((Element) eElement.getElementsByTagName("client").item(0)).getAttribute("data").equals("raw")){
-								cConfig="CTR";
+							if(((Element) eElement.getElementsByTagName("client").item(0)).getAttribute("data").equals("both")){
+								cConfig="CYA";
+							}else if(((Element) eElement.getElementsByTagName("client").item(0)).getAttribute("data").equals("raw")){
+								cConfig="CYR";
 							}else{
-								cConfig="CTC";
+								cConfig="CYC";
 							}
 						}
 						else{
@@ -141,5 +145,6 @@ public class PrivacyPolicyDescriptorParser {
 	protected Boolean isAllowed(String sensorName, String config ){
 		return(config.equalsIgnoreCase(sp.getString(sensorName+"config", "")));		
 	}
+	
 
 }

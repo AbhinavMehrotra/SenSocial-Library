@@ -1,10 +1,12 @@
 package com.ubhave.sensocial.manager;
 
+import com.ubhave.sensocial.data.SocialEvent;
+
 public interface SensorListener {
 
 	/**
-	 * Listener for sensor data
-	 * @param sensor_data The data-type may be String (for classified data) or SensorData (for raw data). 
+	 * Listener
+	 * @param sensor_event SocialEvent
 	 */
-	void onDataSensed(Object sensor_data);
+	void onDataSensed(SocialEvent sensor_event);
 }

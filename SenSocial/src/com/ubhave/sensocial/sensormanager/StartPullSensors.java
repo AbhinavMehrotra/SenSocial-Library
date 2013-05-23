@@ -16,9 +16,10 @@ public class StartPullSensors {
 	private ArrayList<Integer> SensorIds;
 	private final Context context;
 	private String message;
+	private AllPullSensors aps;
 
 	public StartPullSensors(Context context){
-		AllPullSensors aps=new AllPullSensors(context);
+		aps=new AllPullSensors(context);
 		this.SensorIds=aps.getIds();
 		this.context=context;
 	}
@@ -52,6 +53,26 @@ public class StartPullSensors {
 	
 	public void stopIndependentContinuousStreamSensing(){
 		try {
+			new ContinuousStreamSensing (context, SensorIds).stopSensing();
+		} catch (ESException e) {
+			Log.e(TAG, e.toString());
+		}
+	}
+	
+	public void startIndependentContinuousStreamSensing(String sensor){
+		try {
+			ArrayList<Integer> SensorIds=new ArrayList<Integer>();
+			SensorIds.add(aps.getSensorIdByName(sensor));
+			new ContinuousStreamSensing (context, SensorIds).startSensing();
+		} catch (ESException e) {
+			Log.e(TAG, e.toString());
+		}
+	}
+	
+	public void stopIndependentContinuousStreamSensing(String sensor){
+		try {
+			ArrayList<Integer> SensorIds=new ArrayList<Integer>();
+			SensorIds.add(aps.getSensorIdByName(sensor));
 			new ContinuousStreamSensing (context, SensorIds).stopSensing();
 		} catch (ESException e) {
 			Log.e(TAG, e.toString());

@@ -74,7 +74,12 @@ public class FilterParser {
 										activity_name=((Element)eElement1.getChildNodes().item(j)).getAttribute("name");
 										System.out.println("Activity: "+activity_name);
 										condition.add(activity_name);
-										sensorList.add(SensorConfiguration.getSensorNameForActivity(activity_name));
+										if(activity_name.equalsIgnoreCase("all")){
+											sensorList.add(activity_name);
+										}
+										else{
+											sensorList.add(SensorConfiguration.getSensorNameForActivity(activity_name));											
+										}
 									}									
 								}
 								ed.putStringSet(condition_name, condition);

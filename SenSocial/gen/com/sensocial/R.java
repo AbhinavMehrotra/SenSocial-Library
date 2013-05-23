@@ -253,7 +253,8 @@ containing a value of this type.
         public static int activity_main=0x7f0a0000;
     }
     public static final class raw {
-        public static int clientserverconfig=0x7f040000;
+        public static int filter=0x7f040000;
+        public static int ppd=0x7f040001;
     }
     public static final class string {
         public static int app_name=0x7f060019;

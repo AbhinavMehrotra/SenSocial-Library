@@ -3,6 +3,7 @@
     <issue id="NewApi">
         <ignore path="src\com\sensocial\http\HTTPService.java" />
         <ignore path="src\com\ubhave\sensocial\filters\FilterParser.java" />
+        <ignore path="src\com\ubhave\sensocial\filters\FilterSensedData.java" />
         <ignore path="src\com\ubhave\sensocial\http\HTTPService.java" />
         <ignore path="src\com\ubhave\sensocial\mqtt\MQTTService.java" />
         <ignore path="src\com\ubhave\sensocial\socialnetworks\AuthenticateTwitter.java" />

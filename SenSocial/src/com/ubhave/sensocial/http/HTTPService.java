@@ -120,7 +120,8 @@ public class HTTPService extends Service {
 			//unsubscribe if stream-sensing is ON
 			Editor ed=sp.edit();
 			if(sp.getBoolean("streamsensing", false)){
-				ed.putBoolean("streamsensing", false);
+				ed.putBoolean("" +
+						"streamsensing", false);
 				ed.commit();
 				new StartPullSensors(getApplicationContext()).stopIndependentContinuousStreamSensing();
 			}
@@ -160,7 +161,7 @@ public class HTTPService extends Service {
 		case ('0'):
 			Log.d(TAG, "No new configuration for this client.");
 		case ('1'):
-			if(newUpdate.startsWith("1Y")&& sp.getBoolean("sensing", false)==false){
+			if(newUpdate.startsWith("01Y")&& sp.getBoolean("sensing", false)==false){
 				Log.d(TAG, "Sensing configured for for OSN update only. \nFound a new update.");
 				Editor ed=sp.edit();
 				ed.putBoolean("sensing", true);
@@ -173,7 +174,7 @@ public class HTTPService extends Service {
 			}
 			break;
 		case ('2'):
-			if(newUpdate.startsWith("2Y")&& sp.getBoolean("oneoffsensing", false)==false){
+			if(newUpdate.startsWith("02Y")&& sp.getBoolean("oneoffsensing", false)==false){
 				Log.d(TAG, "Independent one-off sensing configured.");
 				Editor ed=sp.edit();
 				ed.putBoolean("oneoffsensing", true);
@@ -189,7 +190,7 @@ public class HTTPService extends Service {
 			}
 			break;
 		case ('3'):
-			if(newUpdate.startsWith("3Y")&& sp.getBoolean("streamsensing", false)==false){
+			if(newUpdate.startsWith("03Y")&& sp.getBoolean("streamsensing", false)==false){
 				Log.d(TAG, "Independent continuous-stream sensing configured.");
 				Editor ed=sp.edit();
 				ed.putBoolean("streamsensing", true);
@@ -197,7 +198,7 @@ public class HTTPService extends Service {
 				SocialNetworkListenerManager.newUpdateArrived(getApplicationContext(),newUpdate);
 				new StartPullSensors(getApplicationContext()).startIndependentContinuousStreamSensing();
 			}
-			else if(newUpdate.startsWith("3N")){
+			else if(newUpdate.startsWith("03N")){
 				Log.d(TAG, "Independent continuous-stream sensing unconfigured.");
 				Editor ed=sp.edit();
 				ed.putBoolean("streamsensing", false);

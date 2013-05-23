@@ -28,6 +28,7 @@ import com.ubhave.sensocial.listener.SensorDataListener;
 import com.ubhave.sensocial.listener.SensorDataListenerManager;
 import com.ubhave.sensocial.listener.SocialNetworkListner;
 import com.ubhave.sensocial.mqtt.PushCallback;
+import com.ubhave.sensocial.sensormanager.StartPullSensors;
 import com.ubhave.sensocial.socialnetworks.AuthenticateFacebook;
 import com.ubhave.sensocial.socialnetworks.AuthenticateTwitter;
 import com.ubhave.sensocial.listener.SocialNetworkListenerManager;;
@@ -86,7 +87,7 @@ public class SenSocialManager{
 		//AF=new AuthenticateFacebook(context, FBConfig.getFacebookClientId(), FBConfig.getFacebookClientSecretId());
 		AF.insideOnActivityResult(currentActivity, requestCode, resultCode, data);
 	}
-	
+
 	/**
 	 * Method to retreive Facebook user name, after successful login.
 	 * It returns null if user is not logged-in.
@@ -133,7 +134,7 @@ public class SenSocialManager{
 	public User twitterOnNewIntent(Intent intent){
 		return AT.insideOnNewIntent(intent);
 	}
-	
+
 	/**
 	 * Method to retreive Twitter user name, after successful login.
 	 * It returns null if user is not logged-in.
@@ -158,25 +159,25 @@ public class SenSocialManager{
 		}
 	}
 
-//	<<<Removed this method as it uses the ServerConfiguration, which is now automated (See the method below).>>>
-//	/**
-//	 * Method to start the android background-service. It will automatically start HTTP or MQTT service according to the
-//	 * configuration set in the ServerConfiguration. It is mandatory to set 
-//	 * @param sensorConfig SensorConfiguration object.
-//	 * @param serverConfig ServerConfiguration object.
-//	 * @throws NullPointerException If SensorConfiguration or ServerConfiguration is not initialized and configured.
-//	 */
-//	public void startService(SensorConfiguration sensorConfig,	ServerConfiguration serverConfig) throws NullPointerException{
-//		if(sensorConfig==null || serverConfig==null ){
-//			Log.e(TAG, "Service can not be started");
-//			throw new NullPointerException("Objects are not initialized");
-//		}
-//		else{
-//			Log.d(TAG, "Starting the service");
-//			new SenSocialService().startService(context);			
-//		}
-//	}
-	
+	//	<<<Removed this method as it uses the ServerConfiguration, which is now automated (See the method below).>>>
+	//	/**
+	//	 * Method to start the android background-service. It will automatically start HTTP or MQTT service according to the
+	//	 * configuration set in the ServerConfiguration. It is mandatory to set 
+	//	 * @param sensorConfig SensorConfiguration object.
+	//	 * @param serverConfig ServerConfiguration object.
+	//	 * @throws NullPointerException If SensorConfiguration or ServerConfiguration is not initialized and configured.
+	//	 */
+	//	public void startService(SensorConfiguration sensorConfig,	ServerConfiguration serverConfig) throws NullPointerException{
+	//		if(sensorConfig==null || serverConfig==null ){
+	//			Log.e(TAG, "Service can not be started");
+	//			throw new NullPointerException("Objects are not initialized");
+	//		}
+	//		else{
+	//			Log.d(TAG, "Starting the service");
+	//			new SenSocialService().startService(context);			
+	//		}
+	//	}
+
 	/**
 	 * Method to start the android background-service. It will automatically start HTTP or MQTT service according to the
 	 * configuration set in the ServerConfiguration. It is mandatory to set ServerConfiguration.
@@ -202,11 +203,11 @@ public class SenSocialManager{
 		new SenSocialService().stopService(context);
 	}
 
-//	<<This method can be exposed to know if the service is running or not.>>
-//	public boolean serviceIsRunning() {
-//		return new SenSocialService().isRunning(context);
-//	}
-	
+	//	<<This method can be exposed to know if the service is running or not.>>
+	//	public boolean serviceIsRunning() {
+	//		return new SenSocialService().isRunning(context);
+	//	}
+
 	/**
 	 * Method to unsubscribe any sensor for the configured sensors.
 	 * @param sensor String Sensor Name: accelerometer, bluetooth, wifi, microphone, location.
@@ -220,9 +221,31 @@ public class SenSocialManager{
 		else if(sensor.equals("microphone")) ed.putBoolean("microphone", false);
 		else if(sensor.equals("location")) ed.putBoolean("location", false);
 		else throw new InvalidSensorNameException();
+		//if OSN independent sensing is On for this sensor then stop it
+		if(sp.getBoolean("streamsensing", false)){
+			new StartPullSensors(context).stopIndependentContinuousStreamSensing();
+		}
 	}
 
-	
+	/**
+	 * Method to subscribe any sensor for the configured sensors.
+	 * @param sensor String Sensor Name: accelerometer, bluetooth, wifi, microphone, location.
+	 * @throws InvalidSensorNameException Caused when the sensor name is invalid.
+	 */
+	public void startSensing(String sensor) throws InvalidSensorNameException{
+		Editor ed=sp.edit();
+		if(sensor.equals("accelerometer")) ed.putBoolean("accelerometer", true);
+		else if(sensor.equals("bluetooth")) ed.putBoolean("bluetooth", true);
+		else if(sensor.equals("wifi")) ed.putBoolean("wifi", true);
+		else if(sensor.equals("microphone")) ed.putBoolean("microphone", true);
+		else if(sensor.equals("location")) ed.putBoolean("location", true);
+		else throw new InvalidSensorNameException();
+		//if configured for OSN independent sensing the start it for this sensor
+		if(sp.getBoolean("streamsensing", false)){
+			new StartPullSensors(context).startIndependentContinuousStreamSensing();
+		}
+	}
+
 
 	/**
 	 * Method to register a listener(SensorListener) for the specific configuration to receive sensor data.
