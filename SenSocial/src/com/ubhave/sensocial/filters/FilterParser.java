@@ -155,7 +155,7 @@ public class FilterParser {
 					}					
 				}
 
-				ed.putStringSet("FilterSet", filter);
+				ed.putStringSet("ConfigurationSet", filter);
 				ed.commit();
 				new SensorConfiguration(context).subscribeSensors(sensorList);
 				fXmlFile.delete();

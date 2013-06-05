@@ -14,7 +14,7 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.ubhave.sensocial.filters.GetNewFilterFromServerr;
+import com.ubhave.sensocial.filters.GetFilterFromServer;
 import com.ubhave.sensocial.filters.SensorConfiguration;
 import com.ubhave.sensocial.listener.SocialNetworkListenerManager;
 import com.ubhave.sensocial.listener.SocialNetworkListner;
@@ -141,7 +141,7 @@ public class HTTPService extends Service {
 					ed.commit();
 				}
 				//get new filter and subscribe sensors
-				new GetNewFilterFromServerr().downloadFilter(getApplicationContext());
+				new GetFilterFromServer().downloadFilter(getApplicationContext());
 			}		
 			else if(ch=='3'){
 				new SensorConfiguration(getApplicationContext()).unsubscribeConfiguration(newUpdate.substring(4, newUpdate.indexOf("CONFIG")));

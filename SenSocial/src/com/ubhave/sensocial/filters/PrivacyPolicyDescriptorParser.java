@@ -124,7 +124,7 @@ public class PrivacyPolicyDescriptorParser {
 		return false;
 	}
 	
-	protected Boolean isAllowed(String sensorName, String serverDataType, String clientDataType ){
+	public Boolean isAllowed(String sensorName, String serverDataType, String clientDataType ){
 		Boolean flag=false;
 		String config=sp.getString(sensorName+"config", "");
 		char serverType=config.charAt(2);

@@ -40,8 +40,7 @@ public class ContinuousStreamSensing {
 			}
 
 			public void onCrossingLowBatteryThreshold(boolean arg0) {
-				// TODO Auto-generated method stub
-
+				// can pause sensing
 			}
 		};
 		ed=sp.edit();

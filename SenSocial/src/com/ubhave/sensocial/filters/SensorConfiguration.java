@@ -180,7 +180,7 @@ public class SensorConfiguration {
 	 */
 	protected static String getSensorNameForActivity(String activity){
 		String sensorName = null;
-		for( Activity activities:Activity.values()){
+		for( Modality activities:Modality.values()){
 			if(activities.getActivityName().equalsIgnoreCase(activity)){
 				sensorName=activities.getSensorName();
 				break;

@@ -14,7 +14,7 @@ import android.util.Log;
 
 import com.ubhave.sensocial.data.FilteredSensorData;
 import com.ubhave.sensocial.data.SocialEvent;
-import com.ubhave.sensocial.manager.SensorListenerManager;
+import com.ubhave.sensocial.manager.SSListenerManager;
 import com.ubhave.sensocial.sensordata.classifier.SensorDataClassifierManager;
 import com.ubhave.sensocial.sensormanager.AllPullSensors;
 import com.ubhave.sensocial.sensormanager.OneOffSensing;
@@ -126,7 +126,7 @@ public class FilterSensedData {
 						socialEventList.add(se);
 					}	
 					//fire social even to listeners
-					SensorListenerManager.fireUpdate(socialEventList);
+					SSListenerManager.fireUpdate(socialEventList);
 				}
 			}.execute();
 		} catch (ESException e) {

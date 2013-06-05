@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<sensorconfiguration>
+<ppd>
 	<sensor name="accelerometer">
 		<server required="true"
 		data="raw" />
@@ -30,4 +30,4 @@
 		<client required="true"
 		data="raw" />
 	</sensor>
-</sensorconfiguration>
+</ppd>

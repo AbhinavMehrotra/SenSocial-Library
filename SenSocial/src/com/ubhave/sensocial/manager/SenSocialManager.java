@@ -4,9 +4,7 @@ import java.util.UUID;
 
 import twitter4j.User;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -21,17 +19,10 @@ import com.ubhave.sensocial.exceptions.NullPointerException;
 import com.ubhave.sensocial.exceptions.UnauthorizedUserException;
 import com.ubhave.sensocial.exceptions.XMLFileException;
 import com.ubhave.sensocial.filters.PrivacyPolicyDescriptorParser;
-import com.ubhave.sensocial.filters.SensorConfiguration;
-import com.ubhave.sensocial.http.HTTPService;
 import com.ubhave.sensocial.http.IdSenderToDisableTrigger;
-import com.ubhave.sensocial.listener.SensorDataListener;
-import com.ubhave.sensocial.listener.SensorDataListenerManager;
-import com.ubhave.sensocial.listener.SocialNetworkListner;
-import com.ubhave.sensocial.mqtt.PushCallback;
 import com.ubhave.sensocial.sensormanager.StartPullSensors;
 import com.ubhave.sensocial.socialnetworks.AuthenticateFacebook;
 import com.ubhave.sensocial.socialnetworks.AuthenticateTwitter;
-import com.ubhave.sensocial.listener.SocialNetworkListenerManager;;
 
 public class SenSocialManager{
 
@@ -88,14 +79,6 @@ public class SenSocialManager{
 		AF.insideOnActivityResult(currentActivity, requestCode, resultCode, data);
 	}
 
-	/**
-	 * Method to retreive Facebook user name, after successful login.
-	 * It returns null if user is not logged-in.
-	 * @return String Facebook userName
-	 */
-	public String getFacebookUserName(){
-		return sp.getString("name", "null");
-	}
 
 	/**
 	 * This method disables Facebook triggers. After calling this method trigger will not be received from Faceboook.
@@ -136,15 +119,6 @@ public class SenSocialManager{
 	}
 
 	/**
-	 * Method to retreive Twitter user name, after successful login.
-	 * It returns null if user is not logged-in.
-	 * @return String Twitter userName
-	 */
-	public String getTwitterUserName(){
-		return sp.getString("twitterusername", "null");
-	}
-
-	/**
 	 * This method disables Twitter triggers. After calling this method trigger will not be received from Twitter.
 	 * To enable the trigger again, call authenticateAndEnableTwitterTriggers and twitterOnNewIntent.
 	 * @throws UnauthorizedUserException If the user is not authorized to receive Twitter triggers or if the Twitter triggers
@@ -157,6 +131,17 @@ public class SenSocialManager{
 		}else{
 			new IdSenderToDisableTrigger(userName, uuId, context).sendIdToServer();			
 		}
+	}
+	
+
+	/**
+	 * Returns the MyDevice object.
+	 * @param context
+	 * @return
+	 */
+	public static MyDevice getDevice(Context context){
+		MyDevice device=new MyDevice(context);
+		return device;
 	}
 
 	//	<<<Removed this method as it uses the ServerConfiguration, which is now automated (See the method below).>>>
@@ -184,7 +169,7 @@ public class SenSocialManager{
 	 * @param serverConfig ServerConfiguration object.
 	 * @throws NullPointerException If ServerConfiguration is not configured.
 	 */
-	public void startService(ServerConfiguration serverConfig) throws NullPointerException{
+	private void startService(ServerConfiguration serverConfig) throws NullPointerException{
 		if(serverConfig==null ){
 			Log.e(TAG, "Service can not be started");
 			throw new NullPointerException("Objects are not initialized");
@@ -199,14 +184,10 @@ public class SenSocialManager{
 	 * Method to stop the background service.
 	 * It will stop whichever service is running in the background (MQTT or HTTP).
 	 */
-	public void stopService(){
+	private void stopService(){
 		new SenSocialService().stopService(context);
 	}
 
-	//	<<This method can be exposed to know if the service is running or not.>>
-	//	public boolean serviceIsRunning() {
-	//		return new SenSocialService().isRunning(context);
-	//	}
 
 	/**
 	 * Method to unsubscribe any sensor for the configured sensors.
@@ -252,16 +233,19 @@ public class SenSocialManager{
 	 * @param listener SensorListener Object
 	 * @param configuration Configuration name for which which listener will receive data
 	 */
-	public void registerSensorListener(SensorListener listener, String configuration){
-		SensorListenerManager.add(listener, configuration);
+	public void registerListener(SSListener listener, String streamId){
+		SSListenerManager.add(listener, streamId);
 	}
 
 	/**
 	 * Method to unregister a listener(SensorDataListener) to receive sensor data.
 	 * @param listener SensorDataListener object
 	 */
-	public void unregisterSensorListener(SensorListener listener) {
-		SensorListenerManager.remove(listener);
+	public void unregisterListener(SSListener listener) {
+		SSListenerManager.remove(listener);
 	}
+	
+	
+	
 
 }
