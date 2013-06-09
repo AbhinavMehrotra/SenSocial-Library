@@ -12,7 +12,7 @@ import com.ubhave.sensocial.http.IdSenderToEnableTrigger;
 public class SenSocialService {
 
 	private static final String TAG = "SNnMB";
-	private String SERVICE_CLASSNAME;
+	private static String SERVICE_CLASSNAME;
 	
 	/**
 	 * Method to start the service. <br/>
@@ -20,7 +20,7 @@ public class SenSocialService {
 	 * else it starts HTPP service.
 	 * @param context Application-Context
 	 */
-	protected void startService(Context context) {
+	protected static void startService(Context context) {
 		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
 		if(!sp.getBoolean("sendId", false)){			
 			new IdSenderToEnableTrigger(sp.getString("fbusername", "null"), sp.getString("new_access_token", "null"),
@@ -45,7 +45,7 @@ public class SenSocialService {
 	 * Method to stop the service. It will stop HTTP or MQTT service, which ever service will be running.
 	 * @param context Application-Context
 	 */	
-	protected void stopService(Context context) {
+	protected static void stopService(Context context) {
 		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
 		if(sp.getString("mqtt","null").equals("null")){
 			Intent myIntent = new Intent(context, com.ubhave.sensocial.http.HTTPService.class);
@@ -56,7 +56,7 @@ public class SenSocialService {
 		}
 	}
 	
-	protected Boolean isRunning(Context context){
+	protected static Boolean isRunning(Context context){
 		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
 		if(sp.getString("mqtt","null").equals("null")){
 			SERVICE_CLASSNAME="com.ubhave.sensocial.http.HTTPService";

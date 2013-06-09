@@ -37,28 +37,8 @@ public class Stream {
 		this.filter=null;
 		this.streamId=UUID.randomUUID().toString();
 		this.isAggregated=false;
-
-		//		//check PPD for the sensors associated to stream 
-		//				PrivacyPolicyDescriptorParser ppd= new PrivacyPolicyDescriptorParser(context);
-		//				if(dataType.equalsIgnoreCase("raw")){
-		//					if(!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId), null, "raw")){
-		//						throw new PPDException(new AllPullSensors(context).getSensorNameById(sensorId)); 
-		//					}
-		//				}else if(dataType.equalsIgnoreCase("classified")){
-		//					if(!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId), null, "raw") ||
-		//							!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId), null, "classified")){
-		//						throw new PPDException(new AllPullSensors(context).getSensorNameById(sensorId)); 
-		//					}
-		//				}
-		//				else{
-		//					throw new SensorDataTypeException(dataType);
-		//				}
-
-
-
-
+		StreamRegistrar.add(device.getDeviceId(), this);
 	}
-
 
 
 	//used for aggregated stream
@@ -71,11 +51,6 @@ public class Stream {
 		this.streamId=UUID.randomUUID().toString();
 		this.isAggregated=true;		
 	}
-
-
-
-
-
 
 
 
@@ -93,17 +68,24 @@ public class Stream {
 			newStream.filter=filter;
 		} catch (SensorDataTypeException e) {
 			newStream=this;
-			System.out.print(TAG+" Error: Something went wrong while creating a new stream with filter "+ filter.getFilterName());
+			System.out.print(TAG+" Error: Something went wrong while creating a new stream with filter ");
 		}
 		return newStream; 
 	}
 
 
 	public void startStream() throws PPDException, XMLFileException{
+		Set<Stream> allStreams= new HashSet<Stream>();
+		if(this.isAggregated)
+			allStreams=this.getAggregator().getAgrregatedStreams();		
+		else
+			allStreams.add(this);
+
 		//check PPD for the sensors associated to activities
 		Map<String,String> ppd= new HashMap<String, String>();
-		ppd.put(Sensors.getSensorNameById(this.getSensorId()), this.getDataType());
-
+		for(Stream s:allStreams){
+			ppd.put(Sensors.getSensorNameById(s.getSensorId()), s.getDataType());			
+		}
 		if(this.filter!=null){
 			ArrayList<Modality> activities=new ArrayList<Modality>();
 			activities=filter.getConditions();
@@ -113,7 +95,7 @@ public class Stream {
 		}
 		PrivacyPolicyDescriptorParser ppdParser= new PrivacyPolicyDescriptorParser();
 		if(!ppdParser.isAllowed(this.getDevice().getDeviceId(), ppd)){
-			throw new PPDException("Sensors associated with the stream not allowed in the PPD");
+			throw new PPDException("Sensors associated with some stream are not allowed in the PPD");
 		}
 
 		//Generate filter xml file
@@ -124,33 +106,35 @@ public class Stream {
 			for(Modality s:activities)
 				act.add(s.getActivityName());
 
-			String config=filter.getFilterName();
-			GenerateFilter.createXML(this.getDevice().getDeviceId(),act, this.getStreamId(), 
-					Sensors.getSensorNameById(this.sensorId), dataType);
+			for(Stream s:allStreams){
+				GenerateFilter.createXML(s.getDevice().getUser(), s.getDevice().getDeviceId(),act, s.getStreamId(), 
+						Sensors.getSensorNameById(s.getSensorId()), s.getDataType());				
+			}
 		}
 		else{
 			ArrayList<String> act= new ArrayList<String>();
 			act.add("ALL");
-			String config=filter.getFilterName();
-			GenerateFilter.createXML(this.getDevice().getDeviceId(),act, this.getStreamId(), 
-					Sensors.getSensorNameById(this.sensorId), dataType);
+			for(Stream s:allStreams){
+				GenerateFilter.createXML(s.getDevice().getUser(), s.getDevice().getDeviceId(),act, s.getStreamId(), 
+						Sensors.getSensorNameById(s.getSensorId()), s.getDataType());				
+			}
 		}
-		
-		MQTTClientNotifier.sendStreamNotification(MQTTNotifitions.start_stream, this.getSensorId());
+
+		MQTTClientNotifier.sendStreamNotification(device.getDeviceId(), MQTTNotifitions.start_stream, this.getStreamId());
 	}
 
 
 	public void pauseStream(){
 		//stop streaming without deleting filter
 		//notify clients to set configuration attribute "sense"="false"
-		MQTTClientNotifier.sendStreamNotification(MQTTNotifitions.pause_stream, this.getSensorId());
-		
+		MQTTClientNotifier.sendStreamNotification(device.getDeviceId(), MQTTNotifitions.pause_stream, this.getStreamId());
+
 	}
 
 	public void unpauseStream(String streamConfig){
 		//start without sending new filter
 		//notify clients to set configuration attribute "sense"="true"
-		MQTTClientNotifier.sendStreamNotification(MQTTNotifitions.unpause_stream, this.getSensorId());
+		MQTTClientNotifier.sendStreamNotification(device.getDeviceId(), MQTTNotifitions.unpause_stream, this.getStreamId());
 	}
 
 	public Device getDevice() {

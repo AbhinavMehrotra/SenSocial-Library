@@ -21,7 +21,7 @@ public class StreamCollection {
 		this.dataType=dataType;
 	}
 
-	public static Set<Stream> getStreamSet(User user, UserRelation relation) throws PPDException, SensorDataTypeException{
+	public Set<Stream> getStreamSet(User user, UserRelation relation) throws PPDException, SensorDataTypeException{
 		Set<Stream> streams= new HashSet<Stream>();
 		Set<Device> devices= new HashSet<Device>();
 		ArrayList<Device> tempdevice= new ArrayList<Device>();
@@ -67,7 +67,7 @@ public class StreamCollection {
 		return streams;
 	}
 
-	public static Set<Stream> getStreamSet(Location location, GeoRelation relation) throws PPDException, SensorDataTypeException{
+	public Set<Stream> getStreamSet(Location location, GeoRelation relation) throws PPDException, SensorDataTypeException{
 		Set<Stream> streams= new HashSet<Stream>();
 		Set<Device> devices= new HashSet<Device>();
 

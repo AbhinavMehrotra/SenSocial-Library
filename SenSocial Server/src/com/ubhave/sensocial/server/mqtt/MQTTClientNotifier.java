@@ -15,15 +15,23 @@ public class MQTTClientNotifier {
 			try {
 				MQTTManager mqtt = new MQTTManager(d.getDeviceId());
 				mqtt.connect();
-				mqtt.publishToDevice(message +":" + time);
+				mqtt.publishToDevice(MQTTNotifitions.facebook_update.getMessage()+":"+ 
+										message +":" + time);
 			} catch (MqttException e) {
 				e.printStackTrace();
 			}
 		}			
 	}
 	
-	public static void sendStreamNotification(MQTTNotifitions message, int streamId){
-		//for start stream client should check this stream id in the exsiting filters and it is not there the request for new file
+	public static void sendStreamNotification(String deviceId, MQTTNotifitions message, String streamId){
+		//the notified client should check this stream id in the exsiting filters and it is not there the request for new file
+		try {
+			MQTTManager mqtt = new MQTTManager(deviceId);
+			mqtt.connect();
+			mqtt.publishToDevice(message +":" + streamId);
+		} catch (MqttException e) {
+			e.printStackTrace();
+		}
 		
 	}
 

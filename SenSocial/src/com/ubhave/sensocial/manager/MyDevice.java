@@ -17,9 +17,11 @@ public class MyDevice {
 
 	private String uuid;
 	private Context context;
+	private User user;
 
-	protected MyDevice(Context context) {
+	protected MyDevice(Context context, User user) {
 		this.context=context;
+		this.user=user;
 		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
 		if(sp.getString("uuid", "null").equals("null")){
 			uuid=UUID.randomUUID().toString();
@@ -43,16 +45,15 @@ public class MyDevice {
 		FilterConfiguration.deleteConfiguration(stream.getFilter().getFilterName()); 
 	}
 
-	public String getDeviceUUID(){
+	public String getDeviceId(){
 		return uuid;
 	}
 	
-	public String getUserName(){
-		//look for the user of device
-		return null;
+	public User getUser(){
+		return this.user;
 	}
 
-	public Location getLocation(){		
+	public Location getLastKnownLocation(){		
 		Location location;
 		//look for location in shared prefrences
 		location= new Location(0, 0);

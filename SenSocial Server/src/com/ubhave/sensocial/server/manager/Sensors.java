@@ -8,6 +8,7 @@ public class Sensors {
 	public final static int SENSOR_TYPE_LOCATION = 5004;
 	public final static int SENSOR_TYPE_MICROPHONE = 5005;
 	public final static int SENSOR_TYPE_WIFI = 5010;
+	public final static int SENSOR_TYPE_TIME=1111;
 	
 	
 	public static String getSensorNameById(int id){
@@ -16,7 +17,8 @@ public class Sensors {
 		else if(id==SENSOR_TYPE_BLUETOOTH) sensor="bluetooth";
 		else if(id==SENSOR_TYPE_LOCATION) sensor="location";
 		else if(id==SENSOR_TYPE_MICROPHONE) sensor="microphone";
-		else if(id==SENSOR_TYPE_WIFI) sensor="wifi";		
+		else if(id==SENSOR_TYPE_WIFI) sensor="wifi";	
+		else if(id==SENSOR_TYPE_TIME) sensor="time";
 		return sensor;
 	}
 

@@ -51,7 +51,7 @@ public class User {
 		Location l;
 		for(String d:this.deviceIds){
 			l= new Location(location.get(d).get(0), location.get(d).get(1));			
-			devices.add(new Device(d, UserRegistrar.getBluetooth(d), l));
+			devices.add(new Device(this, d, UserRegistrar.getBluetooth(d), l));
 		}
 		return devices;
 	}

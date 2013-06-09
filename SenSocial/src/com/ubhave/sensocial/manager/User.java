@@ -2,6 +2,8 @@ package com.ubhave.sensocial.manager;
 
 import java.util.Set;
 
+import android.content.Context;
+
 public class User {
 
 	private String name;
@@ -11,14 +13,14 @@ public class User {
 	private Set<String> fbFriends;
 	private Set<String> twFollowers;
 	
-	public User(String name, String fbName, String twName, MyDevice device, 
+	public User(Context context, String name, String fbName, String twName, 
 			Set<String> fbFriends, Set<String> twFollowers){
 		this.name=name;
 		this.fbName=fbName;
 		this.twName=twName;
-		this.device=device;
+		this.device=new MyDevice(context,this);
 		this.fbFriends=fbFriends;
-		this.twFollowers=twFollowers;
+		this.twFollowers=twFollowers;		
 	}
 
 	

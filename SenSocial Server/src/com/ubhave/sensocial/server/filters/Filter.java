@@ -4,15 +4,9 @@ import java.util.ArrayList;
 
 public class Filter {
 
-	private String filterName;
 	private ArrayList<Modality> activities;
 	
-	public Filter(String filterName){
-		this.filterName=filterName;
-	}
-	
-	public String getFilterName(){
-		return this.filterName;
+	public Filter(){
 	}
 	
 	public void addConditions(ArrayList<Modality> activity){

@@ -67,7 +67,7 @@ public class PushCallback implements MqttCallback {
 			Editor ed=sp.edit();
 			ed.putBoolean("sensing", true);
 			ed.commit();
-			new StartPullSensors(context, message.toString()).startOneOffSensing();
+			
 		}
 		SocialNetworkListenerManager.newUpdateArrived(context,message.toString());	
 	}

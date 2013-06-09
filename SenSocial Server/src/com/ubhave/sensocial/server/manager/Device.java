@@ -1,11 +1,5 @@
 package com.ubhave.sensocial.server.manager;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import com.ubhave.sensocial.server.data.SocialEvent;
 import com.ubhave.sensocial.server.exception.PPDException;
 import com.ubhave.sensocial.server.exception.SensorDataTypeException;
 import com.ubhave.sensocial.server.mqtt.MQTTClientNotifier;
@@ -17,8 +11,10 @@ public class Device {
 	private String deviceId;
 	private Location location;
 	private String bluetoothMAC;
+	private User user;
 
-	protected Device(String deviceId, String bluetoothMAC,  Location location) {
+	protected Device(User user, String deviceId, String bluetoothMAC,  Location location) {
+		this.user=user;
 		this.deviceId=deviceId;
 		this.bluetoothMAC=bluetoothMAC;
 		this.location=location;
@@ -32,7 +28,11 @@ public class Device {
 
 	public void removeStream(Stream stream){
 		//notify clients to delete the filter
-		MQTTClientNotifier.sendStreamNotification(MQTTNotifitions.unpause_stream, stream.getSensorId()); 
+		MQTTClientNotifier.sendStreamNotification(deviceId,MQTTNotifitions.unpause_stream, stream.getStreamId()); 
+	}
+	
+	public User getUser() {
+		return user;
 	}
 
 	public String getDeviceId() {

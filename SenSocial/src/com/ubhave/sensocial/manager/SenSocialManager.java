@@ -3,6 +3,7 @@ package com.ubhave.sensocial.manager;
 import java.util.UUID;
 
 import twitter4j.User;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +19,6 @@ import com.ubhave.sensocial.exceptions.InvalidSensorNameException;
 import com.ubhave.sensocial.exceptions.NullPointerException;
 import com.ubhave.sensocial.exceptions.UnauthorizedUserException;
 import com.ubhave.sensocial.exceptions.XMLFileException;
-import com.ubhave.sensocial.filters.PrivacyPolicyDescriptorParser;
 import com.ubhave.sensocial.http.IdSenderToDisableTrigger;
 import com.ubhave.sensocial.sensormanager.StartPullSensors;
 import com.ubhave.sensocial.socialnetworks.AuthenticateFacebook;
@@ -50,7 +50,7 @@ public class SenSocialManager{
 		else{
 			uuId=sp.getString("uuid", "null");
 		}
-		new PrivacyPolicyDescriptorParser(context).refineXML();
+
 	}
 
 	/**
@@ -132,19 +132,21 @@ public class SenSocialManager{
 			new IdSenderToDisableTrigger(userName, uuId, context).sendIdToServer();			
 		}
 	}
-	
+
 
 	/**
-	 * Returns the MyDevice object.
+	 * Returns the User object.
 	 * @param context
 	 * @return
 	 */
-	public static MyDevice getDevice(Context context){
-		MyDevice device=new MyDevice(context);
-		return device;
+	@SuppressLint("NewApi")
+	public com.ubhave.sensocial.manager.User getUser(){
+		com.ubhave.sensocial.manager.User user=new com.ubhave.sensocial.manager.User(context, sp.getString("name", null), sp.getString("facebookusername", null), sp.getString("twitterusername", null), 
+				sp.getStringSet("facebookfriends", null), sp.getStringSet("twitterfollowers", null));
+		return user;
 	}
 
-	//	<<<Removed this method as it uses the ServerConfiguration, which is now automated (See the method below).>>>
+	//	<<<Removed this method as it uses the SensorConfiguration, which is now automated (See the method below).>>>
 	//	/**
 	//	 * Method to start the android background-service. It will automatically start HTTP or MQTT service according to the
 	//	 * configuration set in the ServerConfiguration. It is mandatory to set 
@@ -169,14 +171,14 @@ public class SenSocialManager{
 	 * @param serverConfig ServerConfiguration object.
 	 * @throws NullPointerException If ServerConfiguration is not configured.
 	 */
-	private void startService(ServerConfiguration serverConfig) throws NullPointerException{
+	public void startService(ServerConfiguration serverConfig) throws NullPointerException{
 		if(serverConfig==null ){
 			Log.e(TAG, "Service can not be started");
 			throw new NullPointerException("Objects are not initialized");
 		}
 		else{
 			Log.d(TAG, "Starting the service");
-			new SenSocialService().startService(context);			
+			SenSocialService.startService(context);			
 		}
 	}
 
@@ -184,8 +186,8 @@ public class SenSocialManager{
 	 * Method to stop the background service.
 	 * It will stop whichever service is running in the background (MQTT or HTTP).
 	 */
-	private void stopService(){
-		new SenSocialService().stopService(context);
+	public void stopService(){
+		SenSocialService.stopService(context);
 	}
 
 
@@ -244,8 +246,8 @@ public class SenSocialManager{
 	public void unregisterListener(SSListener listener) {
 		SSListenerManager.remove(listener);
 	}
-	
-	
-	
+
+
+
 
 }
