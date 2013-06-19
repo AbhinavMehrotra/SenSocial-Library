@@ -28,7 +28,7 @@ public class MQTTClientNotifier {
 		try {
 			MQTTManager mqtt = new MQTTManager(deviceId);
 			mqtt.connect();
-			mqtt.publishToDevice(message +":" + streamId);
+			mqtt.publishToDevice(message.getMessage() +":" + streamId);
 		} catch (MqttException e) {
 			e.printStackTrace();
 		}

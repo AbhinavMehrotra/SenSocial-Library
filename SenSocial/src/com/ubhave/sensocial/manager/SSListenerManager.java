@@ -19,8 +19,8 @@ public class SSListenerManager {
 	protected static void add(SSListener listener, String configuration) {
 		listeners.put(listener,configuration);
 	}
-	
-	
+
+
 	/**
 	 * Method to remove an instance of  listener (SensorListner)
 	 * @param listener SocialNetworkPostListner object
@@ -28,20 +28,20 @@ public class SSListenerManager {
 	protected static void remove(SSListener listener) {
 		listeners.remove(listener);
 	}
-	
-//	/**
-//	 * Method to fire updates to the registered SensorListeners on specific configuration.
-//	 * @param sensor_data Sensor Data for which the listener is configured
-//	 * @param configuration Configuration name
-//	 */
-//	protected static void fireUpdate(Object sensor_data, String configuration) {
-//		for (Map.Entry<SensorListener, String> listener: listeners.entrySet()) {
-//			if(listener.getValue().equalsIgnoreCase(configuration)){
-//				listener.getKey().onDataSensed(sensor_data);
-//			}
-//		}
-//	}
-	
+
+	//	/**
+	//	 * Method to fire updates to the registered SensorListeners on specific configuration.
+	//	 * @param sensor_data Sensor Data for which the listener is configured
+	//	 * @param configuration Configuration name
+	//	 */
+	//	protected static void fireUpdate(Object sensor_data, String configuration) {
+	//		for (Map.Entry<SensorListener, String> listener: listeners.entrySet()) {
+	//			if(listener.getValue().equalsIgnoreCase(configuration)){
+	//				listener.getKey().onDataSensed(sensor_data);
+	//			}
+	//		}
+	//	}
+
 	/**
 	 * Method to fire updates to the registered SensorListeners on specific configuration.
 	 * @param socialEvent ArrayList
@@ -49,11 +49,19 @@ public class SSListenerManager {
 	public static void fireUpdate(ArrayList<SocialEvent> socialEvent){
 		for(int i=0;i<socialEvent.size();i++){
 			for (Map.Entry<SSListener, String> listener: listeners.entrySet()) {
-				if(listener.getValue().equalsIgnoreCase(socialEvent.get(i).getFilteredSensorData().getConfigurationName())){
+				if(listener.getValue().equalsIgnoreCase(socialEvent.get(i).getFilteredSensorData().getStreamId())){
 					listener.getKey().onDataSensed(socialEvent.get(i));
 				}
 			}
 		}
 	}
-	
+
+	public static void fireUpdate(SocialEvent socialEvent){
+		for (Map.Entry<SSListener, String> listener: listeners.entrySet()) {
+			if(listener.getValue().equalsIgnoreCase(socialEvent.getFilteredSensorData().getStreamId())){
+				listener.getKey().onDataSensed(socialEvent);
+			}
+		}
+	}
+
 }

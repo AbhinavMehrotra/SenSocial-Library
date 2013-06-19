@@ -1,10 +1,10 @@
 package com.ubhave.sensocial.server.manager;
 
-import java.net.UnknownHostException;
 import java.util.Set;
 
 import com.mongodb.MongoClient;
 import com.ubhave.sensocial.server.database.UserRegistrar;
+import com.ubhave.sensocial.server.tcp.TCPServer;
 
 
 
@@ -14,7 +14,7 @@ public class SSManager {
 	private static Object lock = new Object();
 	private static MongoClient mongoClient;
 	
-	public static SSManager getSSManager() throws UnknownHostException{
+	public static SSManager getSSManager(){
 		
 		//Check if the mongoDB service running?
 		
@@ -25,13 +25,16 @@ public class SSManager {
 				if (ssManager == null)
 				{
 					ssManager = new SSManager();
-					//ssManager.mongoClient = new MongoClient();  //will pass this to all the DB methods
 				}
 			}
 		}
 		return ssManager;
 	}
 
+	private SSManager(){
+		new TCPServer().start();		
+	}
+	
 	public static User getUser(String osn_name){
 		return UserRegistrar.getUser(osn_name);
 	}

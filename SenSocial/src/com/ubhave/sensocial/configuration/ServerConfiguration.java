@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
-import com.ubhave.sensocial.exceptions.InvalidUrlException;
+import com.ubhave.sensocial.exceptions.ServerException;
 
 public class ServerConfiguration {
 	private static final String TAG = "SNnMB";
@@ -17,21 +17,12 @@ public class ServerConfiguration {
 	 * @param context Application Context
 	 * @param mqttcofig MQTTServerConfiguration object. (It can be null if you wish to use HTTP service.
 	 */
-	public ServerConfiguration(Context context, MQTTServerConfiguration mqttcofig){
+	public ServerConfiguration(Context context){
 		this.context=context;
-		sp=context.getSharedPreferences("snmbData",0);
-		if(mqttcofig!=null){
-			Editor ed=sp.edit();
-			ed.putString("mqtt", mqttcofig.getMQTTServerIP());
-			ed.commit();
-			Log.i(TAG, "MQTT server: "+mqttcofig.getMQTTServerIP()+","+sp.getString("mqtt", "it is null"));
-		}
-		else{
-			Log.i(TAG, "MQTT config null");
-			Editor ed=sp.edit();
-			ed.putString("mqtt", "null");
-			ed.commit();
-		}
+		sp=context.getSharedPreferences(TAG, 0);
+		Editor ed=sp.edit();
+		ed.putInt("refreshInterval", 60000);  //default interval time
+		ed.commit();
 	}
 
 	/**
@@ -39,16 +30,15 @@ public class ServerConfiguration {
 	 * This URL should be the path of the server where all the PHP scripts are hosted. <br/>
 	 * It should always end with "/".
 	 * @param url String
-	 * @throws InvalidUrlException
+	 * @throws ServerException
 	 */
-	public void setServerURL(String url) throws InvalidUrlException{
+	public void setServerURL(String url) throws ServerException{
 		if(!url.endsWith("/")){
-			throw new InvalidUrlException(url+" is not a valid URL. \nURL should contain / at the end, eg- https//:cs.bham.ac.uk/sensocial/");
+			throw new ServerException(url+" is not a valid URL. \nURL should contain / at the end, eg- https//:cs.bham.ac.uk/sensocial/");
 		}
 		else{
 			Editor ed=sp.edit();
-			ed.putString("server", url);
-			ed.putInt("refreshInterval", 60000);  //default interval time
+			ed.putString("serverurl", url);
 			ed.commit();
 		}
 	}
@@ -58,7 +48,28 @@ public class ServerConfiguration {
 	 * @return String
 	 */
 	public String getServerURL(){
-		return sp.getString("server", "");
+		return sp.getString("serverurl", "");
+	}
+	
+	public void setServerIP(String ip){
+			Editor ed=sp.edit();
+			ed.putString("serverip", ip);
+			ed.commit();
+	}
+
+	public String getServerIP(){
+		return sp.getString("serverip", "");
+	}
+	
+	public void setServerPort(int port){
+			Editor ed=sp.edit();
+			ed.putInt("serverport", port);
+			ed.commit();
+	}
+
+	
+	public int getServerPort(){
+		return sp.getInt("serverport", 0);
 	}
 	
 	/**

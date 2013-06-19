@@ -12,9 +12,11 @@ import org.eclipse.paho.client.mqttv3.internal.MemoryPersistence;
 public class MQTTManager {
 
 	private final String TAG = "SNnMB";
-	private final static String BROKER_URL="tcp://localhost:1883";
+	private final static String BROKER_URL="tcp://broker.mqttdashboard.com:1883";//"tcp://localhost:1883";
 	private MqttClient mqttClient;
 	private String deviceId;
+	private String clientId;
+	private final String topic="SenSocial";
 	private int keepAliveInterval=60*5;
 	private MqttConnectOptions opt;
 	
@@ -22,7 +24,7 @@ public class MQTTManager {
 		this.deviceId=deviceId;
 		opt=new MqttConnectOptions();
 		opt.setKeepAliveInterval(keepAliveInterval);
-		mqttClient = new MqttClient(BROKER_URL, deviceId, new MemoryPersistence());
+		mqttClient = new MqttClient(BROKER_URL, "SenSocialServer", new MemoryPersistence());
 		mqttClient.setCallback(new MQTTCallback(BROKER_URL, deviceId, deviceId));
 	}
 	
@@ -81,7 +83,7 @@ public class MQTTManager {
 				throws Exception {
 			// argo-> device id
 			//arg1 --> message
-			
+			System.out.print(arg0.toString()+arg1.toString());
 		}
 
 

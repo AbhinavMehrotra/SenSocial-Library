@@ -98,7 +98,8 @@ public class AuthenticateFacebook {
 		protected Void doInBackground(Void... params) {
 			try {
 				JSONObject obj =null;
-				String jsonUser =fb.request("me");						
+				String jsonUser =fb.request("me");	
+				Log.d(TAG, "FB json: "+jsonUser);
 				obj=Util.parseJson(jsonUser);	    				
 				String userId = obj.optString("id");
 				String userName =obj.optString("name");   				
@@ -118,7 +119,7 @@ public class AuthenticateFacebook {
 				    total.append(line);
 				}
 				String new_access_token= total.toString();
-				editor.putString("new_access_token", new_access_token);
+				editor.putString("fbtoken", new_access_token);
 				editor.commit();
 			} catch (NullPointerException e) {
 		    	Log.e(TAG, "NullPointerException Error:"+e.toString());

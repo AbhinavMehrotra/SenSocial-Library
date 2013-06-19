@@ -38,7 +38,16 @@ public class MQTTService extends Service {
 		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(old)
 		.permitNetwork()
 		.build());
-		connectIt();
+		//connectIt();
+		try {
+			MQTTManager m = new MQTTManager(getApplicationContext(), "abhinav");
+			m.connect();
+			m.publishToDevice("android");
+			m.subscribeToDevice();
+		} catch (MqttException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         StrictMode.setThreadPolicy(old);
 		return START_STICKY;
 	}
@@ -72,7 +81,7 @@ public class MQTTService extends Service {
 	}
 
 	/**
-	 * We are not using this method.
+	 * Not using this method.
 	 * It was used to check if client is connect to MQTT broker.
 	 * If not then it connects it again.
 	 */

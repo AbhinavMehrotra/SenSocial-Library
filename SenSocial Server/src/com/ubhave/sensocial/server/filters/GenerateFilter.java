@@ -221,7 +221,6 @@ public class GenerateFilter {
 			int i=2, j=1;
 			Element activity;
 			for(String s:modalities){
-
 				if(!s.equalsIgnoreCase("LogicalOR")){
 					activity = doc.createElement("activity"+j++);
 					activity.setAttribute("name", s);
@@ -232,8 +231,7 @@ public class GenerateFilter {
 					condition.setAttribute("name", "c"+i++);
 					rootElement.appendChild(condition);
 					j=1;
-				}				
-
+				}		
 			}
 
 			Element reqData = doc.createElement("required_data");

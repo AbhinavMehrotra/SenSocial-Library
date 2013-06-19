@@ -10,6 +10,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 import org.eclipse.paho.client.mqttv3.internal.MemoryPersistence;
 
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -61,15 +62,17 @@ public class PushCallback implements MqttCallback {
 	 * It starts sensing process.
 	 */
 	public void messageArrived(MqttTopic topic, MqttMessage message) throws Exception {
-		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
-		if(sp.getBoolean("sensing", false)==false){
-			Log.d(TAG, "Found a new update");
-			Editor ed=sp.edit();
-			ed.putBoolean("sensing", true);
-			ed.commit();
-			
-		}
-		SocialNetworkListenerManager.newUpdateArrived(context,message.toString());	
+//		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
+//		if(sp.getBoolean("sensing", false)==false){
+//			Log.d(TAG, "Found a new update");
+//			Editor ed=sp.edit();
+//			ed.putBoolean("sensing", true);
+//			ed.commit();
+//			
+//		}
+//		SocialNetworkListenerManager.newUpdateArrived(context,message.toString());	
+		Log.d(TAG, "Received a notification");
+		new NotificationParser((Context)context).takeAction(message.toString());
 	}
 
 	/**

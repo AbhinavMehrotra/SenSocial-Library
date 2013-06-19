@@ -48,7 +48,7 @@ public class PrivacyPolicyDescriptorParser {
 			Document doc = builder.parse(in);
 			
 			doc.getDocumentElement().normalize();
-			if(doc.getDocumentElement().getNodeName().equals("sensorconfiguration")){
+			if(doc.getDocumentElement().getNodeName().equals("ppd")){
 				NodeList nList = doc.getElementsByTagName("sensor");
 				for (int temp=0;temp<nList.getLength();temp++) {
 					Node nNode = nList.item(temp);
@@ -125,17 +125,25 @@ public class PrivacyPolicyDescriptorParser {
 	}
 	
 	public Boolean isAllowed(String sensorName, String serverDataType, String clientDataType ){
+		try {
+			refineXML();
+		} catch (InvalidSensorException e) {
+			Log.e(TAG, "Is allowed 1: "+e.toString());
+		} catch (XMLFileException e) {
+			Log.e(TAG, "Is Allowed 2: "+e.toString());
+		}
 		Boolean flag=false;
 		String config=sp.getString(sensorName+"config", "");
-		char serverType=config.charAt(2);
-		char clientType=config.charAt(5);
+		Log.e(TAG, "Config in ppd: "+config);
 		if(config!=null && serverDataType!=null){
+			char serverType=config.charAt(5);
 			if((serverDataType.toLowerCase()).charAt(0)==serverType){
 				flag=true;
 			}
 		}
 		if(config!=null && clientDataType!=null){
-			if((clientDataType.toLowerCase()).charAt(0)==clientType){
+			char clientType=config.charAt(2);
+			if((clientDataType.toUpperCase()).charAt(0)==clientType){
 				flag=true;
 			}
 		}

@@ -6,22 +6,28 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+import com.ubhave.sensocial.data.DeviceSensorData;
+import com.ubhave.sensocial.data.SocialEvent;
+import com.ubhave.sensocial.manager.SSListenerManager;
+import com.ubhave.sensocial.sensordata.classifier.SensorDataHandler;
+import com.ubhave.sensocial.tcp.ClientServerCommunicator;
+import com.ubhave.sensocial.tcp.TCPClient;
 import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
 import com.ubhave.sensormanager.SensorDataListener;
 import com.ubhave.sensormanager.data.SensorData;
 
 public class ContinuousStreamSensing {
-	
+
 	final private String TAG = "SNnMB";
-	private final ESSensorManager sensorManager;
-	private final Context context;
+	private static ESSensorManager sensorManager;
+	private static Context context;
 	private ArrayList<Integer> SensorIds;
 	private String message;
-	private SharedPreferences sp;
-	private Editor ed;
-	private int subscriptionId;
-	private AllPullSensors aps;
+	private static SharedPreferences sp;
+	private static Editor ed;
+	private static int subscriptionId;
+	private static AllPullSensors aps;
 
 	public ContinuousStreamSensing(Context context, ArrayList<Integer> SensorIds) throws ESException
 	{
@@ -29,14 +35,17 @@ public class ContinuousStreamSensing {
 		this.SensorIds=SensorIds;
 		sensorManager = ESSensorManager.getSensorManager(context);
 		sp=context.getSharedPreferences("snmbData",0);
+		aps=new AllPullSensors(context);
 	}
 
 	protected void startSensing() throws ESException{
 		SensorDataListener listener = new SensorDataListener() {
 
 			public void onDataSensed(SensorData arg0) {
-				// TODO Auto-generated method stub
-
+				//arg0.getSensorType();
+				System.out.println("on Data Sensed");
+				System.out.println("Data: "+arg0);
+				SensorDataHandler.handleStreamData(arg0,context);
 			}
 
 			public void onCrossingLowBatteryThreshold(boolean arg0) {
@@ -45,12 +54,73 @@ public class ContinuousStreamSensing {
 		};
 		ed=sp.edit();
 		for(int i=0;i<SensorIds.size();i++){
-			subscriptionId=sensorManager.subscribeToSensorData (SensorIds.get(i), listener);
+			System.out.println("Continuous sensing (Start sensing): "+SensorIds.get(i));
+			System.out.println(SensorIds);
+//			subscriptionId=sensorManager.subscribeToSensorData (SensorIds.get(i), listener);
+			subscriptionId=sensorManager.subscribeToSensorData (AllPullSensors.SENSOR_TYPE_ACCELEROMETER, listener);
 			ed.putInt(aps.getSensorNameById(SensorIds.get(i))+"_subId", subscriptionId);			
 		}
 		ed.commit();
 	}
-	
+
+	public static void startSensingForServer(final String streamId, int sensorId, final String dataType) throws ESException{
+		SensorDataListener listener = new SensorDataListener() {
+
+			public void onDataSensed(SensorData data) {
+				SocialEvent se=new SocialEvent();
+				DeviceSensorData d=new DeviceSensorData();
+				d.setDeviceId(sp.getString("deviceid", null));
+				d.setRawData(data);
+				d.setStreamId(streamId);
+				if(dataType.equalsIgnoreCase("raw")){
+				se.setFilteredSensorData(d);
+				}
+				else{
+					//classify it
+				}
+				ClientServerCommunicator.sendStream(context, se.toJSONString());
+			}
+
+			public void onCrossingLowBatteryThreshold(boolean arg0) {
+				// can pause sensing
+			}
+		};
+		ed=sp.edit();
+		subscriptionId=sensorManager.subscribeToSensorData (sensorId, listener);
+		ed.putInt(aps.getSensorNameById(sensorId)+"_subId", subscriptionId);			
+		ed.commit();
+	}
+
+	public static void startSensingForDevice(final String streamId, int sensorId, final String dataType) throws ESException{
+		SensorDataListener listener = new SensorDataListener() {
+
+			public void onDataSensed(SensorData data) {
+				//arg0.getSensorType();
+				SocialEvent se=new SocialEvent();
+				DeviceSensorData d=new DeviceSensorData();
+				d.setDeviceId(sp.getString("deviceid", null));
+				d.setRawData(data);
+				d.setStreamId(streamId);
+				if(dataType.equalsIgnoreCase("raw")){
+				se.setFilteredSensorData(d);
+				}
+				else{
+					//classify it
+				}
+				SSListenerManager.fireUpdate(se);
+
+			}
+
+			public void onCrossingLowBatteryThreshold(boolean arg0) {
+				// can pause sensing
+			}
+		};
+		ed=sp.edit();
+		subscriptionId=sensorManager.subscribeToSensorData (sensorId, listener);
+		ed.putInt(aps.getSensorNameById(sensorId)+"_subId", subscriptionId);			
+		ed.commit();
+	}
+
 	protected void stopSensing() throws ESException{
 		for(int i=0;i<SensorIds.size();i++){
 			subscriptionId=sp.getInt(aps.getSensorNameById(SensorIds.get(i))+"_subId", 0);

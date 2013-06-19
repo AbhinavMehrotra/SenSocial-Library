@@ -1,22 +1,12 @@
 package com.ubhave.sensocial.sensormanager;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
 
-import com.ubhave.dataformatter.DataFormatter;
-import com.ubhave.dataformatter.json.JSONFormatter;
-import com.ubhave.sensocial.filters.FilterSensedData;
-import com.ubhave.sensocial.filters.SensorDataFilterManager;
-import com.ubhave.sensocial.http.SendSensorDataToServer;
+import com.ubhave.sensocial.sensordata.classifier.SensorDataHandler;
 import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
 import com.ubhave.sensormanager.data.SensorData;
@@ -66,7 +56,8 @@ public class OneOffSensing extends AsyncTask<Void, Void, ArrayList<SensorData>>
 		Log.d(TAG,"Stopped sensing");
 		if(data!=null){
 //			new SensorDataFilterManager(data, SensorIds, context, message).pushSensorDataAccordingToXML();
-			new FilterSensedData(context).FilterAndFireData(data);			
+//			new FilterSensedData(context).FilterAndFireData(data);	
+			SensorDataHandler.handleOSNDependentData(data, context);
 		}
 		
 	}

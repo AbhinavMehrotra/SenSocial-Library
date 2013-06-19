@@ -141,7 +141,8 @@ public class HTTPService extends Service {
 					ed.commit();
 				}
 				//get new filter and subscribe sensors
-				new GetFilterFromServer().downloadFilter(getApplicationContext());
+				//<working>
+				//new GetFilterFromServer().downloadFilter(getApplicationContext());
 			}		
 			else if(ch=='3'){
 				new SensorConfiguration(getApplicationContext()).unsubscribeConfiguration(newUpdate.substring(4, newUpdate.indexOf("CONFIG")));

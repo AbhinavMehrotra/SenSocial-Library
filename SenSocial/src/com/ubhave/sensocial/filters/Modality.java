@@ -6,6 +6,8 @@ public enum Modality {
 	NoCodition("all","NA"),
 	act1("standing",getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER)),
 	act2("sitting",getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER)),
+	facebook_trigger("facebook_trigger","facebook_trigger"),
+	twitter_post("twitter_post","twitter_post"),
 	logicalOR("LogicalOR","");
 	
 	private final String activity;

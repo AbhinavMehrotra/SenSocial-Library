@@ -1,6 +1,7 @@
 package com.ubhave.sensocial.manager;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -13,18 +14,24 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import android.content.Context;
+import android.os.Environment;
+
+import com.sensocial.R;
+
 public class GenerateFilter {
 
-	protected static void createXML(ArrayList<String> activities, String streamConfig, String sensorName, String sensorDataType){
+	protected static void createXML(Context context,ArrayList<String> activities, String streamConfig, String sensorName, String sensorDataType){
 		try
 		{
+			
 			Element rootElement,mainRoot;
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
 			Document doc = docBuilder.newDocument();
 
-			File file = new File("C:\\testing.xml"); 
+			File file = new File(Environment.getExternalStorageDirectory(), "filter.xml"); 
 			if (file.exists() && file.length()!=0) 
 			{ 
 				System.out.println("file found");
@@ -73,10 +80,10 @@ public class GenerateFilter {
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource source = new DOMSource(doc);
 
-			StreamResult result =  new StreamResult(new File("C:\\testing.xml"));
+			StreamResult result =  new StreamResult(new File(Environment.getExternalStorageDirectory(), "filter.xml"));
 			transformer.transform(source, result);
 
-			System.out.println("Done");
+			System.out.println("GenerateFilter Done");
 
 		} catch (Exception e) {
 			System.out.println(e.toString());

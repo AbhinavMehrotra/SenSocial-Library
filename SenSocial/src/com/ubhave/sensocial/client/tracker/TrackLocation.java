@@ -21,6 +21,7 @@ import android.util.Log;
 import com.ubhave.dataformatter.DataFormatter;
 import com.ubhave.dataformatter.json.JSONFormatter;
 import com.ubhave.sensocial.sensormanager.AllPullSensors;
+import com.ubhave.sensocial.tcp.ClientServerCommunicator;
 import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
 import com.ubhave.sensormanager.data.SensorData;
@@ -46,7 +47,7 @@ public class TrackLocation {
 		sp=context.getSharedPreferences("SNnMB", 0);
 		serverUrl=sp.getString("server", "");
 		uuid=sp.getString("uuid", "null");
-		UPDATE_INTERVAL= 10*60*1000;//sp.getInt("refreshInterval", 60000);
+		UPDATE_INTERVAL= 60*60*1000;//sp.getInt("refreshInterval", 60000);
 	}
 
 	public void startTracking() {
@@ -66,7 +67,8 @@ public class TrackLocation {
 							StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(old)
 							.permitNetwork()
 							.build());
-							sendLocationToServer(latitude,longitude);
+//							sendLocationToServer(latitude,longitude);
+							ClientServerCommunicator.updateLocation(context, latitude, longitude);
 							StrictMode.setThreadPolicy(old);
 						} catch (Exception e) {
 							Log.e(TAG, e.toString());

@@ -6,7 +6,7 @@
         android:title="Subscribe to accelerometer"/>
     <item
         android:id="@+id/unsaccelerometer"
-        android:title="Unsubscribe to accelerometer"/>    
+        android:title="Unsubscribe to accelerometer"/>
     <item
         android:id="@+id/smicrophone"
         android:title="Subscribe to microphone"/>
@@ -40,4 +40,5 @@
     <item
         android:id="@+id/delete"
         android:title="Delete records"/>
+
 </menu>

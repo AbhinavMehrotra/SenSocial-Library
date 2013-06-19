@@ -3,6 +3,7 @@ package com.ubhave.sensocial.manager;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,9 +13,10 @@ import android.util.Log;
 import com.ubhave.sensocial.exceptions.FilterException;
 import com.ubhave.sensocial.exceptions.PPDException;
 import com.ubhave.sensocial.exceptions.SensorDataTypeException;
+import com.ubhave.sensocial.filters.ConfigurationHandler;
 import com.ubhave.sensocial.filters.Modality;
 import com.ubhave.sensocial.filters.Filter;
-import com.ubhave.sensocial.filters.FilterConfiguration;
+import com.ubhave.sensocial.filters.FilterSettings;
 import com.ubhave.sensocial.filters.PrivacyPolicyDescriptorParser;
 import com.ubhave.sensocial.sensormanager.AllPullSensors;
 
@@ -22,6 +24,7 @@ import com.ubhave.sensocial.sensormanager.AllPullSensors;
 public class Stream {
 
 	private int sensorId;
+	private String streamId;
 	private String dataType;
 	private Context context;
 	private Filter filter;
@@ -32,14 +35,15 @@ public class Stream {
 		this.dataType=dataType;
 		this.context=context;
 		this.filter=null; 
+		this.streamId=UUID.randomUUID().toString();
 		//check PPD for the sensors associated to stream 
 		PrivacyPolicyDescriptorParser ppd= new PrivacyPolicyDescriptorParser(context);
 		if(dataType.equalsIgnoreCase("raw")){
-			if(!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId), null, "raw")){
+			if(!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId).toLowerCase(), null, "raw")){
 				throw new PPDException(new AllPullSensors(context).getSensorNameById(sensorId)); 
 			}
 		}else if(dataType.equalsIgnoreCase("classified")){
-			if(!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId), null, "raw") ||
+			if(!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId).toLowerCase(), null, "raw") ||
 					!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId), null, "classified")){
 				throw new PPDException(new AllPullSensors(context).getSensorNameById(sensorId)); 
 			}
@@ -83,32 +87,50 @@ public class Stream {
 		for(Modality s:activities)
 			act.add(s.getActivityName());
 
-		GenerateFilter.createXML(act, config, 
+		GenerateFilter.createXML(context, act, config, 
 				new AllPullSensors(context).getSensorNameById(this.sensorId), dataType);
 
 		return newStream; 
 	}
 
 
+	public int getSensorId() {
+		return sensorId;
+	}
+	
+	public String getStreamId() {
+		return streamId;
+	}
+
+	public String getDataType() {
+		return dataType;
+	}
 
 	public Filter getFilter(){
 		return (this.filter);
 	}
 
-	public void startStream() throws FilterException{
+	public void startStream(){
 		if(this.getFilter()==null){
-			throw new FilterException();
+//			throw new FilterException();
+			ArrayList<String> act= new ArrayList<String>();
+			act.add("ALL");
+
+			GenerateFilter.createXML(context,act, this.streamId, 
+					new AllPullSensors(context).getSensorNameById(this.sensorId), dataType);
+			
 		}
-		FilterConfiguration.startConfiguration(this.getFilter().getFilterName());
+		FilterSettings.startConfiguration(this.streamId);
+		ConfigurationHandler.run(context);	
 	}
 
 
 	public void pauseStream(){
-		FilterConfiguration.stopConfiguration(this.getFilter().getFilterName()); 
+		FilterSettings.stopConfiguration(this.getFilter().getFilterName()); 
 	}
 
 	public void unpauseStream(){
-		FilterConfiguration.startConfiguration(this.getFilter().getFilterName());
+		FilterSettings.startConfiguration(this.getFilter().getFilterName());
 	}
 
 }

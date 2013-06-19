@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import com.ubhave.sensocial.exceptions.PPDException;
 import com.ubhave.sensocial.exceptions.SensorDataTypeException;
-import com.ubhave.sensocial.filters.FilterConfiguration;
+import com.ubhave.sensocial.filters.FilterSettings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -42,7 +42,7 @@ public class MyDevice {
 	
 
 	public void removeStream(Stream stream){
-		FilterConfiguration.deleteConfiguration(stream.getFilter().getFilterName()); 
+		FilterSettings.removeConfiguration(stream.getFilter().getFilterName()); 
 	}
 
 	public String getDeviceId(){
