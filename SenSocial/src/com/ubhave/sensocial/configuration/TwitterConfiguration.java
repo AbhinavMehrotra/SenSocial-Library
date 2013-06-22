@@ -9,7 +9,7 @@ public class TwitterConfiguration {
 	SharedPreferences sp;
 
 	public TwitterConfiguration(Context context){
-		sp=context.getSharedPreferences("snmbData",0);
+		sp=context.getSharedPreferences("SSDATA",0);
 	}
 	
 	/**

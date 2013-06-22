@@ -15,51 +15,34 @@ public class OneOffSensing extends AsyncTask<Void, Void, ArrayList<SensorData>>
 {
 	final private String TAG = "SNnMB";
 	private final ESSensorManager sensorManager;
-	private final Context context;
 	private ArrayList<Integer> SensorIds;
-	private String message;
+	private ArrayList<SensorData> sensorData=new ArrayList<SensorData>();
 
-	public OneOffSensing(Context context, ArrayList<Integer> SensorIds, String message) throws ESException
+	public OneOffSensing(Context context, ArrayList<Integer> SensorIds) throws ESException
 	{
-		this.context=context;
 		this.SensorIds=SensorIds;
-		this.message=message;
 		sensorManager = ESSensorManager.getSensorManager(context);
 	}
 
-	/**
-	 * Here the sensing will start for all the configured sensors.
-	 */
 	@Override
 	protected ArrayList<SensorData> doInBackground(Void... params)
 	{
-		ArrayList<SensorData> sensorData=new ArrayList<SensorData>();		
-		for(int i=0;i<SensorIds.size();i++){
-			try{
-				Log.d("Sensor Task", "Sampling from Sensor");
+		try{		
+			for(int i=0;i<SensorIds.size();i++){
+				Log.d(TAG, "Sampling from Sensor");
 				sensorData.add(sensorManager.getDataFromSensor(SensorIds.get(i)));
 			}
-			catch (ESException e){
-				Log.e(TAG, e.toString());
-				return null;
-			}
 		}
+		catch (ESException e){
+			Log.e(TAG, e.toString());
+			return null;
+		}
+
+		Log.i(TAG, "Data sensed is:");
+		for(SensorData x:sensorData)
+			Log.i(TAG, x.toString());
 		return(sensorData);
 	}
 
-	/**
-	 * Writes the sensor data in a file. 
-	 * After writing it calls the AsyncTask "SendSensorDataToServer" which sends the data to server.
-	 */
-	@Override
-	public void onPostExecute(ArrayList<SensorData> data){
-		Log.d(TAG,"Stopped sensing");
-		if(data!=null){
-//			new SensorDataFilterManager(data, SensorIds, context, message).pushSensorDataAccordingToXML();
-//			new FilterSensedData(context).FilterAndFireData(data);	
-			SensorDataHandler.handleOSNDependentData(data, context);
-		}
-		
-	}
 
 }

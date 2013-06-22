@@ -21,7 +21,7 @@ public class SenSocialService {
 	 * @param context Application-Context
 	 */
 	protected static void startService(Context context) {
-		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA",0);
 		if(!sp.getBoolean("sendId", false)){			
 			new IdSenderToEnableTrigger(sp.getString("fbusername", "null"), sp.getString("new_access_token", "null"),
 					sp.getString("twitterusername", "null"), sp.getString("uuid", "null"), sp.getString("server", "null"))
@@ -46,7 +46,7 @@ public class SenSocialService {
 	 * @param context Application-Context
 	 */	
 	protected static void stopService(Context context) {
-		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA",0);
 		if(sp.getString("mqtt","null").equals("null")){
 			Intent myIntent = new Intent(context, com.ubhave.sensocial.http.HTTPService.class);
 			context.stopService(myIntent);
@@ -57,7 +57,7 @@ public class SenSocialService {
 	}
 	
 	protected static Boolean isRunning(Context context){
-		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA",0);
 		if(sp.getString("mqtt","null").equals("null")){
 			SERVICE_CLASSNAME="com.ubhave.sensocial.http.HTTPService";
 		}else{

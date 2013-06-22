@@ -31,7 +31,7 @@ public class FilterParser {
 	
 	public FilterParser(Context context){
 		this.context=context;
-		this.sp=context.getSharedPreferences("snmbData",0);
+		this.sp=context.getSharedPreferences("SSDATA",0);
 		this.ed=sp.edit();
 	}
 	

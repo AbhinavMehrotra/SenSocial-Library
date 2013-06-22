@@ -18,7 +18,7 @@ public class AllPullSensors {
 	private SensorConfiguration SC;
 	
 	public AllPullSensors(Context context){
-		sp=context.getSharedPreferences("snmbData",0);
+		sp=context.getSharedPreferences("SSDATA",0);
 		SC=new SensorConfiguration(context);
 	}
 	

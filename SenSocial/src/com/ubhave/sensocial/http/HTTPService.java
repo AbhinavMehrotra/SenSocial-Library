@@ -44,7 +44,7 @@ public class HTTPService extends Service {
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		sp=getApplicationContext().getSharedPreferences("snmbData",0);  //PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		sp=getApplicationContext().getSharedPreferences("SSDATA",0);  //PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		Log.e(TAG, "Starting HTTP service.\n Refresh Interval: "+sp.getInt("refreshInterval", 60000));
 		UPDATE_INTERVAL=10000;//sp.getInt("refreshInterval", 60000);
 	    timer = new Timer();
@@ -123,7 +123,7 @@ public class HTTPService extends Service {
 				ed.putBoolean("" +
 						"streamsensing", false);
 				ed.commit();
-				new StartPullSensors(getApplicationContext()).stopIndependentContinuousStreamSensing();
+//				new StartPullSensors(getApplicationContext()).stopIndependentContinuousStreamSensing();
 			}
 			
 			
@@ -168,7 +168,7 @@ public class HTTPService extends Service {
 				ed.putBoolean("sensing", true);
 				ed.commit();
 				SocialNetworkListenerManager.newUpdateArrived(getApplicationContext(),newUpdate);	
-				new StartPullSensors(getApplicationContext()).startOneOffSensingWithOSN(newUpdate);
+//				new StartPullSensors(getApplicationContext()).startOneOffSensingWithOSN(newUpdate);
 			}
 			else{
 				Log.d(TAG, "Sensing configured for for OSN update only. \nBut no new update found.");	
@@ -181,7 +181,7 @@ public class HTTPService extends Service {
 				ed.putBoolean("oneoffsensing", true);
 				ed.commit();
 				SocialNetworkListenerManager.newUpdateArrived(getApplicationContext(),newUpdate);
-				new StartPullSensors(getApplicationContext()).startIndependentOneOffSensing();
+//				new StartPullSensors(getApplicationContext()).startIndependentOneOffSensing();
 			}
 			else{
 				Log.d(TAG, "Independent one-off sensing configured./nBut null trigger for oneoff.");
@@ -197,14 +197,14 @@ public class HTTPService extends Service {
 				ed.putBoolean("streamsensing", true);
 				ed.commit();
 				SocialNetworkListenerManager.newUpdateArrived(getApplicationContext(),newUpdate);
-				new StartPullSensors(getApplicationContext()).startIndependentContinuousStreamSensing();
+//				new StartPullSensors(getApplicationContext()).startIndependentContinuousStreamSensing();
 			}
 			else if(newUpdate.startsWith("03N")){
 				Log.d(TAG, "Independent continuous-stream sensing unconfigured.");
 				Editor ed=sp.edit();
 				ed.putBoolean("streamsensing", false);
 				ed.commit();
-				new StartPullSensors(getApplicationContext()).stopIndependentContinuousStreamSensing();
+//				new StartPullSensors(getApplicationContext()).stopIndependentContinuousStreamSensing();
 			}
 			break;
 		default:

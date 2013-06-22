@@ -44,10 +44,11 @@ public class TrackLocation {
 		this.context=context;
 		this.timer=new Timer();
 		sensorManager = ESSensorManager.getSensorManager(context);
-		sp=context.getSharedPreferences("SNnMB", 0);
+		sp=context.getSharedPreferences("SSDATA", 0);
 		serverUrl=sp.getString("server", "");
 		uuid=sp.getString("uuid", "null");
-		UPDATE_INTERVAL= 60*60*1000;//sp.getInt("refreshInterval", 60000);
+		UPDATE_INTERVAL= sp.getInt("refreshinterval", 60*60*1000);
+		Log.i(TAG, "TrackLocation: ref int-"+UPDATE_INTERVAL);
 	}
 
 	public void startTracking() {
@@ -61,6 +62,15 @@ public class TrackLocation {
 							sensorData=sensorManager.getDataFromSensor(AllPullSensors.SENSOR_TYPE_LOCATION);
 							JSONFormatter formatter = DataFormatter.getJSONFormatter(AllPullSensors.SENSOR_TYPE_LOCATION);
 							JSONObject jsondata=formatter.toJSON(sensorData);
+							System.out.print("location: "+jsondata.get("latitude"));
+							
+
+							JSONFormatter formatter1 = DataFormatter.getJSONFormatter(sensorData.getSensorType());
+							String str=formatter1.toJSON(sensorData).toJSONString();
+							System.out.print("str: "+str);
+							System.out.print("sensorData: "+sensorData);
+							
+							
 							latitude=jsondata.get("latitude").toString();
 							longitude=jsondata.get("longitude").toString();
 							StrictMode.ThreadPolicy old = StrictMode.getThreadPolicy();

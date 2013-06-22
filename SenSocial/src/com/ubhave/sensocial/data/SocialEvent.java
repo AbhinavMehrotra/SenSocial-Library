@@ -6,18 +6,20 @@ import org.json.JSONObject;
 import android.util.Log;
 
 import com.facebook.override;
+import com.ubhave.dataformatter.DataFormatter;
+import com.ubhave.dataformatter.json.JSONFormatter;
 import com.ubhave.sensormanager.data.SensorData;
 
 public class SocialEvent {
 
 	private SocialData socialData;
-	
+
 	private DeviceSensorData sensorData;
-	
+
 	public SocialEvent(){
 		//required to set all elements
 	}
-	
+
 	public SocialEvent(SensorData rawData, String classifiedData, String streamId, String deviceId,
 			String oSNFeed, String oSNName, String feedType){
 		sensorData=new DeviceSensorData();
@@ -29,7 +31,7 @@ public class SocialEvent {
 		socialData.setOSNName(oSNName);
 		socialData.setFeedType(feedType);
 	}
-	
+
 	/**
 	 * Returns the SocialEvent in json-string format
 	 */
@@ -38,46 +40,58 @@ public class SocialEvent {
 		//convert to string
 		JSONObject json =new JSONObject();
 		try {
-			json.put("raw_data", sensorData.getRawData());
-			json.put("classified_data", sensorData.getClassifiedData());
-			json.put("stream_id_data", sensorData.getStreamId());
-			json.put("device_id", sensorData.getDeviceId());
-			json.put("osn_feed", socialData.getOSNFeed());
-			json.put("osn_name", socialData.getOSNName());
-			json.put("_osn_feed_type", socialData.getFeedType());
+			if(sensorData!=null){
+				JSONFormatter formatter = DataFormatter.getJSONFormatter(sensorData.getRawData().getSensorType());
+				String str=formatter.toJSON(sensorData.getRawData()).toJSONString();
+				json.put("raw_data", str);
+				json.put("classified_data", sensorData.getClassifiedData());
+				json.put("stream_id_data", sensorData.getStreamId());
+				json.put("device_id", sensorData.getDeviceId());
+			}
+			if(socialData!=null){
+				json.put("osn_feed", socialData.getOSNFeed());
+				json.put("osn_name", socialData.getOSNName());
+				json.put("_osn_feed_type", socialData.getFeedType());
+			}
 		} catch (JSONException e) {
 			Log.e("SNnMB", e.toString());
 		}
-		
+
 		return json.toString();
 	}
-	
+
 	/**
 	 * Returns the social event in json format
 	 */
 	public JSONObject toJSON(){
 		//convert to json-object
-				JSONObject json =new JSONObject();
-				try {
-					json.put("raw_data", sensorData.getRawData());
-					json.put("classified_data", sensorData.getClassifiedData());
-					json.put("stream_id_data", sensorData.getStreamId());
-					json.put("device_id", sensorData.getDeviceId());
-					json.put("osn_feed", socialData.getOSNFeed());
-					json.put("osn_name", socialData.getOSNName());
-					json.put("_osn_feed_type", socialData.getFeedType());
-				} catch (JSONException e) {
-					Log.e("SNnMB", e.toString());
-				}
-				
-				return json;
+		JSONObject json =new JSONObject();
+		try {
+			if(sensorData!=null){
+				JSONFormatter formatter = DataFormatter.getJSONFormatter(sensorData.getRawData().getSensorType());
+				String str=formatter.toJSON(sensorData.getRawData()).toJSONString();
+				json.put("raw_data", str);
+				json.put("classified_data", sensorData.getClassifiedData());
+				json.put("stream_id_data", sensorData.getStreamId());
+				json.put("device_id", sensorData.getDeviceId());
+			}
+			if(socialData!=null){
+				json.put("osn_feed", socialData.getOSNFeed());
+				json.put("osn_name", socialData.getOSNName());
+				json.put("_osn_feed_type", socialData.getFeedType());
+			}
+		} catch (JSONException e) {
+			Log.e("SNnMB", e.toString());
+		}
+
+		return json;
 	}
 
 	/**
 	 * @return the socialData
 	 */
 	public SocialData getSocialData() {
-		return socialData;
+		return this.socialData;
 	}
 
 	/**
@@ -91,7 +105,7 @@ public class SocialEvent {
 	 * @return the filteredSensorData
 	 */
 	public DeviceSensorData getFilteredSensorData() {
-		return sensorData;
+		return this.sensorData;
 	}
 
 	/**
@@ -101,5 +115,5 @@ public class SocialEvent {
 		this.sensorData = filteredSensorData;
 	}
 
-	
+
 }

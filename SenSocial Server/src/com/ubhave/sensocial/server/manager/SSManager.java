@@ -1,5 +1,6 @@
 package com.ubhave.sensocial.server.manager;
 
+import java.io.File;
 import java.util.Set;
 
 import com.mongodb.MongoClient;
@@ -32,6 +33,10 @@ public class SSManager {
 	}
 
 	private SSManager(){
+		File clientFilters = new File("ClientFilters");  
+		clientFilters.mkdir(); 
+		File ppd = new File("PPD");  
+		ppd.mkdir(); 
 		new TCPServer().start();		
 	}
 	
@@ -47,8 +52,8 @@ public class SSManager {
 		return UserRegistrar.getAllUsers();
 	}	
 
-	public void registerListener(SensorListener listener, int streamId){
-		SensorListenerManager.add(listener, ""+streamId);
+	public void registerListener(SensorListener listener, String streamId){
+		SensorListenerManager.add(listener, streamId);
 	}
 	
 	public void removeListener(SensorListener listener){

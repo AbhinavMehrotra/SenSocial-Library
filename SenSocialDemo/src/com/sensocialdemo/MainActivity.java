@@ -58,13 +58,15 @@ public class MainActivity extends Activity implements SSListener{
 		try {
 			ServerConfiguration sc=new ServerConfiguration(getApplicationContext());
 			sc.setServerIP("192.168.0.10");
-			sc.setServerURL("hhtp://localhost/");
+			sc.setServerProjectURL("http://abhinavtest.net76.net/");
+			sc.setMQTTBrokerURL("tcp://broker.mqttdashboard.com:1883");
+			sc.setRefreshInterval(60);
 			sc.setServerPort(4444);
-			ssm=SenSocialManager.getSensorManager(getApplicationContext(), true);
+			ssm=SenSocialManager.getSenSocialManager(getApplicationContext(), true);
 			String uid=ssm.setUserId("abhinav");
 			System.out.println(uid);
 			User user=ssm.getUser(uid);
-			stream=user.getMyDevice().getStream(AllPullSensors.SENSOR_TYPE_ACCELEROMETER, "raw");
+			stream=user.getMyDevice().getStream(AllPullSensors.SENSOR_TYPE_ACCELEROMETER, "classified");
 			ssm.registerListener(this, stream.getStreamId());
 		} catch (PPDException e) {
 			Log.e(TAG, "Main activity, 1: "+e.toString());
@@ -88,6 +90,12 @@ public class MainActivity extends Activity implements SSListener{
 	}
 
 
+	public void onDataSensed(SocialEvent sensor_event) {
+
+		Log.e("SNnMB", "Received: "+ sensor_event.getFilteredSensorData().getRawData());
+		//Toast.makeText(getApplicationContext(), "Social Event: " +sensor_event.getFilteredSensorData().getStreamId(),Toast.LENGTH_LONG).show();
+
+	}
 
 	public void fblogin(View v){
 //		if(!sp.getString("fbname", "null").equals("null")){
@@ -154,12 +162,6 @@ public class MainActivity extends Activity implements SSListener{
 			}
 		}
 
-		public void onDataSensed(SocialEvent sensor_event) {
-
-			Log.e("SNnMB", "Received: "+ sensor_event.getFilteredSensorData().getRawData());
-			//Toast.makeText(getApplicationContext(), "Social Event: " +sensor_event.getFilteredSensorData().getStreamId(),Toast.LENGTH_LONG).show();
-
-		}
 
 
 		//	public boolean onOptionsItemSelected(MenuItem item) 

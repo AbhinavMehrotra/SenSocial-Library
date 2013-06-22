@@ -11,7 +11,7 @@ public class MQTTServerConfiguration {
 	private String ip;
 
 	public MQTTServerConfiguration(Context context) {
-		sp=context.getSharedPreferences("snmbData",0);
+		sp=context.getSharedPreferences("SSDATA",0);
 	}
 
 	/**

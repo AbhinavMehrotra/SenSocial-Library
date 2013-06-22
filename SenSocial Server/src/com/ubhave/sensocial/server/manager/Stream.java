@@ -93,10 +93,10 @@ public class Stream {
 				ppd.put(a.getSensorName(), "classified");
 			}
 		}
-		PrivacyPolicyDescriptorParser ppdParser= new PrivacyPolicyDescriptorParser();
-		if(!ppdParser.isAllowed(this.getDevice().getDeviceId(), ppd)){
-			throw new PPDException("Sensors associated with some stream are not allowed in the PPD");
-		}
+//		PrivacyPolicyDescriptorParser ppdParser= new PrivacyPolicyDescriptorParser();
+//		if(!ppdParser.isAllowed(this.getDevice().getDeviceId(), ppd)){
+//			throw new PPDException("Sensors associated with some stream are not allowed in the PPD");
+//		}
 
 		//Generate filter xml file
 		if(this.filter!=null){
@@ -119,8 +119,9 @@ public class Stream {
 						Sensors.getSensorNameById(s.getSensorId()), s.getDataType());				
 			}
 		}
-
 		MQTTClientNotifier.sendStreamNotification(device.getDeviceId(), MQTTNotifitions.start_stream, this.getStreamId());
+		
+//		MQTTClientNotifier.sendStreamNotification(device.getDeviceId(), MQTTNotifitions.start_stream, this.getStreamId());
 	}
 
 

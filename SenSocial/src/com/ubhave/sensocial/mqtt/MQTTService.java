@@ -29,10 +29,12 @@ public class MQTTService extends Service {
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		sp=getSharedPreferences("SNnMB", 0);
-		BROKER_URL= "tcp://broker.mqttdashboard.com:1883";//"tcp://"+sp.getString("mqtt", "")+":1883";
+		sp=getSharedPreferences("SSDATA", 0);
+		this.BROKER_URL=sp.getString("mqqt_broker_url", "null");
+		Log.i(TAG, "MQTT service onStart");
 		Log.i(TAG, BROKER_URL);
-		clientId=sp.getString("uuid", "null");
+		clientId=sp.getString("deviceid", "null");
+		Log.i(TAG, "client id: "+clientId);
 		//connectIt();
 		StrictMode.ThreadPolicy old = StrictMode.getThreadPolicy();
 		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(old)
@@ -40,7 +42,7 @@ public class MQTTService extends Service {
 		.build());
 		//connectIt();
 		try {
-			MQTTManager m = new MQTTManager(getApplicationContext(), "abhinav");
+			MQTTManager m = new MQTTManager(getApplicationContext(), clientId);
 			m.connect();
 			m.publishToDevice("android");
 			m.subscribeToDevice();

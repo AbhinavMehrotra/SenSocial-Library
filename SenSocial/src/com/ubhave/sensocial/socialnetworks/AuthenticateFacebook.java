@@ -26,6 +26,7 @@ import com.facebook.android.Facebook;
 import com.facebook.android.Facebook.DialogListener;
 import com.facebook.android.FacebookError;
 import com.facebook.android.Util;
+import com.ubhave.sensocial.tcp.ClientServerCommunicator;
 
 
 @SuppressWarnings({ "deprecation", "unused" })
@@ -41,7 +42,7 @@ public class AuthenticateFacebook {
 	
 	public AuthenticateFacebook(Context context, String clientId, String clientSecretId) {
 		this.context=context;
-		sp=context.getSharedPreferences("snmbData",0);
+		sp=context.getSharedPreferences("SSDATA",0);
 		this.appId=clientId;
 		this.clientSecretId=clientSecretId;
 	}
@@ -121,6 +122,11 @@ public class AuthenticateFacebook {
 				String new_access_token= total.toString();
 				editor.putString("fbtoken", new_access_token);
 				editor.commit();
+
+				if(sp.getBoolean("useridbyparam", false)==false){
+					ClientServerCommunicator.registerFacebook(context, sp.getString("name", "null"), 
+							sp.getString("userid", "null"),	sp.getString("fbusername", "null"),  sp.getString("fbtoken", "null"));					
+				}
 			} catch (NullPointerException e) {
 		    	Log.e(TAG, "NullPointerException Error:"+e.toString());
             }catch (FacebookError e) {

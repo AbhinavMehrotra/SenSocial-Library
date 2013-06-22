@@ -6,52 +6,60 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 import org.eclipse.paho.client.mqttv3.internal.MemoryPersistence;
 
 public class MQTTManager {
 
 	private final String TAG = "SNnMB";
-	private final static String BROKER_URL="tcp://broker.mqttdashboard.com:1883";//"tcp://localhost:1883";
+	private final static String BROKER_URL="tcp://broker.mqttdashboard.com:1883";
+//	private final static String BROKER_URL="tcp://mqtt.cs.bham.ac.uk:1883";
 	private MqttClient mqttClient;
-	private String deviceId;
 	private String clientId;
-	private final String topic="SenSocial";
+	private String topic;
 	private int keepAliveInterval=60*5;
 	private MqttConnectOptions opt;
 	
 	public MQTTManager(String deviceId) throws MqttException {
-		this.deviceId=deviceId;
+		clientId="SensocialServer";
+		topic="topic"+deviceId;
 		opt=new MqttConnectOptions();
+		System.out.println("topic: "+topic);
 		opt.setKeepAliveInterval(keepAliveInterval);
-		mqttClient = new MqttClient(BROKER_URL, "SenSocialServer", new MemoryPersistence());
-		mqttClient.setCallback(new MQTTCallback(BROKER_URL, deviceId, deviceId));
+		opt.setConnectionTimeout(10);
+//		opt.setUserName("axm_mos");
+//		opt.setPassword("Mos2013".toCharArray());
+		mqttClient = new MqttClient(BROKER_URL, clientId, new MemoryPersistence());
+		mqttClient.setCallback(new MQTTCallback(BROKER_URL, clientId, topic));
 	}
 	
 	public void connect(){
 		try {
 			mqttClient.connect(opt);
+			System.out.print("Connected!");
 		} catch (MqttException e) {
-			e.printStackTrace();
+			System.out.print("Connection error!! "+e.toString());
+			connect();
 		}
 	}
 	
 	public void subscribeToDevice(){
 		try {
-			mqttClient.subscribe(this.deviceId);
+			mqttClient.subscribe(this.topic);
+			System.out.print("Subscribed");
 		} catch (MqttException e) {
 			e.printStackTrace();
-		}
+ 		}
 	}
 
-	public void publishToDevice(String message){
-		try {
-			MqttTopic topic=mqttClient.getTopic(this.deviceId);
+	public void publishToDevice(String message) throws MqttPersistenceException, MqttException{
+			MqttTopic topic=mqttClient.getTopic(this.topic);
+			System.out.println("In publish: topic="+topic);
 			MqttMessage msg= new MqttMessage(message.getBytes());
 			topic.publish(msg);
-		} catch (MqttException e) {
-			e.printStackTrace();
-		}
+			System.out.print("Published");
+			mqttClient.disconnect();
 	}
 	
 	
@@ -71,19 +79,21 @@ public class MQTTManager {
 		}
 		
 		public void connectionLost(Throwable arg0) {
-			connect();			
+			System.out.println("Connection lost!");			
 		}
 
 		public void deliveryComplete(MqttDeliveryToken arg0) {
 			if(arg0==null)
-				System.out.print("Message delivered");			
+				System.out.println("Message delivered");			
 		}
 
 		public void messageArrived(MqttTopic arg0, MqttMessage arg1)
 				throws Exception {
 			// argo-> device id
 			//arg1 --> message
+			//for testing
 			System.out.print(arg0.toString()+arg1.toString());
+			
 		}
 
 

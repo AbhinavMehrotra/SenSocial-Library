@@ -12,7 +12,7 @@ public class SenSocialBroadcastReceiver extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA",0);
 		if(!sp.getString("mqtt","no").equals("no")){
 			Intent myIntent = new Intent(context, com.ubhave.sensocial.http.HTTPService.class);
 			context.startService(myIntent);

@@ -10,52 +10,65 @@ import org.eclipse.paho.client.mqttv3.MqttTopic;
 import org.eclipse.paho.client.mqttv3.internal.MemoryPersistence;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 public class MQTTManager {
 
 	private final String TAG = "SNnMB";
-	private final static String BROKER_URL="tcp://broker.mqttdashboard.com:1883";//"tcp://localhost:1883";
+//	private static String BROKER_URL="tcp://broker.mqttdashboard.com:1883";
+	private static String BROKER_URL;
 	private MqttClient mqttClient;
 	private String deviceId;
 	private String clientId;
-	private final String topic="SenSocial";
+	private String topic;
 	private int keepAliveInterval=60*5;
 	private MqttConnectOptions opt;
 	private Context context;
 	
 	public MQTTManager(Context context, String deviceId) throws MqttException {
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
+		this.BROKER_URL=sp.getString("mqqt_broker_url", "null");
 		this.context=context;
 		this.deviceId=deviceId;
+		this.topic="topic"+deviceId;
+//		this.topic="sensocial";
+		Log.i(TAG, "device id is: "+deviceId);
 		opt=new MqttConnectOptions();
+//		opt.setUserName("axm_mos");
+//		opt.setPassword("Mos2013".toCharArray());
 		opt.setKeepAliveInterval(keepAliveInterval);
+		opt.setConnectionTimeout(10);
 		mqttClient = new MqttClient(BROKER_URL, deviceId, new MemoryPersistence());
-		mqttClient.setCallback(new MQTTCallback(BROKER_URL, deviceId, deviceId));
+//		mqttClient = new MqttClient(BROKER_URL, "client", new MemoryPersistence());
+		mqttClient.setCallback(new MQTTCallback(BROKER_URL, deviceId, this.topic));
 	}
 	
 	public void connect(){
 		try {
 			mqttClient.connect(opt);
 		} catch (MqttException e) {
-			e.printStackTrace();
+			Log.e(TAG, "Error while connecting to mqtt broker: "+e.toString());
+			connect();
 		}
 	}
 	
 	public void subscribeToDevice(){
 		try {
-			mqttClient.subscribe(this.deviceId);
+			mqttClient.subscribe(this.topic);
 		} catch (MqttException e) {
-			e.printStackTrace();
+			Log.e(TAG, "Error while subscribing to mqtt broker: "+e.toString());
 		}
 	}
 
 	public void publishToDevice(String message){
 		try {
-			MqttTopic topic=mqttClient.getTopic(this.deviceId);
+			MqttTopic mtopic=mqttClient.getTopic(this.topic);
+			Log.i(TAG, "Published to : "+mtopic);
 			MqttMessage msg= new MqttMessage(message.getBytes());
-			topic.publish(msg);
+			mtopic.publish(msg);
 		} catch (MqttException e) {
-			e.printStackTrace();
+			Log.e(TAG, "Error while publishing to mqtt broker: "+e.toString());
 		}
 	}
 	

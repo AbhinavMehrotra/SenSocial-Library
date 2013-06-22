@@ -33,10 +33,11 @@ public class GenerateFilter {
 	public static void createXML(User user, String deviceId, ArrayList<String> modalities, String streamId, String sensorName, String sensorDataType){
 		//check for filter (server or client)
 		//filter types: device specific, relational, and combinational(two streams
-		//requires similar data with different frequency
+		//on a device requires similar data with different frequency)
 
 		if(isDeviceSpecific(deviceId, modalities)){
 			if(isCombinational(deviceId, sensorName, modalities, streamId)!=null){
+				System.out.println("NEW COMBINATIONAL FILTER");
 				String s=isCombinational(deviceId, sensorName, modalities, streamId);
 				if(!s.equalsIgnoreCase(streamId)){
 					//set it on server
@@ -74,10 +75,12 @@ public class GenerateFilter {
 				}
 			}
 			else{
+				System.out.println("NEW DEVICE SPECIFIC FILTER");
 				createClientFilter(modalities, streamId, sensorName, sensorDataType);				
 			}
 		}
 		else if(isRelational(modalities)){
+			System.out.println("N FILTER");
 			ArrayList<String> modalitiesNew= new ArrayList<String>();
 			modalitiesNew.add("friends_within_1_mile"+deviceId);
 			createServerFilter(modalitiesNew, streamId, sensorName, sensorDataType);			
@@ -206,6 +209,7 @@ public class GenerateFilter {
 			} 
 			else 
 			{ 
+				file.createNewFile();
 				mainRoot = doc.createElement("Filter");
 				doc.appendChild(mainRoot); 
 			} 
@@ -243,8 +247,15 @@ public class GenerateFilter {
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource source = new DOMSource(doc);
-
-			StreamResult result =  new StreamResult(new File("ClientFilters\\Filter"+streamId+".xml"));
+			
+			File newFile=new File("ClientFilters\\Filter"+streamId+".xml");
+			System.out.println("File path: "+newFile.getAbsolutePath());
+			
+			if(newFile.createNewFile())
+				System.out.println("New file created: "+newFile.getName());
+			else
+				System.out.println("File exists: "+newFile.getName());
+			StreamResult result =  new StreamResult(newFile);
 			transformer.transform(source, result);
 
 			System.out.println("Done");
@@ -272,6 +283,7 @@ public class GenerateFilter {
 			} 
 			else 
 			{ 
+				file.createNewFile();
 				mainRoot = doc.createElement("Filter");
 				doc.appendChild(mainRoot); 
 			} 

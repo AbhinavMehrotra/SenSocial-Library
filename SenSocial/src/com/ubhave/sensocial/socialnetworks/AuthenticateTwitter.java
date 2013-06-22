@@ -1,5 +1,7 @@
 package com.ubhave.sensocial.socialnetworks;
 
+import com.ubhave.sensocial.tcp.ClientServerCommunicator;
+
 import oauth.signpost.basic.DefaultOAuthProvider;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.exception.OAuthCommunicationException;
@@ -33,7 +35,7 @@ public class AuthenticateTwitter {
 
 	public AuthenticateTwitter(Context context, String consumerKey, String consumerKeySecret) {
 		this.context=context;
-		sp=context.getSharedPreferences("snmbData",0);
+		sp=context.getSharedPreferences("SSDATA",0);
 		this.consumerKey=consumerKey;
 		this.consumerKeySecret=consumerKeySecret;
 		this.callbackURL="callback://tweetactivity";
@@ -102,6 +104,10 @@ public class AuthenticateTwitter {
 					editor.putString("twitterusername", user.getScreenName());
 					editor.putBoolean("twitterlogin", true);
 					editor.commit();
+					if(sp.getBoolean("useridbytwitter", false)==false){
+						ClientServerCommunicator.registerTwitter(context, sp.getString("name", "null"), 
+								sp.getString("userid", "null"),	sp.getString("fbusername", "null"),  sp.getString("fbtoken", "null"));					
+					}
 				}
 				Log.d(Tag, "Twitter name: "+sp.getString("twitterusername", "null"));
 			}

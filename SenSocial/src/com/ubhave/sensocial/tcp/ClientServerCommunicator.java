@@ -10,7 +10,7 @@ import android.content.SharedPreferences;
 public class ClientServerCommunicator {
 
 	public static void registerUser(Context context, String userId, String deviceId, String mac){
-		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		JSONObject obj = new JSONObject();
 		try {
 			obj.put("name", "registration");
@@ -24,7 +24,7 @@ public class ClientServerCommunicator {
 	}
 	
 	public static void registerFacebook(Context context, String name, String userId, String facebookName, String token){
-		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		JSONObject obj = new JSONObject();
 		JSONObject facebook = new JSONObject();
 		try {
@@ -50,7 +50,7 @@ public class ClientServerCommunicator {
 	
 	
 	public static void registerTwitter(Context context, String name, String userId, String twitterName, String token){
-		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		JSONObject obj = new JSONObject();
 		JSONObject twitter = new JSONObject();
 		try {
@@ -75,15 +75,15 @@ public class ClientServerCommunicator {
 	}
 	
 	public static void updateLocation(Context context, String latitude, String longitude){
-		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		JSONObject obj = new JSONObject();
 		JSONObject location = new JSONObject();
 		try {
 			location.put("lat", latitude);
 			location.put("lon", longitude);
-			location.put("userid", sp.getString("userid", "null"));
+			obj.put("userid", sp.getString("userid", "null"));
 			obj.put("name", "location");
-			obj.put("deviceid", sp.getString("uuid", ""));
+			obj.put("deviceid", sp.getString("deviceid", ""));
 			obj.put("location",location);
 			if(sp.getString("userid", "null").equals("null")){
 				System.out.println("Not able to update location because the user id is null");
@@ -97,7 +97,7 @@ public class ClientServerCommunicator {
 	}
 	
 	public static void sendStream(Context context, String socialEventString){
-		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		JSONObject obj = new JSONObject();
 		try {
 			obj.put("name", "stream");
@@ -105,7 +105,7 @@ public class ClientServerCommunicator {
 			obj.put("deviceid", sp.getString("uuid", "null"));
 			obj.put("stream",socialEventString);
 			if(sp.getString("userid", "null").equals("null")){
-				System.out.println("Not able to update location because the user id is null");
+				System.out.println("Not able to send the stream because the user id is null");
 			}
 			else{
 				TCPClient.getInstance(sp.getString("serverip", ""),sp.getInt("serverport", 0)).startSending(obj.toString());

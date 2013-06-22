@@ -40,6 +40,7 @@ public class GenerateFilter {
 			} 
 			else 
 			{ 
+				file.createNewFile();
 				mainRoot = doc.createElement("Filter");
 				doc.appendChild(mainRoot); 
 			} 

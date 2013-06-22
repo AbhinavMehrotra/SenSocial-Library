@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<ppd>
+	<sensor name="accelerometer">
+		<server required="true"
+		data="raw" />
+		<client required="true"
+		data="raw" />
+	</sensor>
+	<sensor name="location">
+		<server required="true"
+		data="raw" />
+		<client required="true"
+		data="raw" />
+	</sensor>
+	<sensor name="microphone"> 
+		<server required="true"
+		data="raw" />
+		<client required="true"
+		data="raw" />
+	</sensor>
+	<sensor name="bluetooth">
+		<server required="true"
+		data="raw" />
+		<client required="true"
+		data="raw" />
+	</sensor>
+	<sensor name="wifi">
+		<server required="true"
+		data="raw" />
+		<client required="true"
+		data="raw" />
+	</sensor>
+</ppd>

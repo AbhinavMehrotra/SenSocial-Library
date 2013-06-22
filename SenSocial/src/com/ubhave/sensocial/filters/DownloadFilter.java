@@ -10,29 +10,37 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
+import com.facebook.override;
 import com.ubhave.sensormanager.data.SensorData;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 
-public class DownloadFilter extends AsyncTask<Void,Void,Void>{
+public class DownloadFilter extends AsyncTask<Void,Void,Integer>{
 	private Context context;
 	private String url;
-	private String dest_file_path;
+	private String dest_file_name;
 	private String TAG="SNnMB";
-	public DownloadFilter(Context context, String url, String dest_file_path) {
+	public DownloadFilter(Context context, String url, String dest_file_name) {
 		this.context=context;
 		this.url=url;
-		this.dest_file_path=dest_file_path;
+		this.dest_file_name=dest_file_name;
 	}
-
-	protected Void doInBackground(Void... arg0) {
+	@Override
+	public void onPreExecute()
+	{
+		Log.i("SNnMB", "Download filter file:  onPreExecute");
+	}
+	@Override
+	protected Integer doInBackground(Void... arg0) {
 //		final String dwnload_file_path = "http://abhinavtest.net76.net/temp/filter.xml";
 //		final String dest_file_path = "/mnt/sdcard/dwn1.xml";
 		
 		try {
-			File dest_file = new File(dest_file_path);
+			File dest_file = new File(Environment.getExternalStorageDirectory(), dest_file_name);
+			dest_file.createNewFile();
 			URL u = new URL(url);
 			URLConnection conn = u.openConnection();
 			int contentLength = conn.getContentLength();
@@ -45,21 +53,22 @@ public class DownloadFilter extends AsyncTask<Void,Void,Void>{
 			fos.flush();
 			fos.close();
 			
-			FilterSettings.mergeFilters(dest_file_path,"/res/raw/filter.xml");
+			FilterSettings.mergeFilters(dest_file_name);
 
+			Log.d(TAG,"Download Complete");
+			ConfigurationHandler.run(context);
+			
 		} catch(FileNotFoundException e) {
 			Log.e(TAG, "Error while getting new filter!!\n"+e.toString());
 		} catch (IOException e) {
 			Log.e(TAG, "Error while getting new filter!!\n"+e.toString());
 		}
+		return 1;
 		
-		return null;
 	}
-	
-	public void onPostExecute(Void... arg){
+
+	public Void onPostExecute(Integer... arg){
 		Log.d(TAG,"DownloadFilter-onPostExecute: Set new configuration and sensor list");
-		
-		//new FilterParser(context).parseXML();
-		ConfigurationHandler.run(context);		
+		return null;		
 	}
 }

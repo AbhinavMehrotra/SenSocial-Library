@@ -1,17 +1,20 @@
 package com.ubhave.sensocial.sensormanager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.DropBoxManager.Entry;
+import android.util.Log;
 
 import com.ubhave.sensocial.data.DeviceSensorData;
 import com.ubhave.sensocial.data.SocialEvent;
 import com.ubhave.sensocial.manager.SSListenerManager;
 import com.ubhave.sensocial.sensordata.classifier.SensorDataHandler;
 import com.ubhave.sensocial.tcp.ClientServerCommunicator;
-import com.ubhave.sensocial.tcp.TCPClient;
 import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
 import com.ubhave.sensormanager.SensorDataListener;
@@ -28,24 +31,52 @@ public class ContinuousStreamSensing {
 	private static Editor ed;
 	private static int subscriptionId;
 	private static AllPullSensors aps;
+	private static ArrayList<SensorData> sensordata;
+	private static ContinuousStreamSensing instance;
+	private static Map<Integer, SensorData> sensordataCollection;
 
-	public ContinuousStreamSensing(Context context, ArrayList<Integer> SensorIds) throws ESException
+	public static ContinuousStreamSensing getInstance(Context context, ArrayList<Integer> SensorIds) throws ESException{
+		return new ContinuousStreamSensing(context, SensorIds);
+		//		if(instance==null){
+		//			instance=new ContinuousStreamSensing(context, SensorIds);
+		//		}
+		//		return instance;
+	}
+
+	private ContinuousStreamSensing(Context context, ArrayList<Integer> SensorIds) throws ESException
 	{
 		this.context=context;
 		this.SensorIds=SensorIds;
 		sensorManager = ESSensorManager.getSensorManager(context);
-		sp=context.getSharedPreferences("snmbData",0);
+		sp=context.getSharedPreferences("SSDATA",0);
 		aps=new AllPullSensors(context);
+		sensordata=new ArrayList<SensorData>();
+		sensordataCollection=new HashMap<Integer, SensorData>();
 	}
 
 	protected void startSensing() throws ESException{
 		SensorDataListener listener = new SensorDataListener() {
 
-			public void onDataSensed(SensorData arg0) {
-				//arg0.getSensorType();
+			public void onDataSensed(SensorData arg) {
 				System.out.println("on Data Sensed");
-				System.out.println("Data: "+arg0);
-				SensorDataHandler.handleStreamData(arg0,context);
+				System.out.println("Data: "+arg);
+				//				sensordata.add(arg);
+//				if(sensordata.size()==SensorIds.size()){
+//					Log.d("SNnMB", "Data sensed for all sensor-ids");
+//					SensorDataHandler.handleStreamData(sensordata, context);
+//					sensordata.clear();
+//				}
+				sensordataCollection.put(arg.getSensorType(), arg);
+				if(sensordataCollection.size()==SensorIds.size()){
+					Log.d("SNnMB", "Data sensed for all sensor-ids");
+					for(Map.Entry<Integer, SensorData> x: sensordataCollection.entrySet()){
+						sensordata.add(x.getValue());
+					}
+					SensorDataHandler.handleStreamData(sensordata, context);
+					sensordata.clear();
+					sensordataCollection.clear();		
+				}
+
 			}
 
 			public void onCrossingLowBatteryThreshold(boolean arg0) {
@@ -56,8 +87,7 @@ public class ContinuousStreamSensing {
 		for(int i=0;i<SensorIds.size();i++){
 			System.out.println("Continuous sensing (Start sensing): "+SensorIds.get(i));
 			System.out.println(SensorIds);
-//			subscriptionId=sensorManager.subscribeToSensorData (SensorIds.get(i), listener);
-			subscriptionId=sensorManager.subscribeToSensorData (AllPullSensors.SENSOR_TYPE_ACCELEROMETER, listener);
+			subscriptionId=sensorManager.subscribeToSensorData (SensorIds.get(i), listener);
 			ed.putInt(aps.getSensorNameById(SensorIds.get(i))+"_subId", subscriptionId);			
 		}
 		ed.commit();
@@ -73,12 +103,12 @@ public class ContinuousStreamSensing {
 				d.setRawData(data);
 				d.setStreamId(streamId);
 				if(dataType.equalsIgnoreCase("raw")){
-				se.setFilteredSensorData(d);
+					se.setFilteredSensorData(d);
 				}
 				else{
 					//classify it
 				}
-				ClientServerCommunicator.sendStream(context, se.toJSONString());
+				ClientServerCommunicator.sendStream(context, se.toJSONString()); 
 			}
 
 			public void onCrossingLowBatteryThreshold(boolean arg0) {
@@ -102,7 +132,7 @@ public class ContinuousStreamSensing {
 				d.setRawData(data);
 				d.setStreamId(streamId);
 				if(dataType.equalsIgnoreCase("raw")){
-				se.setFilteredSensorData(d);
+					se.setFilteredSensorData(d);
 				}
 				else{
 					//classify it

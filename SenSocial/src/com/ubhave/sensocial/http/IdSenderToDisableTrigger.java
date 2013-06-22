@@ -21,7 +21,7 @@ public class IdSenderToDisableTrigger {
 	private SharedPreferences sp;
 	
 	public IdSenderToDisableTrigger(String userName, String uuId, Context context) {
-		sp=context.getSharedPreferences("SNnMB", 0);
+		sp=context.getSharedPreferences("SSDATA", 0);
 		this.userName=userName;
 		this.uuId=uuId;
 		this.serverUrl= sp.getString("server", "");

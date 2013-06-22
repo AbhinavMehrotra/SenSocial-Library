@@ -15,6 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import android.os.Environment;
+import android.util.Log;
 
 public class FilterSettings {
 
@@ -24,14 +25,10 @@ public class FilterSettings {
 		{
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
 			Document doc = docBuilder.newDocument();
-
 			File file = new File(Environment.getExternalStorageDirectory(), "filter.xml");
 			System.out.println("file found");
 			doc = docBuilder.parse(file); 
-			
-
 			doc.getDocumentElement().normalize();
 			if(doc.getDocumentElement().getNodeName().equalsIgnoreCase("filter")){
 				System.out.println("filter node found");
@@ -39,9 +36,9 @@ public class FilterSettings {
 				for (int temp=0;temp<nList.getLength();temp++) {
 					Node nNode = nList.item(temp);
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-						System.out.println("configuration node found");
+						System.out.println("configuration nodes found");
 						Element eElement = (Element) nNode;
-						if(eElement.getAttribute("name").equalsIgnoreCase(configName)){
+						if(eElement.getAttribute("name").equals(configName)){
 							eElement.setAttribute("sense", "true");
 							System.out.print("config found:"+eElement.getAttribute("name"));
 							//do we need to write it again?
@@ -54,6 +51,7 @@ public class FilterSettings {
 						}
 						else{
 							System.out.println("config not found: "+configName);
+							System.out.println("config name is: "+eElement.getAttribute("name"));
 						}
 					}
 				}
@@ -74,23 +72,31 @@ public class FilterSettings {
 		{
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
 			Document doc = docBuilder.newDocument();
-
-			File file = new File("C:\\testing.xml");
+			File file = new File(Environment.getExternalStorageDirectory(), "filter.xml");
 			System.out.println("file found");
 			doc = docBuilder.parse(file); 
-			
-
 			doc.getDocumentElement().normalize();
-			if(doc.getDocumentElement().getNodeName().equals("filter")){
-				NodeList nList = doc.getElementsByTagName("configuration");
+			if(doc.getDocumentElement().getNodeName().equalsIgnoreCase("filter")){
+				System.out.println("filter node found");
+				NodeList nList = doc.getElementsByTagName("Configuration");
 				for (int temp=0;temp<nList.getLength();temp++) {
 					Node nNode = nList.item(temp);
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+						System.out.println("configuration node found");
 						Element eElement = (Element) nNode;
 						if(eElement.getAttribute("name").equalsIgnoreCase(configName)){
 							eElement.setAttribute("sense", "false");
+							Log.i("SNnMB", "Config sensing false(pause)");
+							TransformerFactory transformerFactory = TransformerFactory.newInstance();
+							Transformer transformer = transformerFactory.newTransformer();
+							DOMSource source = new DOMSource(doc);
+
+							StreamResult result =  new StreamResult(new File(Environment.getExternalStorageDirectory(), "filter.xml"));
+							transformer.transform(source, result);
+						}
+						else{
+							Log.i("SNnMB", "Config not found");
 						}
 					}
 				}
@@ -110,21 +116,31 @@ public class FilterSettings {
 
 			Document doc = docBuilder.newDocument();
 
-			File file = new File("C:\\testing.xml");
+			File file = new File(Environment.getExternalStorageDirectory(), "filter.xml");
 			System.out.println("file found");
 			doc = docBuilder.parse(file); 
 			doc.normalize();
 			
 
 			Element mainRoot=doc.getDocumentElement();
-			if(mainRoot.getNodeName().equals("filter")){
-				NodeList nList = doc.getElementsByTagName("configuration");
+			if(mainRoot.getNodeName().equalsIgnoreCase("filter")){
+				NodeList nList = doc.getElementsByTagName("Configuration");
 				for (int temp=0;temp<nList.getLength();temp++) {
 					Node nNode = nList.item(temp);
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 						Element eElement = (Element) nNode;
 						if(eElement.getAttribute("name").equalsIgnoreCase(configName)){
 							mainRoot.removeChild(nNode);
+							Log.i("SNnMB", "Config deleted");
+							TransformerFactory transformerFactory = TransformerFactory.newInstance();
+							Transformer transformer = transformerFactory.newTransformer();
+							DOMSource source = new DOMSource(doc);
+
+							StreamResult result =  new StreamResult(new File(Environment.getExternalStorageDirectory(), "filter.xml"));
+							transformer.transform(source, result);
+						}
+						else{
+							Log.i("SNnMB", "Config not found");
 						}
 					}
 				}
@@ -136,87 +152,53 @@ public class FilterSettings {
 	}
 
 	
-	public static void mergeFilters(String newFilter, String existingFilter){
+	public static void mergeFilters(String newFilter){
 		//add new filter-config
 		try
 		{
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
 			Document doc = docBuilder.newDocument();
-
-			File file = new File(existingFilter);
-			System.out.println("file found");
-			doc = docBuilder.parse(file); 
-			doc.normalize();
-			
-
-			Element mainRoot=doc.getDocumentElement();
-			if(mainRoot.getNodeName().equals("filter")){
-				
+			File file = new File(Environment.getExternalStorageDirectory(), "filter.xml");
+			Element mainRoot;
+			if(!file.exists()){
+				file.createNewFile();
+				mainRoot = doc.createElement("Filter");
+				doc.appendChild(mainRoot);
+			}
+			else{
+				doc = docBuilder.parse(file); 
+				doc.normalize(); 
+				mainRoot=doc.getDocumentElement();				
+			}
+			if(mainRoot.getNodeName().equalsIgnoreCase("filter")){				
 				DocumentBuilderFactory docFactoryNew = DocumentBuilderFactory.newInstance();
 				DocumentBuilder docBuilderNew = docFactoryNew.newDocumentBuilder();
-
 				Document docNew = docBuilderNew.newDocument();
-
-				File fileNew = new File(newFilter);
-				System.out.println("new filter file found");
+				File fileNew = new File(Environment.getExternalStorageDirectory(), newFilter);
 				docNew = docBuilderNew.parse(fileNew); 
 				docNew.normalize();
-				
-
 				Element mainRootNew=docNew.getDocumentElement();
-				if(mainRootNew.getNodeName().equalsIgnoreCase("filter")){
-					NodeList nList = docNew.getElementsByTagName("configuration");
+				if(mainRootNew.getNodeName().equalsIgnoreCase("Filter")){					
+					NodeList nList = docNew.getElementsByTagName("Configuration");
 					for (int temp=0;temp<nList.getLength();temp++) {
-							mainRoot.appendChild(nList.item(temp));
+						Node n= nList.item(temp);
+						mainRoot.appendChild(doc.importNode(n, true));
 					}
-				}
-				
-				System.out.println("Filter appended");
-				fileNew.delete();
-				System.out.println("File deleted");
-				
-				
+					TransformerFactory transformerFactory = TransformerFactory.newInstance();
+					Transformer transformer = transformerFactory.newTransformer();
+					DOMSource source = new DOMSource(doc);
+
+					StreamResult result =  new StreamResult(new File(Environment.getExternalStorageDirectory(), "filter.xml"));
+					transformer.transform(source, result);
+					System.out.println("Filter appended");
+					fileNew.delete();
+					System.out.println("New Filter-File deleted");
+				}				
 			}		
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 	}
 	
-//	public static void mergeFilters(String sourceFilter, String destinationFilter){
-//		try
-//		{
-//			Element mainRootS, mainRootD;
-//			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-//			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-//
-//			Document doc = docBuilder.newDocument();
-//			Document docSource = docBuilder.newDocument();
-//
-//			File fileDesination = new File(sourceFilter); 
-//			doc = docBuilder.parse(fileDesination); 
-//			mainRootD = doc.getDocumentElement(); 
-//
-//
-//			File fileSource = new File(sourceFilter); 
-//			docSource = docBuilder.parse(fileSource); 
-//			mainRootS = docSource.getDocumentElement(); 
-//
-//			mainRootD.appendChild(mainRootS.getChildNodes().item(0));
-//
-//
-//			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-//			Transformer transformer = transformerFactory.newTransformer();
-//			DOMSource sourceDOM = new DOMSource(doc);
-//
-//			StreamResult result =  new StreamResult(new File(destinationFilter));
-//			transformer.transform(sourceDOM, result);
-//
-//			Log.i("SNnMB", "New filter successfully merged");
-//
-//		} catch (Exception e) {
-//			Log.e("SNnMB", "Error while merging new filter: "+ e.toString());
-//		}
-//	}
 }

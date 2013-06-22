@@ -47,7 +47,7 @@ public class SensorClassifier {
 			}				
 		}
 
-		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		//Check if OSN config has been added/removed
 		if(osnConfigs.size()>sp.getStringSet("OSNConfigurationSet", blankSet).size()){
 			//added new OSN config 
@@ -66,7 +66,7 @@ public class SensorClassifier {
 
 		//Check if Stream config has been added/removed
 		if(streamConfigs.size()>sp.getStringSet("StreamConfigurationSet", blankSet).size()){
-			//added new Stream config 
+			//added new Stream config 			
 			System.out.println("add Stream config");
 			addAndSubscribeStreamConfig(context,streamConfigs);
 		}
@@ -83,7 +83,7 @@ public class SensorClassifier {
 
 	//This method adds new elements to the OSN configuration and OSN sensor set
 	private static void addOSNConfig(Context context, Map<String, Set<String>> osnConfigs){
-		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		Editor ed=sp.edit();
 		Set<String> config=new HashSet<String>();
 		Set<String> sensor=new HashSet<String>();
@@ -104,7 +104,7 @@ public class SensorClassifier {
 
 	//This method removes unused elements to the OSN configuration and OSN sensor set
 	private static void removeOSNConfig(Context context, Map<String, Set<String>> osnConfigs){
-		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		Editor ed=sp.edit();
 		Set<String> config=new HashSet<String>();
 		Set<String> sensor=new HashSet<String>();
@@ -129,67 +129,77 @@ public class SensorClassifier {
 	//This method adds new elements to the Stream configuration and Stream sensor set.
 	//It will also subscribe the new sensors
 	private static void addAndSubscribeStreamConfig(Context context, Map<String, Set<String>> streamConfigs){
-		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		Editor ed=sp.edit();
 		Set<String> config=new HashSet<String>();
 		Set<String> sensor=new HashSet<String>();
+		Set<String> sensorNew=new HashSet<String>();
 		Set<String> blankSet=new HashSet<String>();
 		config=sp.getStringSet("StreamConfigurationSet", null);
 		sensor=sp.getStringSet("StreamSensorSet", sensor);
+		for(String s:sensor)
+			sensorNew.add(s);
+		System.out.println("Sensor: "+sensor);
+		System.out.println("Sensor New: "+sensorNew);
+		
 		for(Map.Entry<String, Set<String>> c: streamConfigs.entrySet()){
 			System.out.println("Map: "+c);
 			if(config==null || !config.contains(c.getKey())){
 				//new element found
 				for(String s:c.getValue()){
 					if(s.equalsIgnoreCase("ALL")){
-						sensor.add(ConfigurationHandler.getRequiredData(c.getKey()));
+						sensorNew.add(ConfigurationHandler.getRequiredData(c.getKey()));
 						System.out.println("Sensor name (for ALL): " + ConfigurationHandler.getRequiredData(c.getKey()));
-						System.out.println("Set- Sensor: "+sensor);
+						System.out.println("Set- Sensor: "+sensorNew);
 					}
 					else{
-						sensor.add(Modality.valueOf(s).getSensorName());
+						sensorNew.add(Modality.valueOf(s).getSensorName());
 						System.out.println("Sensor name: "+Modality.valueOf(s).getSensorName());
 					}
 				}
 			}
 		}
-		
-		System.out.println("Set- Sensor: "+sensor);
 
-		blankSet.clear();
-		System.out.println("Check Sensor size: "+sensor.size());
-		//System.out.println("Check StreamSensorSet size: "+sp.getStringSet("StreamSensorSet", null)==null?0:sp.getStringSet("StreamSensorSet", null).size());
-		for(String s: sensor)
-			System.out.println("Check Sensor: "+s);
+		System.out.println("sensor: "+sensor);
+		System.out.println("sensorNew: "+sensorNew);
 
-		System.out.println("Set- Sensor: "+sensor);
-		
 		//check for new sensors and subscribe 
 		ArrayList<Integer> sensorIds=new ArrayList<Integer>();
 		AllPullSensors aps=new AllPullSensors(context);
-		blankSet.clear();
-		Set<String> sensorTemp=new HashSet<String>();
-		sensorTemp=sensor;
-		sensorTemp.removeAll(sp.getStringSet("StreamSensorSet", blankSet));
+		for(String sensor_name:sensor){
+			sensorIds.add(aps.getSensorIdByName(sensor_name));
+		}
+
+		System.out.println("sensor: "+sensor);
+		System.out.println("sensorNew: "+sensorNew);
+
+
 		//		if(sensor!=sp.getStringSet("StreamSensorSet", blankSet)){
-		if(sensorTemp.size()>0){ //!sp.getStringSet("StreamSensorSet", blankSet).containsAll(sensorTemp)
+		//if(sensorTemp.size()>0){ //
+		if(!sensor.containsAll(sensorNew)){
 			//new sensor required
 			System.out.println("new sensor required");
-			for(String s:sensor){
+			try {
+				ContinuousStreamSensing.getInstance(context,sensorIds).stopSensing();
+
+			} catch (ESException e) {
+				Log.e("SNnMB", "Error at sensor classifier: "+e.toString());
+			}
+			for(String s:sensorNew){
 				if(!sp.getStringSet("StreamSensorSet", blankSet).contains(s)){
-					//found new sensor
+					//found new sensor to be added
 					sensorIds.add(aps.getSensorIdByName(s));
 					System.out.println("sensor id: "+aps.getSensorIdByName(s));
 				}					
 			}
 			try {
 				System.out.println("All sensor Ids: "+sensorIds);
-				new ContinuousStreamSensing(context,sensorIds).startSensing();
+				ContinuousStreamSensing.getInstance(context,sensorIds).startSensing();
 			} catch (ESException e) {
 				Log.e("SNnMB", "Error at sensor classifier: "+e.toString());
 			}
-			ed.putStringSet("StreamSensorSet", sensor);
-//			ed.putStringSet("StreamConfigurationSet", config);
+			ed.putStringSet("StreamSensorSet", sensorNew);
+			//			ed.putStringSet("StreamConfigurationSet", config);
 			ed.commit();
 		}
 		else{
@@ -199,7 +209,7 @@ public class SensorClassifier {
 			for(String s: sensor)
 				System.out.println("Sensor: "+s);
 		}
-		
+
 		if(config==null)
 			config=new HashSet<String>();
 		for(Map.Entry<String, Set<String>> c: streamConfigs.entrySet()){
@@ -212,7 +222,7 @@ public class SensorClassifier {
 	//This method removes unused elements to the Stream configuration and Stream sensor set.
 	//It will also un-subscribe the unused sensors
 	private static void removeAndUnsubscribeStreamConfig(Context context, Map<String, Set<String>> streamConfigs){
-		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		Editor ed=sp.edit();
 		Set<String> config=new HashSet<String>();
 		Set<String> sensor=new HashSet<String>();
@@ -222,6 +232,7 @@ public class SensorClassifier {
 		for(String c:config){
 			if(!streamConfigs.containsKey(c)){
 				//removed element found
+				Log.i("SNnMB", "CONFIG TO BE REMOVED FOUND"+c);
 				config.remove(c);
 			}
 		}
@@ -230,24 +241,35 @@ public class SensorClassifier {
 			for(String s:e.getValue())
 				sensorNew.add(Modality.valueOf(s).getSensorName());
 		}
+		Log.i("SNnMB", "New sensors: "+sensorNew);
 		//check for new sensors and subscribe 
 		ArrayList<Integer> sensorIds=new ArrayList<Integer>();
 		AllPullSensors aps=new AllPullSensors(context);
-		if(!sensor.equals(sp.getStringSet("StreamSensorSet", blankSet))) {
+		for(String sensor_name:sp.getStringSet("StreamSensorSet", blankSet)){
+			sensorIds.add(aps.getSensorIdByName(sensor_name));
+		}
+		try {
+			Log.i("SNnMB", "Stop sensing from: "+sensorIds);
+			ContinuousStreamSensing.getInstance(context,sensorIds).stopSensing();
+		} catch (ESException e) {
+			Log.e("SNnMB", "Error at sensor classifier: "+e.toString());
+		}
+		if(!sensorNew.equals(sensor)) {
 			//sensor to be removed
 			for(String s:sensor){
 				if(!sensorNew.contains(s)){
 					//found sensor
-					sensorIds.add(aps.getSensorIdByName(s));
+					sensorIds.remove(sensorIds.indexOf(aps.getSensorIdByName(s)));
 				}					
 			}
 			try {
-				new ContinuousStreamSensing(context,sensorIds).stopSensing();
+				Log.i("SNnMB", "Start sensing from: "+sensorIds);
+				ContinuousStreamSensing.getInstance(context,sensorIds).startSensing();
 			} catch (ESException e) {
 				Log.e("SNnMB", "Error at sensor classifier: "+e.toString());
 			}
 		}		
-		ed.putStringSet("StreamSensorSet", sensor);
+		ed.putStringSet("StreamSensorSet", sensorNew);
 		ed.putStringSet("StreamConfigurationSet", config);
 		ed.commit();
 	}

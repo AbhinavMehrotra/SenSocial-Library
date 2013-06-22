@@ -39,11 +39,15 @@ public class ConfigurationHandler {
 		Set<String> configsFilter= new HashSet<String>();
 		Set<String> configsMemory= new HashSet<String>();
 		configsFilter=getConfigurations();
-
-		SharedPreferences sp=context.getSharedPreferences("SNnMB", 0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		configsMemory=sp.getStringSet("ConfigurationSet", null);
 
+
+		System.out.println("configsMemory"+configsMemory);
+		System.out.println("configsFilter"+configsFilter);
+
 		if(!configsFilter.equals(configsMemory) ){
+			System.out.println("Some changes in filter file");
 			//find new configs 
 			ArrayList<String> newConfigs= new ArrayList<String>();
 			newConfigs=getNewConfigs(configsFilter, configsMemory);
@@ -58,10 +62,11 @@ public class ConfigurationHandler {
 			ed.commit();
 
 
+			ArrayList<String> blank= new ArrayList<String>();
 
 			//if some configs has been added
-			if(newConfigs!=null){
-				System.out.println("New config found");
+			if(newConfigs!=blank && newConfigs!=null){
+				System.out.println("New config found:" +newConfigs);
 				Set<String> sensors= new HashSet<String>();
 				sensors=sp.getStringSet("SensorSet", sensors);
 				ArrayList<String> newSensors=new ArrayList<String>();
@@ -72,6 +77,8 @@ public class ConfigurationHandler {
 					activities.clear();
 					activities=getActivities(config);
 					ed.putStringSet(config, activities);
+					ed.commit();
+					System.out.println("Activities: "+activities);
 
 					//find new sensors for new-configs
 					for(String activity:activities){
@@ -94,8 +101,8 @@ public class ConfigurationHandler {
 				ed.commit();				
 			}
 			//if some configs has been removeds
-			if(removedConfigs!=null){
-				System.out.println("Unused config found");
+			if(removedConfigs!=blank && removedConfigs!=null){
+				System.out.println("Unused config found"+removedConfigs);
 				Set<String> sensors= new HashSet<String>();
 				sensors=getAllRequiredSensorsByFilter();
 				ArrayList<String> unusedSensors=new ArrayList<String>();
@@ -108,6 +115,7 @@ public class ConfigurationHandler {
 					ed.remove(config);
 					ed.commit();
 
+					System.out.println("New activities: "+activities);	
 					//find usused sensors
 					for(String activity:activities){
 						if(activity.equalsIgnoreCase("ALL")){
@@ -140,6 +148,9 @@ public class ConfigurationHandler {
 			}			
 			SensorClassifier.run(context,filterConfigs);
 
+		}
+		else{
+			System.out.println("No changes found in filter file");
 		}
 
 	}
@@ -190,9 +201,9 @@ public class ConfigurationHandler {
 	private static ArrayList<String> getRemovedConfigs(Set<String> filter, Set<String> mem){
 		ArrayList<String> configs=new ArrayList<String>();
 		if(mem!=null){
-			for(String f : mem){
-				if(!f.contains(f)){
-					configs.add(f);
+			for(String x : mem){
+				if(!filter.contains(x)){
+					configs.add(x);
 				}
 			}		
 		}
@@ -214,11 +225,15 @@ public class ConfigurationHandler {
 
 			Element mainRoot=doc.getDocumentElement();
 			if(mainRoot.getNodeName().equals("Filter")){
+				System.out.println("Filter node found");	
 				NodeList nList = doc.getElementsByTagName("Configuration");
+				System.out.println("Congif nodes found");	
 				for (int temp=0;temp<nList.getLength();temp++) {
 					Node nNode = nList.item(temp);
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+						System.out.println("it is element");	
 						Element eElement = (Element) nNode;
+						System.out.println("element is fine");	
 						if(eElement.getAttribute("name").equalsIgnoreCase(configName)){
 							//							for(int j=0;j<eElement.getChildNodes().getLength();j++){
 							//								if(eElement.getChildNodes().item(j).getNodeType()==Node.ELEMENT_NODE){
@@ -231,7 +246,17 @@ public class ConfigurationHandler {
 							for(int i=0;i<nodeList.getLength();i++){
 								Node nNode1 = nodeList.item(i);
 								for(int j=0;j<nNode1.getChildNodes().getLength();j++){
-									activities.add(((Element)nNode1.getChildNodes().item(j)).getAttribute("name"));
+									Node tempNode=nNode1.getChildNodes().item(j);
+									if(tempNode.getNodeType() == Node.ELEMENT_NODE){
+										System.out.println("Is it??");	
+										Element e= (Element) tempNode;
+										System.out.println("Yessss");	
+										activities.add(e.getAttribute("name"));
+									}
+									else{
+										System.out.println("NOOOOO");	
+									}
+//									activities.add(((Element)nNode1.getChildNodes().item(j)).getAttribute("name"));
 								}
 							}
 						}
@@ -239,7 +264,7 @@ public class ConfigurationHandler {
 				}
 			}		
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			System.out.println("getActivities:"+e.toString());
 		}		
 		return activities;
 	}
@@ -315,11 +340,15 @@ public class ConfigurationHandler {
 							NodeList nodeList = doc.getElementsByTagName("required_data");
 							for(int i=0;i<nodeList.getLength();i++){
 								Node nNode1 = nodeList.item(i);
-								for(int j=0;j<nNode1.getChildNodes().getLength();j++){
-									String location=((Element)nNode1.getChildNodes().item(j)).getAttribute("location");
-									String data=((Element)nNode1.getChildNodes().item(j)).getAttribute("data");
-									map.put(location, data);
-								}
+								Element eElement1 = (Element) nNode1;
+								String location=eElement1.getAttribute("location");
+								String data=eElement1.getAttribute("type");
+								map.put(location, data);
+//								for(int j=0;j<nNode1.getChildNodes().getLength();j++){
+//									String location=((Element)nNode1.getChildNodes().item(j)).getAttribute("location");
+//									String data=((Element)nNode1.getChildNodes().item(j)).getAttribute("data");
+//									map.put(location, data);
+//								}
 							}
 						}
 					}

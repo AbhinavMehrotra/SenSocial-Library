@@ -50,6 +50,7 @@ public class PrivacyPolicyDescriptorParser {
 		    	break;
 		    }
 		}
+		System.out.println("is Allowed: "+flag);
 		return flag;		
 	}
 
@@ -64,7 +65,7 @@ public class PrivacyPolicyDescriptorParser {
 	 */
 	private Map<String, String> parseXML(String deviceId) throws ParserConfigurationException, SAXException, IOException, PPDException, XMLFileException{
 		Map<String,String> ppd= new HashMap<String, String>();		
-		File file = new File("C:\\ppd"+deviceId+".xml");
+		File file = new File("PPD\\ppd"+deviceId+".xml");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document doc = builder.parse(file);

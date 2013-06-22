@@ -11,6 +11,7 @@
         <ignore path="src\com\ubhave\sensocial\mqtt\NotificationParser.java" />
         <ignore path="src\com\ubhave\sensocial\sensordata\classifier\SensorDataHandler.java" />
         <ignore path="src\com\ubhave\sensocial\sensormanager\SensorClassifier.java" />
+        <ignore path="src\com\ubhave\sensocial\sensormanager\StartPullSensors.java" />
         <ignore path="src\com\ubhave\sensocial\socialnetworks\AuthenticateTwitter.java" />
     </issue>
 </lint>

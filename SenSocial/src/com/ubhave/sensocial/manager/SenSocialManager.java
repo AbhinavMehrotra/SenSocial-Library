@@ -40,20 +40,20 @@ public class SenSocialManager{
 	private String deviceId, TAG="SNnMB", mac;
 	private SharedPreferences sp;
 	private static SenSocialManager sensocialManager;
+	private static Boolean isServerClient;
 
 
-	public static SenSocialManager getSensorManager(Context context, Boolean isServerClient) throws ServerException {
+	public static SenSocialManager getSenSocialManager(Context context, Boolean isServerClientApp) throws ServerException {
+		isServerClient=isServerClientApp;
 		if(isServerClient){
 			ServerConfiguration sc=new ServerConfiguration(context);
-			if(sc.getServerIP().isEmpty() || sc.getServerURL().isEmpty() || sc.getServerPort()==0){
+			if(sc.getServerIP().isEmpty() || sc.getServerProjectURL().isEmpty() || sc.getServerPort()==0){
 				throw new ServerException("Server configuration missing!! Help: create ServerConfiguration object and " +
 						"set port, url, ip.");
 			}
 		}
 		if (sensocialManager == null){
-			if (sensocialManager == null){
-				sensocialManager = new SenSocialManager(context);
-			}
+			sensocialManager = new SenSocialManager(context);
 		}		
 		return sensocialManager;
 	}
@@ -66,22 +66,25 @@ public class SenSocialManager{
 	 */
 	private SenSocialManager(Context context){
 		this.context=context;
-		sp=context.getSharedPreferences("snmbData",0);
-		if(sp.getString("uuid", "null").equals("null") || sp.getString("bluetoothmac", "null").equals("null")){
-			deviceId=UUID.randomUUID().toString();
+		sp=context.getSharedPreferences("SSDATA",0);
+		if(sp.getString("deviceid", "null").equals("null") || sp.getString("bluetoothmac", "null").equals("null")){
+			this.deviceId=  UUID.randomUUID().toString().substring(0, 6);//"abhinav123";//
 			BluetoothAdapter a=BluetoothAdapter.getDefaultAdapter();
 			mac= a.getAddress();
 			Editor ed=sp.edit();
-			ed.putString("uuid", deviceId);
+			ed.putString("deviceid", deviceId);
 			ed.putString("bluetoothmac", mac);
 			ed.commit();
+			Log.i(TAG, "Device id in SenSocial Manager is: "+deviceId);
 		}
 		else{
-			deviceId=sp.getString("uuid", "null");
+			deviceId=sp.getString("deviceid", "null");
 			mac=sp.getString("bluetoothmac", "null");
 		}
-		context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
-		context.startService(new Intent(context, com.ubhave.sensocial.mqtt.MQTTService.class));
+		Log.i(TAG, "Device id in SenSocial Manager is: "+sp.getString("deviceid", "null"));
+		//context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
+		if(isServerClient)
+			context.startService(new Intent(context, com.ubhave.sensocial.mqtt.MQTTService.class));
 	}
 
 	/**
@@ -169,9 +172,13 @@ public class SenSocialManager{
 			throw new IllegalUserAccess("User id already set once. Cannot set it again");
 		}
 		String user_id=  generateUserId(userId);
-		ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
+		if(isServerClient){
+			ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
+			context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
+		}
 		Editor ed=sp.edit();
 		ed.putString("userid", user_id);
+		ed.putBoolean("useridbyparam", true);
 		ed.commit();
 		return user_id;
 	}
@@ -185,16 +192,20 @@ public class SenSocialManager{
 		}
 		else{
 			String user_id=  generateUserId(sp.getString("fbusername", "null"));	
-			ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
-			ClientServerCommunicator.registerFacebook(context, sp.getString("name", "null"), user_id,
-					 sp.getString("fbusername", "null"),  sp.getString("fbtoken", "null"));
+			if(isServerClient){
+				ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
+				ClientServerCommunicator.registerFacebook(context, sp.getString("name", "null"), user_id,
+						sp.getString("fbusername", "null"),  sp.getString("fbtoken", "null"));
+				context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
+			}
 			Editor ed=sp.edit();
 			ed.putString("userid", user_id);
+			ed.putBoolean("useridbyfacebook", true);
 			ed.commit();	
 			return user_id;	
 		}
 	}
-	
+
 	public String setUserIdByTwitter() throws NullPointerException, IllegalUserAccess{
 		if(!sp.getString("userid", "null").equals("null")){
 			throw new IllegalUserAccess("User id already set once. Cannot set it again");
@@ -204,16 +215,20 @@ public class SenSocialManager{
 		}
 		else{
 			String user_id= generateUserId(sp.getString("twitterusername", "null"));	
-			ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
-			ClientServerCommunicator.registerTwitter(context, sp.getString("name", "null"), user_id,
-					 sp.getString("twitterusername", "null"),  sp.getString("twittertoken", "null"));
+			if(isServerClient){
+				ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
+				ClientServerCommunicator.registerTwitter(context, sp.getString("name", "null"), user_id,
+						sp.getString("twitterusername", "null"),  sp.getString("twittertoken", "null"));
+				context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
+			}
 			Editor ed=sp.edit();
 			ed.putString("userid", user_id);
+			ed.putBoolean("useridbytwitter", true);
 			ed.commit();
 			return user_id;
 		}
 	}
-	
+
 	private String generateUserId(String id){
 		id=UUID.randomUUID().toString().substring(0, 5) + id;
 		return id;
@@ -284,17 +299,18 @@ public class SenSocialManager{
 	 * @throws InvalidSensorNameException Caused when the sensor name is invalid.
 	 */
 	public void stopSensing(String sensor) throws InvalidSensorNameException{
-		Editor ed=sp.edit();
-		if(sensor.equals("accelerometer")) ed.putBoolean("accelerometer", false);
-		else if(sensor.equals("bluetooth")) ed.putBoolean("bluetooth", false);
-		else if(sensor.equals("wifi")) ed.putBoolean("wifi", false);
-		else if(sensor.equals("microphone")) ed.putBoolean("microphone", false);
-		else if(sensor.equals("location")) ed.putBoolean("location", false);
-		else throw new InvalidSensorNameException();
-		//if OSN independent sensing is On for this sensor then stop it
-		if(sp.getBoolean("streamsensing", false)){
-			new StartPullSensors(context).stopIndependentContinuousStreamSensing();
-		}
+		new StartPullSensors(context).stopIndependentContinuousStreamSensing(sensor);
+		//		Editor ed=sp.edit();
+		//		if(sensor.equals("accelerometer")) ed.putBoolean("accelerometer", false);
+		//		else if(sensor.equals("bluetooth")) ed.putBoolean("bluetooth", false);
+		//		else if(sensor.equals("wifi")) ed.putBoolean("wifi", false);
+		//		else if(sensor.equals("microphone")) ed.putBoolean("microphone", false);
+		//		else if(sensor.equals("location")) ed.putBoolean("location", false);
+		//		else throw new InvalidSensorNameException();
+		//		//if OSN independent sensing is On for this sensor then stop it
+		//		if(sp.getBoolean("streamsensing", false)){
+		//			new StartPullSensors(context).stopIndependentContinuousStreamSensing(sensor);
+		//		}
 	}
 
 	/**
@@ -303,17 +319,18 @@ public class SenSocialManager{
 	 * @throws InvalidSensorNameException Caused when the sensor name is invalid.
 	 */
 	public void startSensing(String sensor) throws InvalidSensorNameException{
-		Editor ed=sp.edit();
-		if(sensor.equals("accelerometer")) ed.putBoolean("accelerometer", true);
-		else if(sensor.equals("bluetooth")) ed.putBoolean("bluetooth", true);
-		else if(sensor.equals("wifi")) ed.putBoolean("wifi", true);
-		else if(sensor.equals("microphone")) ed.putBoolean("microphone", true);
-		else if(sensor.equals("location")) ed.putBoolean("location", true);
-		else throw new InvalidSensorNameException();
-		//if configured for OSN independent sensing the start it for this sensor
-		if(sp.getBoolean("streamsensing", false)){
-			new StartPullSensors(context).startIndependentContinuousStreamSensing();
-		}
+		new StartPullSensors(context).startIndependentContinuousStreamSensing(sensor);
+		//		Editor ed=sp.edit();
+		//		if(sensor.equals("accelerometer")) ed.putBoolean("accelerometer", true);
+		//		else if(sensor.equals("bluetooth")) ed.putBoolean("bluetooth", true);
+		//		else if(sensor.equals("wifi")) ed.putBoolean("wifi", true);
+		//		else if(sensor.equals("microphone")) ed.putBoolean("microphone", true);
+		//		else if(sensor.equals("location")) ed.putBoolean("location", true);
+		//		else throw new InvalidSensorNameException();
+		//		//if configured for OSN independent sensing the start it for this sensor
+		//		if(sp.getBoolean("streamsensing", false)){
+		//			new StartPullSensors(context).startIndependentContinuousStreamSensing(sensor);
+		//		}
 	}
 
 

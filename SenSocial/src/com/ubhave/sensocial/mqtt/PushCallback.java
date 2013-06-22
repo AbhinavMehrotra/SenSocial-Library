@@ -34,7 +34,7 @@ public class PushCallback implements MqttCallback {
 
 	public PushCallback(ContextWrapper context, String clientId) {
 		this.context = context;
-		sp=context.getSharedPreferences("SNnMB", 0);
+		sp=context.getSharedPreferences("SSDATA", 0);
 		BROKER_URL= "tcp://"+sp.getString("mqtt", "")+":1883";
 		this.clientId=clientId;
 	}

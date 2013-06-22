@@ -8,9 +8,10 @@ import android.util.Log;
 import com.ubhave.sensocial.exceptions.ServerException;
 
 public class ServerConfiguration {
-	private static final String TAG = "SNnMB";
+	private static final String TAG = "snmbData";
 	SharedPreferences sp;
 	private Context context;
+	private String brokerUrl;
 
 	/**
 	 * Constructor for ServerConfiguration.
@@ -19,10 +20,20 @@ public class ServerConfiguration {
 	 */
 	public ServerConfiguration(Context context){
 		this.context=context;
-		sp=context.getSharedPreferences(TAG, 0);
+		sp=context.getSharedPreferences("SSDATA", 0);
 		Editor ed=sp.edit();
 		ed.putInt("refreshInterval", 60000);  //default interval time
 		ed.commit();
+	}
+	
+	public void setMQTTBrokerURL(String urlWithPort){
+		Editor ed=sp.edit();
+		ed.putString("mqqt_broker_url", urlWithPort);
+		ed.commit();
+	}
+	
+	public String getMQTTBrokerURL(){
+		return sp.getString("mqqt_broker_url", "");
 	}
 
 	/**
@@ -32,7 +43,7 @@ public class ServerConfiguration {
 	 * @param url String
 	 * @throws ServerException
 	 */
-	public void setServerURL(String url) throws ServerException{
+	public void setServerProjectURL(String url) throws ServerException{
 		if(!url.endsWith("/")){
 			throw new ServerException(url+" is not a valid URL. \nURL should contain / at the end, eg- https//:cs.bham.ac.uk/sensocial/");
 		}
@@ -44,10 +55,10 @@ public class ServerConfiguration {
 	}
 
 	/**
-	 * Method to get the server address where the PHP scripts are running.
+	 * Method to get the server address where the project is hosted.
 	 * @return String
 	 */
-	public String getServerURL(){
+	public String getServerProjectURL(){
 		return sp.getString("serverurl", "");
 	}
 	
@@ -78,11 +89,11 @@ public class ServerConfiguration {
 	 * @param secondss Seconds
 	 */
 	public void setRefreshInterval(int seconds){
-		sp=context.getSharedPreferences("snmbData",0);
+//		sp=context.getSharedPreferences("SSDATA",0);
 		Editor ed=sp.edit();
-		ed.putInt("refreshInterval", seconds*1000);
+		ed.putInt("refreshinterval", seconds*1000);
 		ed.commit();
-		Log.i(TAG, "RI set as: "+ sp.getInt("refreshInterval", 0));
+		Log.i(TAG, "RI set as: "+ sp.getInt("refreshinterval", 0));
 	}
 	
 	

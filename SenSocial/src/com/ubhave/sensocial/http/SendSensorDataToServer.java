@@ -34,7 +34,7 @@ public class SendSensorDataToServer extends AsyncTask<String,Void,String>{
 	public SendSensorDataToServer(String folderName, String fileName, Context context){
 		this.pathToOurFile=this.pathToOurFile+folderName+"/"+fileName;
 		this.context=context;
-		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA",0);
 		this.serverUrl=sp.getString("sever", null);
 	}
 
@@ -103,7 +103,7 @@ public class SendSensorDataToServer extends AsyncTask<String,Void,String>{
 		File file = new File(pathToOurFile);
 		boolean deleted = file.delete();
 		Log.d(TAG, "File Deleted:" + deleted);
-		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA",0);
 		Editor ed=sp.edit();
 		ed.putBoolean("sensing", false);
 		ed.commit();

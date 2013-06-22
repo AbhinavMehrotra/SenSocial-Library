@@ -63,7 +63,7 @@ public class TCPClient{
 						out.println(data[0]); //stream 
 						out.flush();
 					}
-					Log.i("TCP Client", "Stream Sent.");
+					Log.i("TCP Client", "Data Sent.");
 
 				} catch (Exception e) {
 					Log.e("TCP", "Error"+e.toString());

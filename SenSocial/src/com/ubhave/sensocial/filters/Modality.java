@@ -4,8 +4,12 @@ import com.ubhave.sensocial.sensormanager.AllPullSensors;
 
 public enum Modality {
 	NoCodition("all","NA"),
-	act1("standing",getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER)),
-	act2("sitting",getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER)),
+	standing("standing",getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER)),
+	sitting("sitting",getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER)),
+	moving("moving",getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER)),
+	not_moving("not_moving",getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER)),
+	talking("talking",getSensorNameById(AllPullSensors.SENSOR_TYPE_MICROPHONE)),
+	silent("silent",getSensorNameById(AllPullSensors.SENSOR_TYPE_MICROPHONE)),
 	facebook_trigger("facebook_trigger","facebook_trigger"),
 	twitter_post("twitter_post","twitter_post"),
 	logicalOR("LogicalOR","");

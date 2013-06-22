@@ -37,20 +37,20 @@ public class Stream {
 		this.filter=null; 
 		this.streamId=UUID.randomUUID().toString();
 		//check PPD for the sensors associated to stream 
-		PrivacyPolicyDescriptorParser ppd= new PrivacyPolicyDescriptorParser(context);
-		if(dataType.equalsIgnoreCase("raw")){
-			if(!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId).toLowerCase(), null, "raw")){
-				throw new PPDException(new AllPullSensors(context).getSensorNameById(sensorId)); 
-			}
-		}else if(dataType.equalsIgnoreCase("classified")){
-			if(!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId).toLowerCase(), null, "raw") ||
-					!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId), null, "classified")){
-				throw new PPDException(new AllPullSensors(context).getSensorNameById(sensorId)); 
-			}
-		}
-		else{
-			throw new SensorDataTypeException(dataType);
-		}
+//		PrivacyPolicyDescriptorParser ppd= new PrivacyPolicyDescriptorParser(context);
+//		if(dataType.equalsIgnoreCase("raw")){
+//			if(!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId).toLowerCase(), null, "raw")){
+//				throw new PPDException(new AllPullSensors(context).getSensorNameById(sensorId)); 
+//			}
+//		}else if(dataType.equalsIgnoreCase("classified")){
+//			if(!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId).toLowerCase(), null, "raw") ||
+//					!ppd.isAllowed(new AllPullSensors(context).getSensorNameById(sensorId), null, "classified")){
+//				throw new PPDException(new AllPullSensors(context).getSensorNameById(sensorId)); 
+//			}
+//		}
+//		else{
+//			throw new SensorDataTypeException(dataType);
+//		}
 	}
 
 	/**
@@ -60,36 +60,16 @@ public class Stream {
 	 * (or SensorData from this sensor on client) is not declared in PPD.
 	 */
 	public Stream setFilter(Filter filter) throws PPDException{		
-		String config=filter.getFilterName();
 
 		Stream newStream;
 		try {
 			newStream = new Stream(this.sensorId, this.dataType, this.context);
+			Log.i("SNnMB","Filter set & stream id is: "+ newStream.getStreamId());
 			newStream.filter=filter;
 		} catch (SensorDataTypeException e) {
 			newStream=this;
 			Log.e(TAG, "Something went wrong while creating a new stream");
 		}
-
-
-		ArrayList<Modality> activities=new ArrayList<Modality>();
-		activities=filter.getConditions();
-
-		//check PPD for the sensors associated to activities 
-		PrivacyPolicyDescriptorParser ppd= new PrivacyPolicyDescriptorParser(context);	
-		for(int i=0;i<activities.size();i++){			
-			if(!ppd.isAllowed(activities.get(i).getSensorName(), null, "classified")){
-				throw new PPDException(activities.get(i).getSensorName()); 
-			}
-		}
-
-		ArrayList<String> act= new ArrayList<String>();
-		for(Modality s:activities)
-			act.add(s.getActivityName());
-
-		GenerateFilter.createXML(context, act, config, 
-				new AllPullSensors(context).getSensorNameById(this.sensorId), dataType);
-
 		return newStream; 
 	}
 
@@ -111,26 +91,53 @@ public class Stream {
 	}
 
 	public void startStream(){
+		Log.e(TAG, "Start stream: "+ getStreamId());
 		if(this.getFilter()==null){
 //			throw new FilterException();
 			ArrayList<String> act= new ArrayList<String>();
 			act.add("ALL");
 
-			GenerateFilter.createXML(context,act, this.streamId, 
+			GenerateFilter.createXML(context,act, this.getStreamId(), 
 					new AllPullSensors(context).getSensorNameById(this.sensorId), dataType);
 			
 		}
-		FilterSettings.startConfiguration(this.streamId);
+		else{
+			ArrayList<Modality> activities=new ArrayList<Modality>();
+			activities=this.getFilter().getConditions();
+
+			//check PPD for the sensors associated to activities 
+//			PrivacyPolicyDescriptorParser ppd= new PrivacyPolicyDescriptorParser(context);	
+//			for(int i=0;i<activities.size();i++){			
+//				if(!ppd.isAllowed(activities.get(i).getSensorName(), null, "classified")){
+//					throw new PPDException(activities.get(i).getSensorName()); 
+//				}
+//			}
+
+			ArrayList<String> act= new ArrayList<String>();
+			for(Modality s:activities)
+				act.add(s.getActivityName());
+			String config= getStreamId();
+
+			GenerateFilter.createXML(context, act, config, 
+					new AllPullSensors(context).getSensorNameById(this.sensorId), dataType);
+			
+		}
+		
+		FilterSettings.startConfiguration(this.getStreamId());
 		ConfigurationHandler.run(context);	
 	}
 
 
 	public void pauseStream(){
-		FilterSettings.stopConfiguration(this.getFilter().getFilterName()); 
+		Log.e(TAG, "Pause stream: "+ getStreamId());
+		FilterSettings.stopConfiguration(this.getStreamId()); 
+		ConfigurationHandler.run(context);	
 	}
 
 	public void unpauseStream(){
-		FilterSettings.startConfiguration(this.getFilter().getFilterName());
+		Log.e(TAG, "Unpause stream: "+ getStreamId());
+		FilterSettings.startConfiguration(this.getStreamId());
+		ConfigurationHandler.run(context);	
 	}
 
 }

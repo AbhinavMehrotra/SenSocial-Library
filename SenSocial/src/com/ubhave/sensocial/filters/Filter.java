@@ -15,16 +15,11 @@ import com.ubhave.sensocial.exceptions.PPDException;
 
 public class Filter {
 
-	private String filterName;
 	private ArrayList<Modality> activities;
 	
-	public Filter(String filterName){
-		this.filterName=filterName;
+	public Filter(){
 	}
 
-	public String getFilterName(){
-		return this.filterName;
-	}
 	
 	public void addConditions(ArrayList<Modality> activity){
 		this.activities=activity;

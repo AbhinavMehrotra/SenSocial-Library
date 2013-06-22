@@ -50,7 +50,12 @@ public class User {
 		ArrayList<Device> devices= new ArrayList<Device>();
 		Location l;
 		for(String d:this.deviceIds){
-			l= new Location(location.get(d).get(0), location.get(d).get(1));			
+			try{
+			l= new Location(location.get(d).get(0), location.get(d).get(1));
+			}
+			catch(NullPointerException e){
+				l= new Location(0,0);
+			}
 			devices.add(new Device(this, d, UserRegistrar.getBluetooth(d), l));
 		}
 		return devices;

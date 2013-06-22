@@ -23,7 +23,7 @@ public class SensorConfiguration {
 	 */
 	public SensorConfiguration(Context context){
 		this.context=context;
-		sp=context.getSharedPreferences("snmbData",0);
+		sp=context.getSharedPreferences("SSDATA",0);
 	}
 	
 //	<<These methods are removed as now sensor configuration is automated. So now we have only one method: subscribeSensors()>>

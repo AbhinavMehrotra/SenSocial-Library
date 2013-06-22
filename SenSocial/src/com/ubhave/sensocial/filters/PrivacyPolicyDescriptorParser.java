@@ -29,7 +29,7 @@ public class PrivacyPolicyDescriptorParser {
 
 	public PrivacyPolicyDescriptorParser(Context context){
 		this.context=context;
-		sp=context.getSharedPreferences("snmbData",0);
+		sp=context.getSharedPreferences("SSDATA",0);
 		ed=sp.edit();
 	}
 	

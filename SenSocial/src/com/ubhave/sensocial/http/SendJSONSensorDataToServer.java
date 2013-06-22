@@ -26,7 +26,7 @@ public class SendJSONSensorDataToServer extends AsyncTask<String,Void,String>{
 	 */
 	public SendJSONSensorDataToServer( Context context, SensorData sensorData){
 		this.context=context;
-		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA",0);
 		this.serverUrl=sp.getString("sever", null);
 	}
 
@@ -66,7 +66,7 @@ public class SendJSONSensorDataToServer extends AsyncTask<String,Void,String>{
 	protected void onPostExecute(String result){
 		Log.d(TAG, "Sending JSON sensor data complete");
 		Log.d(TAG, "Server response: "+result);
-		SharedPreferences sp=context.getSharedPreferences("snmbData",0);
+		SharedPreferences sp=context.getSharedPreferences("SSDATA",0);
 		Editor ed=sp.edit();
 		ed.putBoolean("sensing", false);
 		ed.commit();

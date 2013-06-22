@@ -9,7 +9,7 @@ public class FacebookConfiguration {
 	SharedPreferences sp;
 
 	public FacebookConfiguration(Context context){
-		sp=context.getSharedPreferences("snmbData",0);
+		sp=context.getSharedPreferences("SSDATA",0);
 	}
 	
 	/**

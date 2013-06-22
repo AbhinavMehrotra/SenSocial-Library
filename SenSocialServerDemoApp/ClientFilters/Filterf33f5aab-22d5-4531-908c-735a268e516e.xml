@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Filter>
+
+    <Configuration
+        name="f33f5aab-22d5-4531-908c-735a268e516e"
+        sense="true" >
+
+        <Condition name="c1" >
+
+            <activity1 name="sitting" />
+        </Condition>
+
+        <required_data
+            location="server"
+            sensor="wifi"
+            type="raw" />
+    </Configuration>
+
+</Filter>

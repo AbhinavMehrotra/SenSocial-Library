@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Filter>
+
+    <Configuration name="2e944f08-90f4-48eb-aee8-6f7f5bc15bdb" sense="true">
+
+        <Condition name="c1">
+
+            <activity1 name="not_moving"/>
+
+            <activity2 name="silent"/>
+        </Condition>
+
+        <required_data location="client" sensor="location" type="raw"/>
+   	 </Configuration>
+
+    	<Configuration name="529fe467-6198-4b4c-8655-592b24df9d1a" sense="false">
+
+        <Condition name="c1">
+
+            <activity1 name="not_moving"/>
+
+            <activity2 name="silent"/>
+        </Condition>
+
+        <required_data location="client" sensor="location" type="raw"/>
+    	</Configuration>
+
+    <Configuration name="795d67cf-5394-4dca-acb5-b10b9e0f468c" sense="true"><Condition name="c1"><activity1 name="sitting"/></Condition><required_data location="server" sensor="wifi" type="raw"/></Configuration></Filter>
