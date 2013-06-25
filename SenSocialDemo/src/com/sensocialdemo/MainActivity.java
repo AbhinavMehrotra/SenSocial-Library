@@ -18,18 +18,11 @@ import com.ubhave.sensocial.configuration.MQTTServerConfiguration;
 import com.ubhave.sensocial.configuration.ServerConfiguration;
 import com.ubhave.sensocial.configuration.TwitterConfiguration;
 import com.ubhave.sensocial.data.SocialEvent;
-import com.ubhave.sensocial.exceptions.IllegalUserAccess;
-import com.ubhave.sensocial.exceptions.PPDException;
-import com.ubhave.sensocial.exceptions.SensorDataTypeException;
 import com.ubhave.sensocial.exceptions.ServerException;
+import com.ubhave.sensocial.http.SendSensorDataToServer;
 import com.ubhave.sensocial.manager.SSListener;
 import com.ubhave.sensocial.manager.SenSocialManager;
 import com.ubhave.sensocial.manager.Stream;
-import com.ubhave.sensocial.manager.User;
-import com.ubhave.sensocial.sensormanager.AllPullSensors;
-import com.ubhave.sensormanager.ESException;
-import com.ubhave.sensormanager.ESSensorManager;
-import com.ubhave.sensormanager.data.SensorData;
 
 public class MainActivity extends Activity implements SSListener{
 
@@ -42,10 +35,15 @@ public class MainActivity extends Activity implements SSListener{
 	Button fbBtn,twBtn,button;
 	MQTTServerConfiguration mqtt;
 	Stream stream;
+	public final String conKey="vbsG14ISG49JNs0ux0A2g";
+	public final String conKeySecret="lb2Pwr1Xl6E4WNPZIOwwNwrsgXfQRQSS6kylciRyk0";
+	public final String accessToken ="111082828-bZHnz1qj2iKYPtGMZNyKHtq3EtaYhjMrafZf1V5b";
+	public final String accessTokenSecret ="NJLdDIlgwgBPhqxAiyN59G8dgullbQPZ5hESbahLE";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	
 		setContentView(R.layout.activity_main);
 		sp=getSharedPreferences("ssdemo", 0);	
 		fbconfig= new FacebookConfiguration(getApplicationContext());
@@ -60,23 +58,23 @@ public class MainActivity extends Activity implements SSListener{
 			sc.setServerIP("192.168.0.10");
 			sc.setServerProjectURL("http://abhinavtest.net76.net/");
 			sc.setMQTTBrokerURL("tcp://broker.mqttdashboard.com:1883");
-			sc.setRefreshInterval(60);
+			sc.setRefreshInterval(60*60);
 			sc.setServerPort(4444);
-			ssm=SenSocialManager.getSenSocialManager(getApplicationContext(), true);
-			String uid=ssm.setUserId("abhinav");
-			System.out.println(uid);
-			User user=ssm.getUser(uid);
-			stream=user.getMyDevice().getStream(AllPullSensors.SENSOR_TYPE_ACCELEROMETER, "classified");
-			ssm.registerListener(this, stream.getStreamId());
-		} catch (PPDException e) {
-			Log.e(TAG, "Main activity, 1: "+e.toString());
-		} catch (SensorDataTypeException e) {
-			Log.e(TAG, "Main activity, 2: "+e.toString());
+			ssm=SenSocialManager.getSenSocialManager(getApplicationContext(), false);
+//			String uid=ssm.setUserId("abhinav");
+//			System.out.println(uid);
+//			User user=ssm.getUser(uid);
+//			stream=user.getMyDevice().getStream(AllPullSensors.SENSOR_TYPE_ACCELEROMETER, "classified");
+//			ssm.registerListener(this, stream.getStreamId());
+//		} catch (PPDException e) {
+//			Log.e(TAG, "Main activity, 1: "+e.toString());
+//		} catch (SensorDataTypeException e) {
+//			Log.e(TAG, "Main activity, 2: "+e.toString());
 		} catch (ServerException e) {
 			Log.e(TAG, "Main activity, 3: "+e.toString());
-		} catch (IllegalUserAccess e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+//		} catch (IllegalUserAccess e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
 		}
 
 	}
@@ -102,31 +100,22 @@ public class MainActivity extends Activity implements SSListener{
 //			Toast.makeText(getApplicationContext(), "Already logged-in!", Toast.LENGTH_LONG).show();
 //			return;			
 //		}
-		fbconfig.setFacebookId("518620884845095", "647777d181d707d4d2993be83c8489d0");
-		ssm.authenticateFacebook(MainActivity.this, fbconfig);
-//		try {
-//			ESSensorManager manager= ESSensorManager.getSensorManager(getApplicationContext());
-//			com.ubhave.sensormanager.SensorDataListener l=new com.ubhave.sensormanager.SensorDataListener() {
-//				
-//				public void onDataSensed(SensorData data) {
-//					// TODO Auto-generated method stub
-//					System.out.println("got it");
-//				}
-//				
-//				public void onCrossingLowBatteryThreshold(boolean isBelowThreshold) {
-//					// TODO Auto-generated method stub
-//					
-//				}
-//			};
-//			
-//			manager.subscribeToSensorData(AllPullSensors.SENSOR_TYPE_ACCELEROMETER, l);
-//			
-//		} catch (ESException e) {
-//			e.printStackTrace();
-//		}
+//		fbconfig.setFacebookId("518620884845095", "647777d181d707d4d2993be83c8489d0");
+//		ssm.authenticateFacebook(MainActivity.this, fbconfig);
+
+		new SendSensorDataToServer("", "http://10.4.190.245:90/get_file/GetSensorData.php", getApplicationContext()).execute();
+	}
+//192.168.0.10:90
+
+	public void twlogin(View v){
+		tconfig.setTwitterIds(conKey, conKeySecret);
+		ssm.authenticateTwitter(MainActivity.this, tconfig);
 	}
 
-
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		ssm.twitterOnNewIntent(intent,tconfig);
+	}
 
 	public void showRecords(View v){
 		startActivity(new Intent(MainActivity.this, ShowSensedDataActivity.class));		

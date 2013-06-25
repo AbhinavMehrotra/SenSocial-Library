@@ -82,17 +82,17 @@ public class Stream {
 			allStreams.add(this);
 
 		//check PPD for the sensors associated to activities
-		Map<String,String> ppd= new HashMap<String, String>();
-		for(Stream s:allStreams){
-			ppd.put(Sensors.getSensorNameById(s.getSensorId()), s.getDataType());			
-		}
-		if(this.filter!=null){
-			ArrayList<Modality> activities=new ArrayList<Modality>();
-			activities=filter.getConditions();
-			for(Modality a:activities){
-				ppd.put(a.getSensorName(), "classified");
-			}
-		}
+//		Map<String,String> ppd= new HashMap<String, String>();
+//		for(Stream s:allStreams){
+//			ppd.put(Sensors.getSensorNameById(s.getSensorId()), s.getDataType());			
+//		}
+//		if(this.filter!=null){
+//			ArrayList<Modality> activities=new ArrayList<Modality>();
+//			activities=filter.getConditions();
+//			for(Modality a:activities){
+//				ppd.put(a.getSensorName(), "classified");
+//			}
+//		}
 //		PrivacyPolicyDescriptorParser ppdParser= new PrivacyPolicyDescriptorParser();
 //		if(!ppdParser.isAllowed(this.getDevice().getDeviceId(), ppd)){
 //			throw new PPDException("Sensors associated with some stream are not allowed in the PPD");

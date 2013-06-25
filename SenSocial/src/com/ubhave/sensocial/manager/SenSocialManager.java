@@ -25,6 +25,7 @@ import com.ubhave.sensocial.exceptions.ServerException;
 import com.ubhave.sensocial.exceptions.UnauthorizedUserException;
 import com.ubhave.sensocial.exceptions.XMLFileException;
 import com.ubhave.sensocial.http.IdSenderToDisableTrigger;
+import com.ubhave.sensocial.privacy.PPDGenerator;
 import com.ubhave.sensocial.sensormanager.StartPullSensors;
 import com.ubhave.sensocial.socialnetworks.AuthenticateFacebook;
 import com.ubhave.sensocial.socialnetworks.AuthenticateTwitter;
@@ -82,6 +83,10 @@ public class SenSocialManager{
 			mac=sp.getString("bluetoothmac", "null");
 		}
 		Log.i(TAG, "Device id in SenSocial Manager is: "+sp.getString("deviceid", "null"));
+		
+		//create a default ppd
+		PPDGenerator.createDefaultPPD();
+		
 		//context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
 		if(isServerClient)
 			context.startService(new Intent(context, com.ubhave.sensocial.mqtt.MQTTService.class));
@@ -137,7 +142,7 @@ public class SenSocialManager{
 	 * @param TwitterConfig TwitterConfiguration object.
 	 */
 	public void authenticateTwitter(Activity activity, TwitterConfiguration TwitterConfig){
-		AT=new AuthenticateTwitter(context, TwitterConfig.getTwitterConsumerKey(), TwitterConfig.getTwitterConsumerSecretKey());
+		AT=AuthenticateTwitter.getInstance(context, TwitterConfig.getTwitterConsumerKey(), TwitterConfig.getTwitterConsumerSecretKey());
 		AT.tryLogin(activity);
 	}
 
@@ -148,7 +153,8 @@ public class SenSocialManager{
 	 * @param TwitterConfig TwitterConfiguration Object.
 	 * @return User Object with information of user.
 	 */
-	public User twitterOnNewIntent(Intent intent){
+	public User twitterOnNewIntent(Intent intent, TwitterConfiguration TwitterConfig){
+		AT=AuthenticateTwitter.getInstance(context, TwitterConfig.getTwitterConsumerKey(), TwitterConfig.getTwitterConsumerSecretKey());
 		return AT.insideOnNewIntent(intent);
 	}
 
@@ -298,40 +304,40 @@ public class SenSocialManager{
 	 * @param sensor String Sensor Name: accelerometer, bluetooth, wifi, microphone, location.
 	 * @throws InvalidSensorNameException Caused when the sensor name is invalid.
 	 */
-	public void stopSensing(String sensor) throws InvalidSensorNameException{
-		new StartPullSensors(context).stopIndependentContinuousStreamSensing(sensor);
-		//		Editor ed=sp.edit();
-		//		if(sensor.equals("accelerometer")) ed.putBoolean("accelerometer", false);
-		//		else if(sensor.equals("bluetooth")) ed.putBoolean("bluetooth", false);
-		//		else if(sensor.equals("wifi")) ed.putBoolean("wifi", false);
-		//		else if(sensor.equals("microphone")) ed.putBoolean("microphone", false);
-		//		else if(sensor.equals("location")) ed.putBoolean("location", false);
-		//		else throw new InvalidSensorNameException();
-		//		//if OSN independent sensing is On for this sensor then stop it
-		//		if(sp.getBoolean("streamsensing", false)){
-		//			new StartPullSensors(context).stopIndependentContinuousStreamSensing(sensor);
-		//		}
-	}
-
-	/**
-	 * Method to subscribe any sensor for the configured sensors.
-	 * @param sensor String Sensor Name: accelerometer, bluetooth, wifi, microphone, location.
-	 * @throws InvalidSensorNameException Caused when the sensor name is invalid.
-	 */
-	public void startSensing(String sensor) throws InvalidSensorNameException{
-		new StartPullSensors(context).startIndependentContinuousStreamSensing(sensor);
-		//		Editor ed=sp.edit();
-		//		if(sensor.equals("accelerometer")) ed.putBoolean("accelerometer", true);
-		//		else if(sensor.equals("bluetooth")) ed.putBoolean("bluetooth", true);
-		//		else if(sensor.equals("wifi")) ed.putBoolean("wifi", true);
-		//		else if(sensor.equals("microphone")) ed.putBoolean("microphone", true);
-		//		else if(sensor.equals("location")) ed.putBoolean("location", true);
-		//		else throw new InvalidSensorNameException();
-		//		//if configured for OSN independent sensing the start it for this sensor
-		//		if(sp.getBoolean("streamsensing", false)){
-		//			new StartPullSensors(context).startIndependentContinuousStreamSensing(sensor);
-		//		}
-	}
+//	public void stopSensing(String sensor) throws InvalidSensorNameException{
+//		new StartPullSensors(context).stopIndependentContinuousStreamSensing(sensor);
+//		//		Editor ed=sp.edit();
+//		//		if(sensor.equals("accelerometer")) ed.putBoolean("accelerometer", false);
+//		//		else if(sensor.equals("bluetooth")) ed.putBoolean("bluetooth", false);
+//		//		else if(sensor.equals("wifi")) ed.putBoolean("wifi", false);
+//		//		else if(sensor.equals("microphone")) ed.putBoolean("microphone", false);
+//		//		else if(sensor.equals("location")) ed.putBoolean("location", false);
+//		//		else throw new InvalidSensorNameException();
+//		//		//if OSN independent sensing is On for this sensor then stop it
+//		//		if(sp.getBoolean("streamsensing", false)){
+//		//			new StartPullSensors(context).stopIndependentContinuousStreamSensing(sensor);
+//		//		}
+//	}
+//
+//	/**
+//	 * Method to subscribe any sensor for the configured sensors.
+//	 * @param sensor String Sensor Name: accelerometer, bluetooth, wifi, microphone, location.
+//	 * @throws InvalidSensorNameException Caused when the sensor name is invalid.
+//	 */
+//	public void startSensing(String sensor) throws InvalidSensorNameException{
+//		new StartPullSensors(context).startIndependentContinuousStreamSensing(sensor);
+//		//		Editor ed=sp.edit();
+//		//		if(sensor.equals("accelerometer")) ed.putBoolean("accelerometer", true);
+//		//		else if(sensor.equals("bluetooth")) ed.putBoolean("bluetooth", true);
+//		//		else if(sensor.equals("wifi")) ed.putBoolean("wifi", true);
+//		//		else if(sensor.equals("microphone")) ed.putBoolean("microphone", true);
+//		//		else if(sensor.equals("location")) ed.putBoolean("location", true);
+//		//		else throw new InvalidSensorNameException();
+//		//		//if configured for OSN independent sensing the start it for this sensor
+//		//		if(sp.getBoolean("streamsensing", false)){
+//		//			new StartPullSensors(context).startIndependentContinuousStreamSensing(sensor);
+//		//		}
+//	}
 
 
 	/**

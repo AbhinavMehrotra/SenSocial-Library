@@ -18,7 +18,7 @@ public class MessageParser {
 			
 			switch (name) {
 			case "registration":
-				UserRegistrar.registerUser(obj.getString("userid"),deviceId, obj.getString("bluetoothmac"));
+				UserRegistrar.registerUser(obj.getString("userid"),deviceId, obj.getString("bluetoothmac"), obj.getString("ppd"));
 				break;
 			case "osn":
 				JSONObject osn=obj.getJSONObject("osn");

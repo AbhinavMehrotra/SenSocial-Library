@@ -88,7 +88,7 @@ public class GenerateFilter {
 			Filter f=new Filter();
 			ArrayList<Modality> modality= new ArrayList<Modality>();
 			for(String m:modalities)
-				modality.add(Modality.every_ten_minutes.getModaalityByName(m));
+				modality.add(Modality.getModaalityByName(m));
 			f.addConditions(modality);
 			Set<Stream> streams=new HashSet<Stream>();
 			StreamCollection sc=new StreamCollection(Sensors.SENSOR_TYPE_LOCATION, "raw");

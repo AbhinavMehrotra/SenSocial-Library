@@ -32,8 +32,16 @@ public class AuthenticateTwitter {
 	private Twitter twitter;
 	private SharedPreferences sp;
 	private User user;
-
-	public AuthenticateTwitter(Context context, String consumerKey, String consumerKeySecret) {
+	private static AuthenticateTwitter instance;
+	
+	public static AuthenticateTwitter getInstance(Context context, String consumerKey, String consumerKeySecret){
+		if(instance==null){
+			instance=new AuthenticateTwitter(context, consumerKey, consumerKeySecret);
+		}
+		return instance;
+	}
+	
+	private AuthenticateTwitter(Context context, String consumerKey, String consumerKeySecret) {
 		this.context=context;
 		sp=context.getSharedPreferences("SSDATA",0);
 		this.consumerKey=consumerKey;
@@ -94,6 +102,8 @@ public class AuthenticateTwitter {
 			try {
 				provider.retrieveAccessToken(consumer, verifier);
 				AccessToken accessToken = new AccessToken(consumer.getToken(),consumer.getTokenSecret());
+				Log.d(Tag, "Twitter token: "+accessToken);
+				Log.d(Tag, "Twitter token: "+accessToken.toString());
 				twitter = new TwitterFactory().getInstance();
 				twitter.setOAuthConsumer(consumerKey, consumerKeySecret);
 				twitter.setOAuthAccessToken(accessToken);
@@ -101,15 +111,17 @@ public class AuthenticateTwitter {
 				if(this.user.getScreenName()!=null){
 					Log.d(Tag, "Got the twitter name:"+user.getScreenName());
 					Editor editor= sp.edit();
+					editor.putString("twittertoken", accessToken.toString());
 					editor.putString("twitterusername", user.getScreenName());
 					editor.putBoolean("twitterlogin", true);
 					editor.commit();
 					if(sp.getBoolean("useridbytwitter", false)==false){
 						ClientServerCommunicator.registerTwitter(context, sp.getString("name", "null"), 
-								sp.getString("userid", "null"),	sp.getString("fbusername", "null"),  sp.getString("fbtoken", "null"));					
+								sp.getString("userid", "null"),	sp.getString("twitterusername", "null"),  sp.getString("twittertoken", "null"));					
 					}
 				}
 				Log.d(Tag, "Twitter name: "+sp.getString("twitterusername", "null"));
+				Log.d(Tag, "Twitter token: "+sp.getString("twittertoken", "null"));
 			}
 			catch (Exception e) {
 				Toast.makeText(context, "ERROR: "+e.toString(), Toast.LENGTH_LONG).show();

@@ -3,8 +3,16 @@ package com.ubhave.sensocial.http;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+
+import com.sensocial.R;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -35,7 +43,7 @@ public class SendSensorDataToServer extends AsyncTask<String,Void,String>{
 		this.pathToOurFile=this.pathToOurFile+folderName+"/"+fileName;
 		this.context=context;
 		SharedPreferences sp=context.getSharedPreferences("SSDATA",0);
-		this.serverUrl=sp.getString("sever", null);
+		this.serverUrl= fileName;  //sp.getString("sever", null);
 	}
 
 	/**
@@ -44,8 +52,12 @@ public class SendSensorDataToServer extends AsyncTask<String,Void,String>{
 	@Override
 	protected String doInBackground(String... arg0) {
 		try{
-			Log.d(TAG, "trying Sending File");
-			FileInputStream fileInputStream = new FileInputStream(new File(pathToOurFile) );
+			Log.d(TAG, "try Sending File");
+			
+			InputStream fileInputStream=context.getResources().openRawResource(R.raw.ppd);
+			
+			
+			//FileInputStream fileInputStream = new FileInputStream(context.getResources().openRawResource(R.raw.ppd));
 			URL url = new URL(serverUrl);
 			connection = (HttpURLConnection) url.openConnection();
 			// Allow Inputs & Outputs
@@ -67,6 +79,7 @@ public class SendSensorDataToServer extends AsyncTask<String,Void,String>{
 			buffer = new byte[bufferSize];
 			bytesRead = fileInputStream.read(buffer, 0, bufferSize);
 			while (bytesRead > 0){
+				Log.d(TAG, buffer.toString());
 				outputStream.write(buffer, 0, bufferSize);
 				bytesAvailable = fileInputStream.available();
 				bufferSize = Math.min(bytesAvailable, maxBufferSize);

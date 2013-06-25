@@ -95,8 +95,6 @@ public class MQTTManager {
 			System.out.print(arg0.toString()+arg1.toString());
 			
 		}
-
-
 	}
 
 

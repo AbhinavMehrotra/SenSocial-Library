@@ -79,7 +79,7 @@ public class ServerBoard extends JFrame {
         					Stream stream=d.getStream(Sensors.SENSOR_TYPE_WIFI, "raw");
         					Filter filter=new Filter();
         					ArrayList<Modality> activity=new ArrayList<Modality>();
-        					activity.add(Modality.sitting);
+        					activity.add(Modality.Not_Moving);
         					filter.addConditions(activity);
         					Stream s=stream.setFilter(filter);
         					SensorListener l=new SensorListener() {

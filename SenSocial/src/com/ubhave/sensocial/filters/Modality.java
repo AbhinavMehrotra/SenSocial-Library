@@ -39,4 +39,6 @@ public enum Modality {
 		else if(id==AllPullSensors.SENSOR_TYPE_WIFI) sensor="wifi";		
 		return sensor;
 	}
+	
+	
 }

@@ -37,7 +37,7 @@ public class UserRegistrar {
 	//	private ArrayList<String> twFollowers;
 	//	private Location deviceLocation;
 
-	public static void registerUser(String userId, String deviceId, String bluetoothMAC){
+	public static void registerUser(String userId, String deviceId, String bluetoothMAC, String ppd){
 		//String userId=UUID.randomUUID().toString();
 		try {
 			MongoClient mongoClient = new MongoClient();
@@ -50,7 +50,8 @@ public class UserRegistrar {
 			BasicDBObject doc=new BasicDBObject();
 			doc.append("userid", userId).
 			append("deviceids", deviceid).
-			append("bluetoothmac", bluetooth);
+			append("bluetoothmac", bluetooth).
+			append("ppd", ppd);
 			coll.save(doc);
 		} catch (UnknownHostException e) {
 			System.out.println(TAG+" error: "+e.toString());
@@ -72,52 +73,52 @@ public class UserRegistrar {
 			obj.put("facebooktoken", facebookToken);
 			obj.put("facebookfriends", fbFriends);
 			coll.save(obj);
-			
-//			DBObject obj;
-//			if(coll.find(doc).count()>0){
-//				//user already registered and authenticated FB with some other device
-//
-//				//get blueetoth and delete the entry
-//				BasicDBObject temp = new BasicDBObject("deviceid", deviceId);
-//				String bluetoothMAC=coll.find(temp).next().get("bluetoothmac").toString();
-//				coll.remove(coll.find(temp).next());
-//
-//				//update the already registered user
-//				obj = coll.find(doc).next();
-//				//update the device list
-//				ArrayList<String> deviceid=new ArrayList<String>();
-//				deviceid= (ArrayList<String>) obj.get("deviceids");
-//				deviceid.add(deviceId);
-//				obj.removeField("deviceids");
-//				obj.put("deviceids", deviceid);
-//
-//				//update the bluetooth MAP
-//				Map<String,String> bluetooth=new HashMap<String,String>();
-//				bluetooth= (Map<String, String>) obj.get("bluetoothmac");
-//				bluetooth.put(deviceId, bluetoothMAC);
-//				obj.removeField("bluetoothmac");
-//				obj.put("bluetoothmac", bluetooth);
-//
-//				coll.save(obj);
-//			}
-//			else{
-//				//user authenticated FB with first device, so add details to the device registration dataArrayList<String> fbFriends= new ArrayList<String>();
-//				ArrayList<String> fbFriends= new ArrayList<String>();
-//				//TODO: create logic to update friends
-//				fbFriends = getFacebookFriends(facebookId, facebookToken);
-//				DBCursor cursor =coll.find();				
-//				while(cursor.hasNext()){
-//					obj=cursor.next();
-//					if(((ArrayList<String>) obj.get("deviceids")).contains(deviceId)){
-//						obj.put("username", userName);
-//						obj.put("facebookid", facebookId);
-//						obj.put("facebooktoken", facebookToken);
-//						obj.put("facebookfriends", fbFriends);
-//						coll.save(obj);
-//						break;
-//					}					
-//				}
-//			}			
+
+			//			DBObject obj;
+			//			if(coll.find(doc).count()>0){
+			//				//user already registered and authenticated FB with some other device
+			//
+			//				//get blueetoth and delete the entry
+			//				BasicDBObject temp = new BasicDBObject("deviceid", deviceId);
+			//				String bluetoothMAC=coll.find(temp).next().get("bluetoothmac").toString();
+			//				coll.remove(coll.find(temp).next());
+			//
+			//				//update the already registered user
+			//				obj = coll.find(doc).next();
+			//				//update the device list
+			//				ArrayList<String> deviceid=new ArrayList<String>();
+			//				deviceid= (ArrayList<String>) obj.get("deviceids");
+			//				deviceid.add(deviceId);
+			//				obj.removeField("deviceids");
+			//				obj.put("deviceids", deviceid);
+			//
+			//				//update the bluetooth MAP
+			//				Map<String,String> bluetooth=new HashMap<String,String>();
+			//				bluetooth= (Map<String, String>) obj.get("bluetoothmac");
+			//				bluetooth.put(deviceId, bluetoothMAC);
+			//				obj.removeField("bluetoothmac");
+			//				obj.put("bluetoothmac", bluetooth);
+			//
+			//				coll.save(obj);
+			//			}
+			//			else{
+			//				//user authenticated FB with first device, so add details to the device registration dataArrayList<String> fbFriends= new ArrayList<String>();
+			//				ArrayList<String> fbFriends= new ArrayList<String>();
+			//				//TODO: create logic to update friends
+			//				fbFriends = getFacebookFriends(facebookId, facebookToken);
+			//				DBCursor cursor =coll.find();				
+			//				while(cursor.hasNext()){
+			//					obj=cursor.next();
+			//					if(((ArrayList<String>) obj.get("deviceids")).contains(deviceId)){
+			//						obj.put("username", userName);
+			//						obj.put("facebookid", facebookId);
+			//						obj.put("facebooktoken", facebookToken);
+			//						obj.put("facebookfriends", fbFriends);
+			//						coll.save(obj);
+			//						break;
+			//					}					
+			//				}
+			//			}			
 		} catch (UnknownHostException e) {
 			System.out.println(TAG+" error: "+e.toString());
 		}
@@ -138,52 +139,52 @@ public class UserRegistrar {
 			obj.put("facebooktoken", twitterToken);
 			obj.put("facebookfriends", twitterFollowers);
 			coll.save(obj);
-			
-//			DBObject obj;
-//			if(coll.find(doc).count()>0){
-//				//user already registered and authenticated FB with some other device
-//
-//				//get blueetoth and delete the entry
-//				BasicDBObject temp = new BasicDBObject("deviceid", deviceId);
-//				String bluetoothMAC=coll.find(temp).next().get("bluetoothmac").toString();
-//				coll.remove(coll.find(temp).next());
-//
-//				//update the already registered user
-//				obj = coll.find(doc).next();
-//				//update the device list
-//				ArrayList<String> deviceid=new ArrayList<String>();
-//				deviceid= (ArrayList<String>) obj.get("deviceids");
-//				deviceid.add(deviceId);
-//				obj.removeField("deviceids");
-//				obj.put("deviceids", deviceid);
-//
-//				//update the bluetooth MAP
-//				Map<String,String> bluetooth=new HashMap<String,String>();
-//				bluetooth= (Map<String, String>) obj.get("bluetoothmac");
-//				bluetooth.put(deviceId, bluetoothMAC);
-//				obj.removeField("bluetoothmac");
-//				obj.put("bluetoothmac", bluetooth);
-//
-//				coll.save(obj);
-//			}
-//			else{
-//				//user authenticated FB with first device, so add details to the device registration dataArrayList<String> fbFriends= new ArrayList<String>();
-//				ArrayList<String> twitterFollowers= new ArrayList<String>();
-//				//TODO: create logic to update friends
-//				twitterFollowers = getTwitterFollowers(twitterId);
-//				DBCursor cursor =coll.find();				
-//				while(cursor.hasNext()){
-//					obj=cursor.next();
-//					if(((ArrayList<String>) obj.get("deviceids")).contains(deviceId)){
-//						obj.put("username", userName);
-//						obj.put("twitterid", twitterId);
-//						obj.put("twittertoken", twitterToken);
-//						obj.put("twitterfollowers", twitterFollowers);
-//						coll.save(obj);
-//						break;
-//					}					
-//				}
-//			}			
+
+			//			DBObject obj;
+			//			if(coll.find(doc).count()>0){
+			//				//user already registered and authenticated FB with some other device
+			//
+			//				//get blueetoth and delete the entry
+			//				BasicDBObject temp = new BasicDBObject("deviceid", deviceId);
+			//				String bluetoothMAC=coll.find(temp).next().get("bluetoothmac").toString();
+			//				coll.remove(coll.find(temp).next());
+			//
+			//				//update the already registered user
+			//				obj = coll.find(doc).next();
+			//				//update the device list
+			//				ArrayList<String> deviceid=new ArrayList<String>();
+			//				deviceid= (ArrayList<String>) obj.get("deviceids");
+			//				deviceid.add(deviceId);
+			//				obj.removeField("deviceids");
+			//				obj.put("deviceids", deviceid);
+			//
+			//				//update the bluetooth MAP
+			//				Map<String,String> bluetooth=new HashMap<String,String>();
+			//				bluetooth= (Map<String, String>) obj.get("bluetoothmac");
+			//				bluetooth.put(deviceId, bluetoothMAC);
+			//				obj.removeField("bluetoothmac");
+			//				obj.put("bluetoothmac", bluetooth);
+			//
+			//				coll.save(obj);
+			//			}
+			//			else{
+			//				//user authenticated FB with first device, so add details to the device registration dataArrayList<String> fbFriends= new ArrayList<String>();
+			//				ArrayList<String> twitterFollowers= new ArrayList<String>();
+			//				//TODO: create logic to update friends
+			//				twitterFollowers = getTwitterFollowers(twitterId);
+			//				DBCursor cursor =coll.find();				
+			//				while(cursor.hasNext()){
+			//					obj=cursor.next();
+			//					if(((ArrayList<String>) obj.get("deviceids")).contains(deviceId)){
+			//						obj.put("username", userName);
+			//						obj.put("twitterid", twitterId);
+			//						obj.put("twittertoken", twitterToken);
+			//						obj.put("twitterfollowers", twitterFollowers);
+			//						coll.save(obj);
+			//						break;
+			//					}					
+			//				}
+			//			}			
 		} catch (UnknownHostException e) {
 			System.out.println(TAG+" error: "+e.toString());
 		}
@@ -195,7 +196,7 @@ public class UserRegistrar {
 			DB db = mongoClient.getDB( "SenSocial" );
 			DBCollection coll = db.getCollection("User");
 			DBCursor cursor =coll.find();
-			
+
 			ArrayList<Double> loc=new ArrayList<Double>();
 			loc.add(Double.parseDouble(lat));
 			loc.add(Double.parseDouble(lon));
@@ -207,26 +208,26 @@ public class UserRegistrar {
 			location.put(deviceId,loc);
 			obj.put("location", location);
 			coll.save(obj);
-			
-			
-//			DBObject obj;
-//
-//			ArrayList<Double> loc=new ArrayList<Double>();
-//			loc.add(Double.parseDouble(lat));
-//			loc.add(Double.parseDouble(lon));
-//
-//			Map<String,ArrayList<Double>> location=new HashMap<String,ArrayList<Double>>();			
-//			while(cursor.hasNext()){
-//				obj=cursor.next();
-//				if(((ArrayList<String>) obj.get("deviceids")).contains(deviceId)){
-//					location = (Map<String, ArrayList<Double>>) obj.get("location");
-//					location.remove(deviceId);
-//					location.put(deviceId,loc);
-//					obj.put("location", location);
-//					coll.save(obj);
-//					break;
-//				}					
-//			}
+
+
+			//			DBObject obj;
+			//
+			//			ArrayList<Double> loc=new ArrayList<Double>();
+			//			loc.add(Double.parseDouble(lat));
+			//			loc.add(Double.parseDouble(lon));
+			//
+			//			Map<String,ArrayList<Double>> location=new HashMap<String,ArrayList<Double>>();			
+			//			while(cursor.hasNext()){
+			//				obj=cursor.next();
+			//				if(((ArrayList<String>) obj.get("deviceids")).contains(deviceId)){
+			//					location = (Map<String, ArrayList<Double>>) obj.get("location");
+			//					location.remove(deviceId);
+			//					location.put(deviceId,loc);
+			//					obj.put("location", location);
+			//					coll.save(obj);
+			//					break;
+			//				}					
+			//			}
 		} catch (UnknownHostException e) {
 			System.out.println(TAG+" error: "+e.toString());
 		}
@@ -572,6 +573,42 @@ public class UserRegistrar {
 			System.out.println(TAG+" error: "+e.toString());
 		}
 		return users;
+	}
+
+
+	public static User getUserById(String userId){
+		User user=null;
+
+		String name;
+		String fbName;
+		String twName;
+		String id;
+		ArrayList<String> deviceIds= new ArrayList<String>();
+		ArrayList<String> fbFriends= new ArrayList<String>();
+		ArrayList<String> twFollowers= new ArrayList<String>();
+		HashMap<String, ArrayList<Double>> location = new HashMap<String, ArrayList<Double>>();
+
+		try {
+			MongoClient mongoClient = new MongoClient();
+			DB db = mongoClient.getDB( "SenSocial" );
+			DBCollection coll = db.getCollection("User");			
+			BasicDBObject doc = new BasicDBObject("userid", userId);	
+			DBObject obj = coll.find(doc).next();
+			name=obj.get("name").toString();
+			id=obj.get("userid").toString();
+			fbName=obj.get("facebookname").toString();
+			twName=obj.get("twittername").toString();
+			fbFriends=(ArrayList<String>) obj.get("facebookfriends");
+			twFollowers=(ArrayList<String>) obj.get("twitterfollowers");
+			deviceIds=(ArrayList<String>) obj.get("deviceids");
+			location=(HashMap<String, ArrayList<Double>>) obj.get("location");		
+			user=new User(name, id, fbName, twName, deviceIds, fbFriends, twFollowers, location);
+
+
+		} catch (UnknownHostException e) {
+			System.out.println(TAG+" error: "+e.toString());
+		}
+		return user;
 	}
 
 	private static String generateUserId(String fbName, String twitterName){

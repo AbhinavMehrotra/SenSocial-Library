@@ -21,6 +21,10 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Environment;
 
+import com.ubhave.sensocial.privacy.PPDDataType;
+import com.ubhave.sensocial.privacy.PPDLocation;
+import com.ubhave.sensocial.privacy.PPDParser;
+import com.ubhave.sensocial.privacy.PPDSensor;
 import com.ubhave.sensocial.sensormanager.SensorClassifier;
 
 public class ConfigurationHandler {
@@ -41,8 +45,11 @@ public class ConfigurationHandler {
 		configsFilter=getConfigurations();
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		configsMemory=sp.getStringSet("ConfigurationSet", null);
-
-
+		
+		
+		//check for PPD
+		configsFilter=checkForPPD(configsFilter);
+		
 		System.out.println("configsMemory"+configsMemory);
 		System.out.println("configsFilter"+configsFilter);
 
@@ -153,6 +160,45 @@ public class ConfigurationHandler {
 			System.out.println("No changes found in filter file");
 		}
 
+	}
+	
+	private static Set<String> checkForPPD(Set<String> configsFilter){
+		String sName, reqData;
+		Map<String, String> lnt;
+		String lName;
+		Boolean flag;
+		Set<String> sensors= new HashSet<String>();
+		Set<String> configsPPD= new HashSet<String>();		
+		for(String con:configsFilter){
+			flag=false;
+			for(String sen: getActivities(con)){
+				sensors.add(Modality.valueOf(sen).getSensorName());
+			}
+			reqData=getRequiredData(con);
+			if(reqData!=null){
+				sensors.add(reqData);
+			}
+			lnt=getRequiredDataLocationNType(con);
+			if(lnt.containsKey("server"))
+				lName=PPDLocation.SERVER;
+			else
+				lName=PPDLocation.CLIENT;
+			
+			for(String sen: sensors){				
+				if(!PPDParser.isAllowed(sen, lName, PPDDataType.CLASSIFIED)){
+					flag=true;
+					break;
+				}
+			}
+			if(flag==true){
+				configsPPD.add(con);
+			}
+		}
+		for(String sen:configsPPD){
+			configsFilter.remove(sen);
+		}
+
+		return configsFilter;
 	}
 
 	private static Set<String> getConfigurations(){

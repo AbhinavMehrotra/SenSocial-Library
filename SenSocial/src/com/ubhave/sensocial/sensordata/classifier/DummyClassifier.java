@@ -1,11 +1,11 @@
 package com.ubhave.sensocial.sensordata.classifier;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 
 import com.ubhave.dataformatter.DataFormatter;
 import com.ubhave.dataformatter.json.JSONFormatter;
@@ -166,5 +166,12 @@ public class DummyClassifier {
 		double c = 2 * Math.asin(Math.sqrt(a));  
 		return Radius * c;  
 	} 
-
+	
+	//bluetoothmac
+	public static Boolean isBluetoothPresent(Set<String> macs, String mac) {  
+		if(macs.contains(mac))
+			return true;
+		else
+			return false;
+	}
 }

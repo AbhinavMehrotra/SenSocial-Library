@@ -1,16 +1,18 @@
 package com.ubhave.sensocial.server.filters;
 
-import com.ubhave.sensocial.server.manager.Device;
+import java.awt.GraphicsDevice.WindowTranslucency;
+
 import com.ubhave.sensocial.server.manager.Sensors;
 
 
 public enum Modality {
 	NoCodition("all","NA"),
-	standing("standing",getSensorNameById(Sensors.SENSOR_TYPE_ACCELEROMETER)),
-	sitting("sitting",getSensorNameById(Sensors.SENSOR_TYPE_ACCELEROMETER)),
-	every_ten_minutes("every_ten_minutes",getSensorNameById(Sensors.SENSOR_TYPE_TIME)),
-	every_thirty_minutes("every_thirty_minutes",getSensorNameById(Sensors.SENSOR_TYPE_TIME)),
-	friends_within_1_mile("friends_within_1_mile",getSensorNameById(Sensors.SENSOR_TYPE_LOCATION)),
+	Moving("Moving",getSensorNameById(Sensors.SENSOR_TYPE_ACCELEROMETER)),
+	Not_Moving("Not_Moving",getSensorNameById(Sensors.SENSOR_TYPE_ACCELEROMETER)),
+	Silent("Silent",getSensorNameById(Sensors.SENSOR_TYPE_MICROPHONE)),
+	Talking("Talking",getSensorNameById(Sensors.SENSOR_TYPE_MICROPHONE)),
+	Within_1_mile_of_UoB("Within_1_mile_of_lat_52.449_lon_-1.925",getSensorNameById(Sensors.SENSOR_TYPE_LOCATION)),
+	//With_User_("friends_within_1_mile",getSensorNameById(Sensors.SENSOR_TYPE_LOCATION)),	
 	logicalOR("LogicalOR","");
 	
 	private String activity;
@@ -29,21 +31,21 @@ public enum Modality {
 		return sensor;
 	}
 	
-	public Modality getModaalityByName(String name){
-		switch (name) {
+	public static Modality getModaalityByName(String name){
+		switch (name.toLowerCase()) {
 		case "all":
 			return NoCodition;
-		case "standing":
-			return standing;
-		case "sitting":
-			return sitting;
-		case "every_ten_minutes":
-			return every_ten_minutes;
-		case "every_thirty_minutes":
-			return every_thirty_minutes;
-		case "friends_within_1_mile":
-			return friends_within_1_mile;
-		case "logicalOR":
+		case "moving":
+			return Moving;
+		case "not_moving":
+			return Not_Moving;
+		case "silent":
+			return Silent;
+		case "talking":
+			return Talking;
+		case "within_1_mile_of_uob":
+			return Within_1_mile_of_UoB;
+		case "logicalor":
 			return logicalOR;
 		}
 		return null;

@@ -3,6 +3,8 @@ package com.ubhave.sensocial.tcp;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.ubhave.sensocial.privacy.PPDParser;
+
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,6 +19,7 @@ public class ClientServerCommunicator {
 			obj.put("deviceid", deviceId);
 			obj.put("userid", userId);
 			obj.put("bluetoothmac", mac);
+			obj.put("ppd", PPDParser.getPPDJSONString());
 			TCPClient.getInstance(sp.getString("serverip", ""),sp.getInt("serverport", 0)).startSending(obj.toString());
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -115,7 +118,7 @@ public class ClientServerCommunicator {
 		}
 	}
 	
-//	Registration:  { “name”: “registration”, "userid":<...>, “deviceid”:”<<unique_device_id>>”, "bluetoothmac":"<...>"}
+//	Registration:  { “name”: “registration”, "userid":<...>, “deviceid”:”<<unique_device_id>>”, "bluetoothmac":"<...>", "ppd":<...>}
 //	OSN authentication:  { “name”: “osn”, "userid":<...>,  “deviceid”:”<<unique_device_id>>”, “osn”:”<<json_object_for_specific_osn>>” }
 //	json_object_for_specific_osn: {“osnname”:””, ”name”:””,  ”userid”:””, “username”:””, “token”:”” }
 //	Location tracking:  { “name”: “location”, "userid":<...>,  “deviceid”:”<<unique_device_id>>”, “location”:”{“lat”:0,”lon”:0}” }
