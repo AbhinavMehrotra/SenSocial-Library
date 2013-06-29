@@ -21,10 +21,12 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Environment;
 
+import com.ubhave.sensocial.manager.SenSocialManager;
 import com.ubhave.sensocial.privacy.PPDDataType;
 import com.ubhave.sensocial.privacy.PPDLocation;
 import com.ubhave.sensocial.privacy.PPDParser;
 import com.ubhave.sensocial.privacy.PPDSensor;
+import com.ubhave.sensocial.sensormanager.AllPullSensors;
 import com.ubhave.sensocial.sensormanager.SensorClassifier;
 
 public class ConfigurationHandler {
@@ -45,10 +47,12 @@ public class ConfigurationHandler {
 		configsFilter=getConfigurations();
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		configsMemory=sp.getStringSet("ConfigurationSet", null);
-		
+
+		System.out.println("configsMemory"+configsMemory);
+		System.out.println("configsFilter"+configsFilter);
 		
 		//check for PPD
-		configsFilter=checkForPPD(configsFilter);
+		//configsFilter=checkForPPD(configsFilter);
 		
 		System.out.println("configsMemory"+configsMemory);
 		System.out.println("configsFilter"+configsFilter);
@@ -78,23 +82,25 @@ public class ConfigurationHandler {
 				sensors=sp.getStringSet("SensorSet", sensors);
 				ArrayList<String> newSensors=new ArrayList<String>();
 				//set new activities for new configs
-				Set<String> activities= new HashSet<String>();
+				Set<String> conditions= new HashSet<String>();
 				for(String config:newConfigs){
 					System.out.println("New config: "+config);
-					activities.clear();
-					activities=getActivities(config);
-					ed.putStringSet(config, activities);
+					conditions.clear();
+					conditions=getConditionString(config);
+					ed.putStringSet(config, conditions);
 					ed.commit();
-					System.out.println("Activities: "+activities);
+					System.out.println("Conditions: "+conditions);
 
 					//find new sensors for new-configs
-					for(String activity:activities){
-						if(activity.equalsIgnoreCase("ALL")){
+					AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
+					for(String condition:conditions){
+						if(condition.equalsIgnoreCase(ModalityType.null_condition)){
 							newSensors.add(getRequiredData(config));
 							continue;
 						}
-						if(!sensors.contains(Modality.valueOf(activity).getSensorName())){
-							newSensors.add(Modality.valueOf(activity).getSensorName());
+						Condition con=new Condition(condition);
+						if(!sensors.contains(aps.getSensorNameById(ModalityType.getSensorId(con.getModalityType())))){
+							newSensors.add(aps.getSensorNameById(ModalityType.getSensorId(con.getModalityType())));
 						}
 					}
 				}
@@ -114,23 +120,26 @@ public class ConfigurationHandler {
 				sensors=getAllRequiredSensorsByFilter();
 				ArrayList<String> unusedSensors=new ArrayList<String>();
 				//delete activities for unused configs
-				Set<String> activities= new HashSet<String>();
+				Set<String> conditions= new HashSet<String>();
 				for(String config:removedConfigs){
 					System.out.println("Unused config: "+config);
-					activities.clear();
-					activities=sp.getStringSet(config, null);
+					conditions.clear();
+					conditions=sp.getStringSet(config, null);
 					ed.remove(config);
 					ed.commit();
 
-					System.out.println("New activities: "+activities);	
+					System.out.println("New activities: "+conditions);	
 					//find usused sensors
-					for(String activity:activities){
-						if(activity.equalsIgnoreCase("ALL")){
+					AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
+					for(String condition:conditions){
+						
+						if(condition.equalsIgnoreCase("ALL")){
 							unusedSensors.add(getRequiredData(config));
 							continue;
 						}
-						if(!sensors.contains(Modality.valueOf(activity).getSensorName())){
-							unusedSensors.add(Modality.valueOf(activity).getSensorName());
+						Condition con=new Condition(condition);
+						if(!sensors.contains(aps.getSensorNameById(ModalityType.getSensorId(con.getModalityType())))){
+							unusedSensors.add(aps.getSensorNameById(ModalityType.getSensorId(con.getModalityType())));
 						}
 					}
 				}
@@ -147,10 +156,10 @@ public class ConfigurationHandler {
 			//subscribe new sensors
 			//there can be two sensor-lists
 			Map<String, Set<String>> filterConfigs=new HashMap<String, Set<String>>();
-			for(String c : getConfigurations()){
-				filterConfigs.put(c, getActivities(c));
+			for(String c : configsFilter){
+				filterConfigs.put(c, getConditionString(c));
 				System.out.println(c);
-				for(String s:getActivities(c))
+				for(String s:getConditionString(c))
 					System.out.println(s);
 			}			
 			SensorClassifier.run(context,filterConfigs);
@@ -168,11 +177,13 @@ public class ConfigurationHandler {
 		String lName;
 		Boolean flag;
 		Set<String> sensors= new HashSet<String>();
-		Set<String> configsPPD= new HashSet<String>();		
+		Set<String> configsPPD= new HashSet<String>();	
+		AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
 		for(String con:configsFilter){
 			flag=false;
-			for(String sen: getActivities(con)){
-				sensors.add(Modality.valueOf(sen).getSensorName());
+			for(String conditions: getConditionString(con)){
+				Condition c=new Condition(conditions);
+				sensors.add(aps.getSensorNameById(ModalityType.getSensorId(c.getModalityType())));
 			}
 			reqData=getRequiredData(con);
 			if(reqData!=null){
@@ -194,8 +205,9 @@ public class ConfigurationHandler {
 				configsPPD.add(con);
 			}
 		}
-		for(String sen:configsPPD){
-			configsFilter.remove(sen);
+		for(String configs:configsPPD){
+			System.out.println("Config not allowed by PPD: "+configs);			
+			configsFilter.remove(configs);
 		}
 
 		return configsFilter;
@@ -226,7 +238,7 @@ public class ConfigurationHandler {
 						}
 					}
 				}
-				System.out.println("Get-Config in C-Handler: Done");
+				System.out.println("Get Configurations in C-Handler");
 			}		
 		} catch (Exception e) {
 			System.out.println("C-Handler getConfig: "+e.toString());
@@ -256,8 +268,8 @@ public class ConfigurationHandler {
 		return configs;
 	}
 
-	private static Set<String> getActivities(String configName){
-		Set<String> activities= new HashSet<String>();
+	private static Set<String> getConditionString(String configName){
+		Set<String> conditions= new HashSet<String>();
 		try
 		{
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -294,10 +306,8 @@ public class ConfigurationHandler {
 								for(int j=0;j<nNode1.getChildNodes().getLength();j++){
 									Node tempNode=nNode1.getChildNodes().item(j);
 									if(tempNode.getNodeType() == Node.ELEMENT_NODE){
-										System.out.println("Is it??");	
 										Element e= (Element) tempNode;
-										System.out.println("Yessss");	
-										activities.add(e.getAttribute("name"));
+										conditions.add(e.getAttribute("name"));
 									}
 									else{
 										System.out.println("NOOOOO");	
@@ -312,7 +322,7 @@ public class ConfigurationHandler {
 		} catch (Exception e) {
 			System.out.println("getActivities:"+e.toString());
 		}		
-		return activities;
+		return conditions;
 	}
 
 
@@ -410,13 +420,15 @@ public class ConfigurationHandler {
 		Set<String> sensors= new HashSet<String>();
 		Set<String> configs= new HashSet<String>();
 		configs=getConfigurations();
+		AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
 		for(String c:configs){
-			for(String s:getActivities(c)){
+			for(String s:getConditionString(c)){
 				if(s.equalsIgnoreCase("ALL")){
 					sensors.add(getRequiredData(c));
 					break;
 				}
-				sensors.add(Modality.valueOf(s).getSensorName());
+				Condition con=new Condition(s);
+				sensors.add(aps.getSensorNameById(ModalityType.getSensorId(con.getModalityType())));
 			}
 		}
 		return sensors;

@@ -63,7 +63,11 @@ public class FacebookEventNotifier{
 					
 					//TODO: check if the trigger is for facebook freinds then just update the friend list in db and 
 					// no need to send trigger to client device.
-					
+					if(fields.getString(j).equalsIgnoreCase("friends")){
+						//update friend list
+						
+						continue;
+					}
 					FacebookGetters fg=new FacebookGetters(id);
 					message=fg.getUpdatedData(fields.get(j).toString(), time);
 					MQTTClientNotifier.sendFacebookUpdate(id, message,time);

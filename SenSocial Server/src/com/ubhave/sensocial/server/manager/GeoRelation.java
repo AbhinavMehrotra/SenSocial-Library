@@ -1,8 +1,8 @@
 package com.ubhave.sensocial.server.manager;
 
 public enum GeoRelation {
-	in_this_city("start_stream"),
-	within_1km("stop_stream");
+	in_this_city("in_this_city"),
+	within_1mile("within_1mile");
 	
 	private final String message;
 	

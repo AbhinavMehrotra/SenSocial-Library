@@ -9,13 +9,16 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import com.ubhave.sensocial.server.data.SensorData;
 import com.ubhave.sensocial.server.data.SocialEvent;
 import com.ubhave.sensocial.server.exception.PPDException;
 import com.ubhave.sensocial.server.exception.SensorDataTypeException;
 import com.ubhave.sensocial.server.exception.XMLFileException;
+import com.ubhave.sensocial.server.filters.Condition;
 import com.ubhave.sensocial.server.filters.Filter;
+import com.ubhave.sensocial.server.filters.ModalValue;
 import com.ubhave.sensocial.server.filters.Modality;
+import com.ubhave.sensocial.server.filters.ModalityType;
+import com.ubhave.sensocial.server.filters.Operator;
 import com.ubhave.sensocial.server.manager.Device;
 import com.ubhave.sensocial.server.manager.SSManager;
 import com.ubhave.sensocial.server.manager.SensorListener;
@@ -78,9 +81,12 @@ public class ServerBoard extends JFrame {
                 		try {
         					Stream stream=d.getStream(Sensors.SENSOR_TYPE_WIFI, "raw");
         					Filter filter=new Filter();
-        					ArrayList<Modality> activity=new ArrayList<Modality>();
-        					activity.add(Modality.Not_Moving);
-        					filter.addConditions(activity);
+        					ArrayList<Condition> conditions=new ArrayList<Condition>();
+        					conditions.add(new Condition(ModalityType.physical_activity, Operator.equal_to, ModalValue.running));
+        					conditions.add(new Condition(ModalityType.neighbour, Operator.equal_to, ModalValue.isWithUser("A0:6C:EC:89:4C:01")));
+        					
+        					
+        					filter.addConditions(conditions);
         					Stream s=stream.setFilter(filter);
         					SensorListener l=new SensorListener() {
         						
@@ -88,7 +94,7 @@ public class ServerBoard extends JFrame {
         							System.out.println("Social Event received");
         							System.out.println("Stream id: "+socialEvent.getFilteredSensorData().getStreamId());
         							System.out.println("Raw data: "+socialEvent.getFilteredSensorData().getRawData());
-        							SensorData d=socialEvent.getFilteredSensorData().getRawData();
+        							com.ubhave.sensormanager.data.SensorData d=socialEvent.getFilteredSensorData().getRawData();
         							
         							
         						}

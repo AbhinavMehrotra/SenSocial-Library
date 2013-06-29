@@ -232,6 +232,26 @@ public class UserRegistrar {
 			System.out.println(TAG+" error: "+e.toString());
 		}
 	}
+	
+	public static Location getLocation(String userId){
+		try {
+			MongoClient mongoClient = new MongoClient();
+			DB db = mongoClient.getDB( "SenSocial" );
+			DBCollection coll = db.getCollection("User");
+			DBCursor cursor =coll.find();
+			BasicDBObject doc = new BasicDBObject("userid", userId);
+			DBObject obj = coll.find(doc).next();
+			Map<String,ArrayList<Double>> location=new HashMap<String,ArrayList<Double>>();	
+			ArrayList<Double> l=new ArrayList<Double>();
+			for(Map.Entry<String, ArrayList<Double>> e: location.entrySet()){
+				l=e.getValue();
+			}
+			return new Location(l.get(0), l.get(1));
+		} catch (UnknownHostException e) {
+			System.out.println(TAG+" error: "+e.toString());
+		}
+		return new Location(0, 0);
+	}
 
 	public static void registerUser(String userName, String deviceId, String bluetoothMAC, String fbName, String fbId, String fbToken, String twitterName, double latitude, double longitude){
 
@@ -417,6 +437,41 @@ public class UserRegistrar {
 		return null;
 	}
 
+	public static User getUserByDeviceId(String deviceId){
+		String name;
+		String fbName;
+		String twName;
+		String id;
+		ArrayList<String> deviceIds= new ArrayList<String>();
+		ArrayList<String> fbFriends= new ArrayList<String>();
+		ArrayList<String> twFollowers= new ArrayList<String>();
+		HashMap<String, ArrayList<Double>> location = new HashMap<String, ArrayList<Double>>();
+
+		try {
+			MongoClient mongoClient = new MongoClient();
+			DB db = mongoClient.getDB( "SenSocial" );
+			DBCollection coll = db.getCollection("User");				
+			DBCursor cursor=coll.find();
+			while( cursor.hasNext()) {
+				DBObject obj = cursor.next();
+				if(((ArrayList<String>) obj.get("deviceids")).contains(deviceId)){
+					name=obj.get("name").toString();
+					id=obj.get("userid").toString();
+					fbName=obj.get("facebookname").toString();
+					twName=obj.get("twittername").toString();
+					fbFriends=(ArrayList<String>) obj.get("facebookfriends");
+					twFollowers=(ArrayList<String>) obj.get("twitterfollowers");
+					deviceIds=(ArrayList<String>) obj.get("deviceids");
+					location=(HashMap<String, ArrayList<Double>>) obj.get("location");		
+					return new User(name, id, fbName, twName, deviceIds, fbFriends, twFollowers, location);
+				}
+			}
+		} catch (UnknownHostException e) {
+			System.out.println(TAG+" error: "+e.toString());
+		}
+		//if user not found then return null
+		return null;
+	}
 
 	public static Device getDeviceWithBluetooth(String bluetoothMAC){
 		String name;

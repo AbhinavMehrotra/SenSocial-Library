@@ -1,12 +1,15 @@
 package com.ubhave.sensocial.server.filters;
 
 public class Operator {
-	public static String greater_than_equal_to = "_greater_than_equal_to_";
-	public static String greater_than = "_greater_than_";
-	public static String equal_to = "_equal_to_";
-	public static String less_than = "_less_than_";
-	public static String less_than_equal_to = "_less_than_equal_to_";
-	public static String logical_AND = "_logical_AND_";
-	public static String logical_OR = "_logical_OR_";
+	public static String greater_than_equal_to = ":greater_than_equal_to:";
+	public static String greater_than = ":greater_than:";
+	public static String equal_to = ":equal_to:";
+	public static String less_than = ":less_than:";
+	public static String less_than_equal_to = ":less_than_equal_to:";
+	public static String within_time_range = ":within_range:";
+	public static String after_every = ":after_every:";	
+	public static String within_location_range = ":within_location_range:";
+	public static String with_user =":with_user:";
+	
 		
 }

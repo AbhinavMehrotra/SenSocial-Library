@@ -1,19 +1,18 @@
 package com.ubhave.sensocial.server.manager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import com.ubhave.sensocial.server.exception.PPDException;
 import com.ubhave.sensocial.server.exception.SensorDataTypeException;
 import com.ubhave.sensocial.server.exception.XMLFileException;
-import com.ubhave.sensocial.server.filters.Modality;
+import com.ubhave.sensocial.server.filters.Condition;
 import com.ubhave.sensocial.server.filters.Filter;
 import com.ubhave.sensocial.server.filters.GenerateFilter;
-import com.ubhave.sensocial.server.filters.PrivacyPolicyDescriptorParser;
+import com.ubhave.sensocial.server.filters.Modality;
+import com.ubhave.sensocial.server.filters.ModalityType;
 import com.ubhave.sensocial.server.mqtt.MQTTClientNotifier;
 import com.ubhave.sensocial.server.mqtt.MQTTNotifitions;
 
@@ -37,7 +36,8 @@ public class Stream {
 		this.filter=null;
 		this.streamId=UUID.randomUUID().toString();
 		this.isAggregated=false;
-		StreamRegistrar.add(device.getDeviceId(), this);
+		System.out.println("device id is:  "+device.getDeviceId());
+		StreamRegistrar.add(device.getDeviceId(), (Stream)this);
 	}
 
 
@@ -63,9 +63,16 @@ public class Stream {
 	public Stream setFilter(Filter filter)throws PPDException{		
 		this.filter=filter;
 		Stream newStream;
+
 		try {
-			newStream = new Stream(this.device, this.sensorId, this.dataType);
-			newStream.filter=filter;
+			if(this.isAggregated()){
+				newStream = new Stream(getAggregator(), this.sensorId, this.dataType);
+				newStream.filter=filter;
+			}
+			else{
+				newStream = new Stream(this.device, this.sensorId, this.dataType);
+				newStream.filter=filter;
+			}
 		} catch (SensorDataTypeException e) {
 			newStream=this;
 			System.out.print(TAG+" Error: Something went wrong while creating a new stream with filter ");
@@ -82,46 +89,48 @@ public class Stream {
 			allStreams.add(this);
 
 		//check PPD for the sensors associated to activities
-//		Map<String,String> ppd= new HashMap<String, String>();
-//		for(Stream s:allStreams){
-//			ppd.put(Sensors.getSensorNameById(s.getSensorId()), s.getDataType());			
-//		}
-//		if(this.filter!=null){
-//			ArrayList<Modality> activities=new ArrayList<Modality>();
-//			activities=filter.getConditions();
-//			for(Modality a:activities){
-//				ppd.put(a.getSensorName(), "classified");
-//			}
-//		}
-//		PrivacyPolicyDescriptorParser ppdParser= new PrivacyPolicyDescriptorParser();
-//		if(!ppdParser.isAllowed(this.getDevice().getDeviceId(), ppd)){
-//			throw new PPDException("Sensors associated with some stream are not allowed in the PPD");
-//		}
+		//		Map<String,String> ppd= new HashMap<String, String>();
+		//		for(Stream s:allStreams){
+		//			ppd.put(Sensors.getSensorNameById(s.getSensorId()), s.getDataType());			
+		//		}
+		//		if(this.filter!=null){
+		//			ArrayList<Modality> activities=new ArrayList<Modality>();
+		//			activities=filter.getConditions();
+		//			for(Modality a:activities){
+		//				ppd.put(a.getSensorName(), "classified");
+		//			}
+		//		}
+		//		PrivacyPolicyDescriptorParser ppdParser= new PrivacyPolicyDescriptorParser();
+		//		if(!ppdParser.isAllowed(this.getDevice().getDeviceId(), ppd)){
+		//			throw new PPDException("Sensors associated with some stream are not allowed in the PPD");
+		//		}
 
 		//Generate filter xml file
 		if(this.filter!=null){
-			ArrayList<Modality> activities=new ArrayList<Modality>();
-			activities=filter.getConditions();
-			ArrayList<String> act= new ArrayList<String>();
-			for(Modality s:activities)
-				act.add(s.getActivityName());
+			ArrayList<Condition> conditions=new ArrayList<Condition>();
+			conditions=filter.getConditions();
+			//			ArrayList<String> act= new ArrayList<String>();
+			//			for(Condition s:conditions)
+			//				act.add(s.getConditionString());
 
 			for(Stream s:allStreams){
-				GenerateFilter.createXML(s.getDevice().getUser(), s.getDevice().getDeviceId(),act, s.getStreamId(), 
+				GenerateFilter.createXML(s.getDevice().getUser(), s.getDevice().getDeviceId(),conditions, s.getStreamId(), 
 						Sensors.getSensorNameById(s.getSensorId()), s.getDataType());				
 			}
 		}
 		else{
-			ArrayList<String> act= new ArrayList<String>();
-			act.add("ALL");
+			ArrayList<Condition> conditions= new ArrayList<Condition>();
+			conditions.add(new Condition(ModalityType.null_condition, "", ""));
 			for(Stream s:allStreams){
-				GenerateFilter.createXML(s.getDevice().getUser(), s.getDevice().getDeviceId(),act, s.getStreamId(), 
+				GenerateFilter.createXML(s.getDevice().getUser(), s.getDevice().getDeviceId(),conditions, this.getStreamId(), 
 						Sensors.getSensorNameById(s.getSensorId()), s.getDataType());				
 			}
 		}
-		MQTTClientNotifier.sendStreamNotification(device.getDeviceId(), MQTTNotifitions.start_stream, this.getStreamId());
-		
-//		MQTTClientNotifier.sendStreamNotification(device.getDeviceId(), MQTTNotifitions.start_stream, this.getStreamId());
+		for(Stream s:allStreams){
+			MQTTClientNotifier.sendStreamNotification(s.getDevice().getDeviceId(), MQTTNotifitions.start_stream, this.getStreamId());
+		}
+
+		//		MQTTClientNotifier.sendStreamNotification(device.getDeviceId(), MQTTNotifitions.start_stream, this.getStreamId());
 	}
 
 
@@ -158,7 +167,7 @@ public class Stream {
 		return streamId;
 	}
 
-	public Boolean getIsAggregated() {
+	public Boolean isAggregated() {
 		return isAggregated;
 	}
 	public Aggregator getAggregator() {

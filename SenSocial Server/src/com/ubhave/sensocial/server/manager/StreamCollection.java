@@ -37,6 +37,7 @@ public class StreamCollection {
 					devices.add(tempdevice.get(j));
 				}
 			}
+			break;
 		case twitter_followers:
 			relativeIds=user.getTwitterFollowers();
 			for(int i=0;i<relativeIds.size();i++){
@@ -45,17 +46,17 @@ public class StreamCollection {
 					devices.add(tempdevice.get(j));
 				}
 			}
-			
-		case people_near_the_user:
-			Set<String> bluetooths=new HashSet<String>();
-			MQTTClientNotifier.sendQueryNotifications(MQTTNotifitions.nearby_bluetooths);
-			
-			//get the query result 
-			bluetooths=null;
-			
-			for(String b:bluetooths){
-				devices.add(UserRegistrar.getDeviceWithBluetooth(b));
-			}
+			break;
+//		case people_near_the_user:
+//			Set<String> bluetooths=new HashSet<String>();
+//			MQTTClientNotifier.sendQueryNotifications(MQTTNotifitions.nearby_bluetooths);
+//			
+//			//get the query result 
+//			bluetooths=null;
+//			
+//			for(String b:bluetooths){
+//				devices.add(UserRegistrar.getDeviceWithBluetooth(b));
+//			}
 			
 		}
 

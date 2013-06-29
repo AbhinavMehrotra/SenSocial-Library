@@ -1,18 +1,43 @@
 package com.ubhave.sensocial.server.data;
 
+import org.json.JSONObject;
+
+import com.mongodb.util.JSON;
+import com.ubhave.sensormanager.data.SensorData;
 
 public class SocialEvent {
 
-	private String deviceId;
 	private SocialData socialData;
+
+	private DeviceSensorData sensorData;
+
+	public SocialEvent(){
+		//required to set all elements
+	}
+
+	public SocialEvent(SensorData rawData, String classifiedData, String streamId, String deviceId,
+			String oSNFeed, String oSNName, String feedType){
+		sensorData=new DeviceSensorData();
+		sensorData.setClassifiedData(classifiedData);
+		sensorData.setRawData(rawData);
+		sensorData.setStreamId(streamId);
+		sensorData.setDeviceId(deviceId);
+		socialData.setOSNFeed(oSNFeed);
+		socialData.setOSNName(oSNName);
+		socialData.setFeedType(feedType);
+	}
+
 	
-	private SensorData filteredSensorData;
+	public static SocialEvent getSocialEvent(JSONObject obj){
+		
+		return null;
+	}
 
 	/**
 	 * @return the socialData
 	 */
 	public SocialData getSocialData() {
-		return socialData;
+		return this.socialData;
 	}
 
 	/**
@@ -25,16 +50,16 @@ public class SocialEvent {
 	/**
 	 * @return the filteredSensorData
 	 */
-	public SensorData getFilteredSensorData() {
-		return filteredSensorData;
+	public DeviceSensorData getFilteredSensorData() {
+		return this.sensorData;
 	}
 
 	/**
 	 * @param filteredSensorData the filteredSensorData to set
 	 */
-	public void setFilteredSensorData(SensorData filteredSensorData) {
-		this.filteredSensorData = filteredSensorData;
+	public void setFilteredSensorData(DeviceSensorData filteredSensorData) {
+		this.sensorData = filteredSensorData;
 	}
 
-	
+
 }

@@ -21,6 +21,7 @@ import android.util.Log;
 import com.ubhave.dataformatter.DataFormatter;
 import com.ubhave.dataformatter.json.JSONFormatter;
 import com.ubhave.sensocial.sensormanager.AllPullSensors;
+import com.ubhave.sensocial.sensormanager.SensorDataCollector;
 import com.ubhave.sensocial.tcp.ClientServerCommunicator;
 import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
@@ -59,7 +60,8 @@ public class TrackLocation {
 				handler.post(new Runnable() {
 					public void run() {       
 						try {
-							sensorData=sensorManager.getDataFromSensor(AllPullSensors.SENSOR_TYPE_LOCATION);
+//							sensorData=sensorManager.getDataFromSensor(AllPullSensors.SENSOR_TYPE_LOCATION);
+							sensorData=SensorDataCollector.getData(AllPullSensors.SENSOR_TYPE_LOCATION);
 							JSONFormatter formatter = DataFormatter.getJSONFormatter(AllPullSensors.SENSOR_TYPE_LOCATION);
 							JSONObject jsondata=formatter.toJSON(sensorData);
 							System.out.print("location: "+jsondata.get("latitude"));

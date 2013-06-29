@@ -1,23 +1,19 @@
 package com.ubhave.sensocial.manager;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
-import com.ubhave.sensocial.exceptions.FilterException;
 import com.ubhave.sensocial.exceptions.PPDException;
 import com.ubhave.sensocial.exceptions.SensorDataTypeException;
+import com.ubhave.sensocial.filters.Condition;
 import com.ubhave.sensocial.filters.ConfigurationHandler;
-import com.ubhave.sensocial.filters.Modality;
 import com.ubhave.sensocial.filters.Filter;
 import com.ubhave.sensocial.filters.FilterSettings;
-import com.ubhave.sensocial.filters.PrivacyPolicyDescriptorParser;
+import com.ubhave.sensocial.filters.Modality;
+import com.ubhave.sensocial.filters.ModalityType;
 import com.ubhave.sensocial.sensormanager.AllPullSensors;
 
 
@@ -93,17 +89,18 @@ public class Stream {
 	public void startStream(){
 		Log.e(TAG, "Start stream: "+ getStreamId());
 		if(this.getFilter()==null){
-//			throw new FilterException();
-			ArrayList<String> act= new ArrayList<String>();
-			act.add("ALL");
-
-			GenerateFilter.createXML(context,act, this.getStreamId(), 
+			Log.e(TAG, "Filter is null");
+			ArrayList<Condition> conditions= new ArrayList<Condition>();
+			conditions.add(new Condition(ModalityType.null_condition, "", ""));
+			
+			GenerateFilter.createXML(context,conditions, this.getStreamId(), 
 					new AllPullSensors(context).getSensorNameById(this.sensorId), dataType);
 			
 		}
 		else{
-			ArrayList<Modality> activities=new ArrayList<Modality>();
-			activities=this.getFilter().getConditions();
+			Log.e(TAG, "Filter present");
+			ArrayList<Condition> conditions=new ArrayList<Condition>();
+			conditions=this.getFilter().getConditions();
 
 			//check PPD for the sensors associated to activities 
 //			PrivacyPolicyDescriptorParser ppd= new PrivacyPolicyDescriptorParser(context);	
@@ -113,17 +110,13 @@ public class Stream {
 //				}
 //			}
 
-			ArrayList<String> act= new ArrayList<String>();
-			for(Modality s:activities)
-				act.add(s.getActivityName());
-			String config= getStreamId();
 
-			GenerateFilter.createXML(context, act, config, 
+			GenerateFilter.createXML(context, conditions, getStreamId(), 
 					new AllPullSensors(context).getSensorNameById(this.sensorId), dataType);
 			
 		}
 		
-		FilterSettings.startConfiguration(this.getStreamId());
+		FilterSettings.startConfiguration(getStreamId());
 		ConfigurationHandler.run(context);	
 	}
 

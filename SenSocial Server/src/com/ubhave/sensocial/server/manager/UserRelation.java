@@ -1,8 +1,8 @@
 package com.ubhave.sensocial.server.manager;
 
 public enum UserRelation {
-	facebook_friends("start_stream"),
-	twitter_followers("stop_stream"),
+	facebook_friends("facebook_friends"),
+	twitter_followers("twitter_followers"),
 	people_near_the_user("people_near_the_user");
 	
 	private final String relation;

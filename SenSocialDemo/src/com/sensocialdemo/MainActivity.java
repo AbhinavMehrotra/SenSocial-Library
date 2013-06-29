@@ -18,6 +18,7 @@ import com.ubhave.sensocial.configuration.MQTTServerConfiguration;
 import com.ubhave.sensocial.configuration.ServerConfiguration;
 import com.ubhave.sensocial.configuration.TwitterConfiguration;
 import com.ubhave.sensocial.data.SocialEvent;
+import com.ubhave.sensocial.exceptions.IllegalUserAccess;
 import com.ubhave.sensocial.exceptions.ServerException;
 import com.ubhave.sensocial.http.SendSensorDataToServer;
 import com.ubhave.sensocial.manager.SSListener;
@@ -60,8 +61,8 @@ public class MainActivity extends Activity implements SSListener{
 			sc.setMQTTBrokerURL("tcp://broker.mqttdashboard.com:1883");
 			sc.setRefreshInterval(60*60);
 			sc.setServerPort(4444);
-			ssm=SenSocialManager.getSenSocialManager(getApplicationContext(), false);
-//			String uid=ssm.setUserId("abhinav");
+			ssm=SenSocialManager.getSenSocialManager(getApplicationContext(), true);
+			String uid=ssm.setUserId("abhinav");
 //			System.out.println(uid);
 //			User user=ssm.getUser(uid);
 //			stream=user.getMyDevice().getStream(AllPullSensors.SENSOR_TYPE_ACCELEROMETER, "classified");
@@ -72,9 +73,9 @@ public class MainActivity extends Activity implements SSListener{
 //			Log.e(TAG, "Main activity, 2: "+e.toString());
 		} catch (ServerException e) {
 			Log.e(TAG, "Main activity, 3: "+e.toString());
-//		} catch (IllegalUserAccess e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
+		} catch (IllegalUserAccess e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}

@@ -5,5 +5,7 @@
 	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/Desktop/JARs/mongo-2.10.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/Desktop/JARs/org.eclipse.paho.client.mqttv3.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/Desktop/JARs/java-json.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/Desktop/JARs/sensordatamanager.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/Desktop/JARs/sensormanager.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

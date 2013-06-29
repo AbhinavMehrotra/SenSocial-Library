@@ -133,6 +133,22 @@ public class Testing {
 		//			// TODO Auto-generated catch block
 		//			e.printStackTrace();
 		//		}
+//		String value="latitude_5"+"_longitude_7"+"_range_3";
+//		String str=value.substring(9);
+//		System.out.println(str);
+//		String lat=str.substring(0, str.indexOf("_"));
+//		str=str.substring(str.indexOf("_")+1);
+//		str=str.substring(str.indexOf("_")+1);
+//		System.out.println(str);
+//		String lon=str.substring(0, str.indexOf("_"));
+//		str=str.substring(str.indexOf("_")+1);
+//		str=str.substring(str.indexOf("_")+1);
+//		System.out.println(str);			
+//		String range=str;
+//		
+//		System.out.println(lat);
+//		System.out.println(lon);
+//		System.out.println(range);
 				SSManager sm=SSManager.getSSManager();
 				ServerBoard frame = new ServerBoard();
 		        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

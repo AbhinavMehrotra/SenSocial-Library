@@ -29,6 +29,8 @@ private static Map<String, Set<String>> filterRecord = new HashMap<String, Set<S
 		}
 	}
 	
+	
+	
 
 	protected static void remove(String filterId, String clientStreamId) {
 		for(Map.Entry<String, Set<String>> entry: filterRecord.entrySet()) {
@@ -43,9 +45,16 @@ private static Map<String, Set<String>> filterRecord = new HashMap<String, Set<S
 		}
 	}
 
+	public static String isPresent(String clientStreamId){
+		for (Map.Entry<String, Set<String>> entry: filterRecord.entrySet()) {
+			if(entry.getValue().contains(clientStreamId)){
+				return entry.getKey();
+			}
+		}
+		return null;
+	}
 	
-	
-	public static Set<String> getClientStreamIds(String filterId){
+	public static Set<String> getClientStreamId(String filterId){
 		Set<String> streams = new HashSet<String>();
 		for (Map.Entry<String, Set<String>> entry: filterRecord.entrySet()) {
 			if(entry.getKey().equalsIgnoreCase(filterId)){
@@ -56,7 +65,7 @@ private static Map<String, Set<String>> filterRecord = new HashMap<String, Set<S
 		return streams;
 	}
 	
-	public static String getFilterIds(String clientStreamId){
+	public static String getFilterId(String clientStreamId){
 		for (Map.Entry<String, Set<String>> entry: filterRecord.entrySet()) {
 			if(entry.getValue().contains(clientStreamId)){
 				return entry.getKey();
@@ -64,5 +73,8 @@ private static Map<String, Set<String>> filterRecord = new HashMap<String, Set<S
 		}
 		return null;
 	}
+	
+	
+	
 
 }

@@ -43,15 +43,15 @@ public class SocialEvent {
 			if(sensorData!=null){
 				JSONFormatter formatter = DataFormatter.getJSONFormatter(sensorData.getRawData().getSensorType());
 				String str=formatter.toJSON(sensorData.getRawData()).toJSONString();
-				json.put("raw_data", str);
-				json.put("classified_data", sensorData.getClassifiedData());
-				json.put("stream_id_data", sensorData.getStreamId());
-				json.put("device_id", sensorData.getDeviceId());
+				json.put("rawdata", str);
+				json.put("classifieddata", sensorData.getClassifiedData());
+				json.put("streamid", sensorData.getStreamId());
+				json.put("deviceid", sensorData.getDeviceId());
 			}
 			if(socialData!=null){
-				json.put("osn_feed", socialData.getOSNFeed());
-				json.put("osn_name", socialData.getOSNName());
-				json.put("_osn_feed_type", socialData.getFeedType());
+				json.put("osnfeed", socialData.getOSNFeed());
+				json.put("osnname", socialData.getOSNName());
+				json.put("osnfeedtype", socialData.getFeedType());
 			}
 		} catch (JSONException e) {
 			Log.e("SNnMB", e.toString());
@@ -70,15 +70,15 @@ public class SocialEvent {
 			if(sensorData!=null){
 				JSONFormatter formatter = DataFormatter.getJSONFormatter(sensorData.getRawData().getSensorType());
 				String str=formatter.toJSON(sensorData.getRawData()).toJSONString();
-				json.put("raw_data", str);
-				json.put("classified_data", sensorData.getClassifiedData());
-				json.put("stream_id_data", sensorData.getStreamId());
-				json.put("device_id", sensorData.getDeviceId());
+				json.put("rawdata", str);
+				json.put("classifieddata", sensorData.getClassifiedData());
+				json.put("streamid", sensorData.getStreamId());
+				json.put("deviceid", sensorData.getDeviceId());
 			}
 			if(socialData!=null){
-				json.put("osn_feed", socialData.getOSNFeed());
-				json.put("osn_name", socialData.getOSNName());
-				json.put("_osn_feed_type", socialData.getFeedType());
+				json.put("osnfeed", socialData.getOSNFeed());
+				json.put("osnname", socialData.getOSNName());
+				json.put("osnfeedtype", socialData.getFeedType());
 			}
 		} catch (JSONException e) {
 			Log.e("SNnMB", e.toString());

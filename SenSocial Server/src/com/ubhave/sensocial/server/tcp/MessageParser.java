@@ -12,10 +12,9 @@ public class MessageParser {
 			JSONObject obj= new JSONObject(message);
 			String name= obj.getString("name");
 			String deviceId=null, userId=null;
-//			if(!name.equalsIgnoreCase("facebook"))
-				deviceId= obj.getString("deviceid");
-				userId=obj.getString("userid");
-			
+			deviceId= obj.getString("deviceid");
+			userId=obj.getString("userid");
+
 			switch (name) {
 			case "registration":
 				UserRegistrar.registerUser(obj.getString("userid"),deviceId, obj.getString("bluetoothmac"), obj.getString("ppd"));
@@ -34,21 +33,21 @@ public class MessageParser {
 				UserRegistrar.updateLocation(userId, deviceId, location.getString("lat"), location.getString("lon"));
 				break;
 			case "stream":
-				StreamReceiver.onReceive(deviceId, obj.getString("stream"));
+				StreamReceiver.onReceive(userId, deviceId, obj.getString("stream"));
 				break;
 			case "facebook":
 				FacebookEventNotifier.parseJSON(obj.getJSONObject("facebook"));
 			}
-			
+
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
-	
-//	Registration:  { “name”: “registration”, "userid":<...>, “deviceid”:”<<unique_device_id>>”, "bluetoothmac":"<...>"}
-//	OSN authentication:  { “name”: “osn”, "userid":<...>,  “deviceid”:”<<unique_device_id>>”, “osn”:”<<json_object_for_specific_osn>>” }
-//	json_object_for_specific_osn: {“osnname”:””, ”name”:””,  ”userid”:””, “username”:””, “token”:”” }
-//	Location tracking:  { “name”: “location”, "userid":<...>,  “deviceid”:”<<unique_device_id>>”, “location”:”{“lat”:0,”lon”:0}” }
-//	Stream:  { “name”: “stream”, "userid":<...>,  “deviceid”:”<<unique_device_id>>”, “stream”:”social_event”}
+
+	//	Registration:  { “name”: “registration”, "userid":<...>, “deviceid”:”<<unique_device_id>>”, "bluetoothmac":"<...>"}
+	//	OSN authentication:  { “name”: “osn”, "userid":<...>,  “deviceid”:”<<unique_device_id>>”, “osn”:”<<json_object_for_specific_osn>>” }
+	//	json_object_for_specific_osn: {“osnname”:””, ”name”:””,  ”userid”:””, “username”:””, “token”:”” }
+	//	Location tracking:  { “name”: “location”, "userid":<...>,  “deviceid”:”<<unique_device_id>>”, “location”:”{“lat”:0,”lon”:0}” }
+	//	Stream:  { “name”: “stream”, "userid":<...>,  “deviceid”:”<<unique_device_id>>”, “stream”:”social_event”}
 
 }

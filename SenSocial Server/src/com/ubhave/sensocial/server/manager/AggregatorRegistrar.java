@@ -21,6 +21,7 @@ public class AggregatorRegistrar {
 		aggregators.remove(aggregatedStreamId);
 	}
 
+
 	
 	public static Boolean isAggregated(String streamId){
 		for (Map.Entry<String, Set<String>> entry: aggregators.entrySet()) {

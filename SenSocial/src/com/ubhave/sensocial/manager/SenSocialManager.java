@@ -37,13 +37,17 @@ public class SenSocialManager{
 
 	private AuthenticateFacebook AF;
 	private AuthenticateTwitter AT;
-	private Context context;
+	private static Context context;
 	private String deviceId, TAG="SNnMB", mac;
 	private SharedPreferences sp;
 	private static SenSocialManager sensocialManager;
 	private static Boolean isServerClient;
 
 
+	public static Context getContext(){
+		return context;
+	}
+	
 	public static SenSocialManager getSenSocialManager(Context context, Boolean isServerClientApp) throws ServerException {
 		isServerClient=isServerClientApp;
 		if(isServerClient){

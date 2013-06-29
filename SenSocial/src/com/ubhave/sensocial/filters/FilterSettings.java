@@ -23,6 +23,7 @@ public class FilterSettings {
 		//set the configuration attribute "sense"="true"
 		try
 		{
+			System.out.println("Filter Stream!!");
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 			Document doc = docBuilder.newDocument();

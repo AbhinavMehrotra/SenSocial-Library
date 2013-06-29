@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Filter>
+
+    <Configuration
+        name="1d6ff88e-5adf-4df9-bedc-decf48167933"
+        sense="true" >
+
+        <Condition name="c1" >
+
+            <activity1 name="facebook_friends_location:equal_to:activity" />
+        </Condition>
+
+        <required_data
+            location="server"
+            sensor="wifi"
+            type="raw" />
+    </Configuration>
+
+    <Configuration
+        name="7d43867f-108d-4b3a-a73f-123ed4ed05c4"
+        sense="true" >
+
+        <Condition name="c1" >
+
+            <activity1 name="facebook_friends_location:equal_to:activity" />
+        </Condition>
+
+        <required_data
+            location="server"
+            sensor="wifi"
+            type="raw" />
+    </Configuration>
+
+    <Configuration
+        name="2ddabfe2-1563-441f-b7f1-9d12c593c578"
+        sense="true" >
+
+        <Condition name="c1" >
+
+            <activity1 name="facebook_friends_location:equal_to:activity" />
+        </Condition>
+
+        <required_data
+            location="server"
+            sensor="wifi"
+            type="raw" />
+    </Configuration>
+
+</Filter>

@@ -12,8 +12,10 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
+import com.ubhave.sensocial.filters.Condition;
 import com.ubhave.sensocial.filters.ConfigurationHandler;
 import com.ubhave.sensocial.filters.Modality;
+import com.ubhave.sensocial.filters.ModalityType;
 import com.ubhave.sensormanager.ESException;
 
 public class SensorClassifier {
@@ -36,8 +38,8 @@ public class SensorClassifier {
 		Set<String> blankSet=new HashSet<String>();
 		//Classify new configurations as OSN & Stream
 		for(Map.Entry<String, Set<String>> c: filterConfigs.entrySet()){
-			if(c.getValue().contains(Modality.facebook_trigger.getActivityName()) ||
-					c.getValue().contains(Modality.twitter_post.getActivityName())){
+			if(c.getValue().contains(ModalityType.facebook_activity) ||
+					c.getValue().contains(ModalityType.twitter_activity)){
 				System.out.println("OSN config: "+c.getKey());
 				osnConfigs.put(c.getKey(), c.getValue());
 			}
@@ -93,8 +95,10 @@ public class SensorClassifier {
 		for(Map.Entry<String, Set<String>> c: osnConfigs.entrySet()){
 			if(!config.contains(c.getKey())){
 				//new element found
-				for(String s:c.getValue())
-					sensor.add(Modality.valueOf(s).getSensorName());
+				for(String s:c.getValue()){
+					Condition newC=new Condition(s);
+					sensor.add(ModalityType.getSensorName(newC.getModalityType()));
+				}
 			}
 		}
 		ed.putStringSet("OSNSensorSet", sensor);
@@ -118,8 +122,10 @@ public class SensorClassifier {
 			}
 		}
 		for(Map.Entry<String, Set<String>> e:osnConfigs.entrySet()){
-			for(String s:e.getValue())
-				sensor.add(Modality.valueOf(s).getSensorName());
+			for(String s:e.getValue()){
+				Condition newC=new Condition(s);
+				sensor.add(ModalityType.getSensorName(newC.getModalityType()));				
+			}
 		}
 		ed.putStringSet("OSNSensorSet", sensor);
 		ed.putStringSet("OSNConfigurationSet", config);
@@ -153,8 +159,10 @@ public class SensorClassifier {
 						System.out.println("Set- Sensor: "+sensorNew);
 					}
 					else{
-						sensorNew.add(Modality.valueOf(s).getSensorName());
-						System.out.println("Sensor name: "+Modality.valueOf(s).getSensorName());
+						Condition newC=new Condition(s);
+						System.out.println("ModalityType is: "+newC.getModalityType());					
+						sensorNew.add(ModalityType.getSensorName(newC.getModalityType()));
+						System.out.println("Sensor name: "+ModalityType.getSensorName(newC.getModalityType()));
 					}
 				}
 			}
@@ -238,8 +246,11 @@ public class SensorClassifier {
 		}
 		Set<String> sensorNew=new HashSet<String>();
 		for(Map.Entry<String, Set<String>> e: streamConfigs.entrySet()){
-			for(String s:e.getValue())
-				sensorNew.add(Modality.valueOf(s).getSensorName());
+			for(String s:e.getValue()){
+				Condition newC=new Condition(s);
+				sensor.add(ModalityType.getSensorName(newC.getModalityType()));
+				//sensorNew.add(Modality.valueOf(s).getSensorName());
+			}
 		}
 		Log.i("SNnMB", "New sensors: "+sensorNew);
 		//check for new sensors and subscribe 

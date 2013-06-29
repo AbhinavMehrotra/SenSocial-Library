@@ -22,4 +22,14 @@ public class Sensors {
 		return sensor;
 	}
 
+	public static int getSensorIdByName(String name){
+		int sensor=0;
+		if(name.equalsIgnoreCase("accelerometer")) sensor=SENSOR_TYPE_ACCELEROMETER;
+		else if(name.equalsIgnoreCase("bluetooth")) sensor=SENSOR_TYPE_BLUETOOTH;
+		else if(name.equalsIgnoreCase("location")) sensor=SENSOR_TYPE_LOCATION;
+		else if(name.equalsIgnoreCase("microphone")) sensor=SENSOR_TYPE_MICROPHONE;
+		else if(name.equalsIgnoreCase("wifi")) sensor=SENSOR_TYPE_WIFI;	
+		else if(name.equalsIgnoreCase("time")) sensor=SENSOR_TYPE_TIME;
+		return sensor;
+	}
 }

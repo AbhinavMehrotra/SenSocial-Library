@@ -1,11 +1,14 @@
 package com.ubhave.sensocial.sensordata.classifier;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.util.Log;
 
 import com.ubhave.dataformatter.DataFormatter;
 import com.ubhave.dataformatter.json.JSONFormatter;
@@ -14,8 +17,19 @@ import com.ubhave.sensocial.sensormanager.AllPullSensors;
 import com.ubhave.sensormanager.data.SensorData;
 
 public class DummyClassifier {
+	public static String getClassifiedData(SensorData data){
+		String str=null;
+		if(data.getSensorType()!=AllPullSensors.SENSOR_TYPE_ACCELEROMETER && data.getSensorType()!=AllPullSensors.SENSOR_TYPE_MICROPHONE){
+			str="Data from this sensor cannot be classified"; 
+		}
+		else{
+			str=classifyData(data);
+		}
 
-	public static String classifyData(SensorData data){
+		return str;
+	}
+
+	private static String classifyData(SensorData data){
 		String result = "";
 		JSONFormatter formatter = DataFormatter.getJSONFormatter(data.getSensorType());
 		String str=formatter.toJSON(data).toJSONString();
@@ -25,6 +39,86 @@ public class DummyClassifier {
 			result=classifyMicrophone(str);
 		return result;
 	}
+
+	public static Boolean isSatisfied(ArrayList<SensorData> data,String sensorName, String operator,String value){
+		
+		return classifyWithModality(data, sensorName, operator, value);
+	}
+
+	private static SensorData getData(ArrayList<SensorData> data, int sensorId){
+		for(SensorData s:data){
+			if(s.getSensorType()==sensorId){
+				return s;
+			}
+		}
+		return null;
+	}
+
+	private static Boolean classifyWithModality(ArrayList<SensorData> data, String sensorName, String operator,String value){
+		SensorData acc=getData(data, AllPullSensors.SENSOR_TYPE_ACCELEROMETER);
+		SensorData mic=getData(data, AllPullSensors.SENSOR_TYPE_MICROPHONE);
+		SensorData wifi=getData(data, AllPullSensors.SENSOR_TYPE_WIFI);
+		SensorData bt=getData(data, AllPullSensors.SENSOR_TYPE_BLUETOOTH);
+		SensorData loc=getData(data, AllPullSensors.SENSOR_TYPE_LOCATION);
+		Boolean isTrue=false;
+		if(sensorName.equals("accelerometer")){
+			String activity= value;
+			if(classifyData(acc).equalsIgnoreCase(activity)){
+				return true;
+			}
+			return false;
+		}
+		else if(sensorName.equals("microphone")){
+			String sound= value;
+			if(classifyData(mic).equalsIgnoreCase(sound)){
+				return true;
+			}
+			return false;
+		}
+		else if(sensorName.equals("bluetooth")){
+			System.out.println("Modal-Value: "+value);
+			String string=value.substring("neighbour_".length());
+			System.out.println("Looking for bluetooth MAC: "+string);
+			return isBluetoothPresent(bt, string);
+		}
+		else if(sensorName.equals("location")){
+			try{
+				//String str="latitude_"+location.getLatitude()+"_longitude_"+location.getLongitude()+"_range_"+rangeInMiles;
+				String str=value.substring(9);
+				String lat=str.substring(0, str.indexOf("_"));
+				str=str.substring(str.indexOf("_")+1);
+				str=str.substring(str.indexOf("_")+1);
+				String lon=str.substring(0, str.indexOf("_"));
+				str=str.substring(str.indexOf("_")+1);
+				str=str.substring(str.indexOf("_")+1);			
+				String range=str;				
+				JSONFormatter formatter = DataFormatter.getJSONFormatter(loc.getSensorType());
+				String currentLoc=formatter.toJSON(loc).toJSONString();
+				System.out.print("Sensed location string:"+currentLoc);
+				JSONObject obj=new JSONObject(currentLoc);			
+				Location l1=new Location(Double.parseDouble(lat),Double.parseDouble(lon));
+				Location l2=new Location(obj.getDouble("latitude"),obj.getDouble("longitude"));
+				System.out.print("Sensed location:"+ l2.getLatitude()+","+l2.getLongitude());
+				if(Double.parseDouble(range)>calculateDistanceInMiles(l1, l2)){
+					System.out.println("Range "+range+", Distance: "+ calculateDistanceInMiles(l1, l2));
+					return true;
+				}
+				return false;
+			}
+			catch(Exception e){
+				Log.e("SNnMB", "Error"+e.toString());
+			}
+		}
+		else if(sensorName.equals("wifi")){
+
+
+		}
+		return isTrue;
+	}
+
+
+
+
 
 	private static String classifyMicrophone(String str){
 		ArrayList<Double> ar =new ArrayList<Double>();
@@ -146,18 +240,14 @@ public class DummyClassifier {
 	}
 
 
-	public static double calculateDistanceInMiles(Location StartP, Location EndP) {  
+	private static double calculateDistanceInMiles(Location StartP, Location EndP) {  
 		//Haversine formula-wiki used by google
-//		double Radius=6371; //kms
-				double Radius=3963.1676; //miles
+		//		double Radius=6371; //kms
+		double Radius=3963.1676; //miles
 		double lat1 = StartP.getLatitude();  
 		double lat2 = EndP.getLatitude();  
 		double lon1 = StartP.getLongitude();  
-		double lon2 = EndP.getLongitude(); 
-		//		double lat1 = StartP.getLatitude()/1E6;  
-		//		double lat2 = EndP.getLatitude()/1E6;  
-		//		double lon1 = StartP.getLongitude()/1E6;  
-		//		double lon2 = EndP.getLongitude()/1E6;  
+		double lon2 = EndP.getLongitude();  
 		double dLat = Math.toRadians(lat2-lat1);  
 		double dLon = Math.toRadians(lon2-lon1);  
 		double a = Math.sin(dLat/2) * Math.sin(dLat/2) +  
@@ -166,12 +256,29 @@ public class DummyClassifier {
 		double c = 2 * Math.asin(Math.sqrt(a));  
 		return Radius * c;  
 	} 
-	
+
 	//bluetoothmac
-	public static Boolean isBluetoothPresent(Set<String> macs, String mac) {  
-		if(macs.contains(mac))
+	private static Boolean isBluetoothPresent(SensorData data, String mac) { 
+		try{
+		JSONFormatter formatter = DataFormatter.getJSONFormatter(data.getSensorType());
+		String json_string=formatter.toJSON(data).toJSONString();
+		JSONObject obj=new JSONObject(json_string);
+		JSONArray devices= obj.getJSONArray("devices");
+		Set<String> macs=new HashSet<String>();
+		Set<String> names=new HashSet<String>();
+		for(int i=0;i<devices.length();i++){
+			JSONObject temp=new JSONObject(devices.getString(i));
+			macs.add(temp.getString("address"));
+			names.add(temp.getString("name"));
+		}
+		if(macs.contains(mac) || names.contains(mac))
 			return true;
 		else
 			return false;
+		}
+		catch(Exception e){
+			System.out.println("Error in isBLuetoothPresent: "+ e.toString());
+		}
+		return false;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.ubhave.sensocial.exceptions.InvalidSensorException;
+import com.ubhave.sensocial.manager.SenSocialManager;
 import com.ubhave.sensocial.sensormanager.AllPullSensors;
 
 import android.annotation.SuppressLint;
@@ -150,7 +151,7 @@ public class SensorConfiguration {
 				}
 				sensors.clear();
 				for(String activity:sp.getStringSet(condition, null)){
-					sensors.add(getSensorNameForActivity(activity));
+					sensors.add(getSensorNameForConditions(activity));
 				}
 				subscribeSensors(sensors);
 			}
@@ -178,15 +179,11 @@ public class SensorConfiguration {
 	 * @param activity name (String)
 	 * @return sensor name (String)
 	 */
-	protected static String getSensorNameForActivity(String activity){
+	protected static String getSensorNameForConditions(String activity){
 		String sensorName = null;
-		for( Modality activities:Modality.values()){
-			if(activities.getActivityName().equalsIgnoreCase(activity)){
-				sensorName=activities.getSensorName();
-				break;
-			}
-		}
-		return sensorName;		
+		AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
+		Condition c=new Condition(activity);
+		return aps.getSensorNameById(ModalityType.getSensorId(c.getModalityType()));		
 	}
 	
 }
