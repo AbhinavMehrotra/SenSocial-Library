@@ -12,9 +12,10 @@ public class MessageParser {
 			JSONObject obj= new JSONObject(message);
 			String name= obj.getString("name");
 			String deviceId=null, userId=null;
-			deviceId= obj.getString("deviceid");
-			userId=obj.getString("userid");
-
+			if(!name.equalsIgnoreCase("facebook") && !name.equalsIgnoreCase("twitter")){
+				deviceId= obj.getString("deviceid");
+				userId=obj.getString("userid");
+			}
 			switch (name) {
 			case "registration":
 				UserRegistrar.registerUser(obj.getString("userid"),deviceId, obj.getString("bluetoothmac"), obj.getString("ppd"));
@@ -33,9 +34,11 @@ public class MessageParser {
 				UserRegistrar.updateLocation(userId, deviceId, location.getString("lat"), location.getString("lon"));
 				break;
 			case "stream":
+				System.out.println("Stream recieved in Message Parser: "+obj.getString("stream"));
 				StreamReceiver.onReceive(userId, deviceId, obj.getString("stream"));
 				break;
 			case "facebook":
+				System.out.println("Stream recieved in Message Parser: "+ obj.getJSONObject("facebook").toString());
 				FacebookEventNotifier.parseJSON(obj.getJSONObject("facebook"));
 			}
 

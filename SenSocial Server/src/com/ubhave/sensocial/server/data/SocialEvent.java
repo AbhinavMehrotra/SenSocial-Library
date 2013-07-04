@@ -22,6 +22,7 @@ public class SocialEvent {
 		sensorData.setRawData(rawData);
 		sensorData.setStreamId(streamId);
 		sensorData.setDeviceId(deviceId);
+		socialData=new SocialData();
 		socialData.setOSNFeed(oSNFeed);
 		socialData.setOSNName(oSNName);
 		socialData.setFeedType(feedType);
@@ -29,8 +30,53 @@ public class SocialEvent {
 
 	
 	public static SocialEvent getSocialEvent(JSONObject obj){
+		SensorData rawData = null;
+		String classifiedData = "Not found", streamId = "Not found", deviceId = "Not found", oSNFeed = "Not found", oSNName = "Not found", feedType = "Not found";
+		try{
+			rawData=(SensorData) obj.get("rawdata");
+		}
+		catch(Exception e){
+			System.out.println("Raw data not present or "+e.toString());
+		}
+		try{
+			classifiedData= obj.getString("classifieddata");
+		}
+		catch(Exception e){
+			System.out.println("Classified data not present or "+e.toString());
+		}
+		try{
+			streamId= obj.getString("streamid");
+		}
+		catch(Exception e){
+			System.out.println("Stream id not present or "+e.toString());
+		}
+		try{
+			deviceId= obj.getString("deviceid");
+		}
+		catch(Exception e){
+			System.out.println("Device id not present or "+e.toString());
+		}
+		try{
+			oSNFeed= obj.getString("osnfeed");
+		}
+		catch(Exception e){
+			System.out.println("OSN feed not present or "+e.toString());
+		}
+		try{
+			oSNName= obj.getString("osnname");
+		}
+		catch(Exception e){
+			System.out.println("OSN name not present or "+e.toString());
+		}
+		try{
+			feedType= obj.getString("feedtype");
+		}
+		catch(Exception e){
+			System.out.println("Feed type not present or "+e.toString());
+		}
 		
-		return null;
+		
+		return new SocialEvent(rawData, classifiedData, streamId, deviceId, oSNFeed, oSNName, feedType);
 	}
 
 	/**

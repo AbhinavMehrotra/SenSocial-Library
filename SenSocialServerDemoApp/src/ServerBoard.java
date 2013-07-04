@@ -10,6 +10,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import com.ubhave.sensocial.server.data.SocialEvent;
+import com.ubhave.sensocial.server.database.DBDataAccess;
 import com.ubhave.sensocial.server.exception.PPDException;
 import com.ubhave.sensocial.server.exception.SensorDataTypeException;
 import com.ubhave.sensocial.server.exception.XMLFileException;
@@ -53,25 +54,7 @@ public class ServerBoard extends JFrame {
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                // get the message from the text view
-//                String messageText = message.getText();
-//                // add message to the message area
-//                messagesArea.append("\n" + messageText);
-//                // send the message to the client
-//
-//                MQTTManager m;
-//				try {
-//					m = new MQTTManager("abhinav");
-//	    			m.connect();
-//	    			m.publishToDevice("hello??");
-//	    			m.subscribeToDevice();
-//				} catch (MqttException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				}
-//                // clear text
-//                message.setText("");
-            	
+//          
             	SSManager sm=SSManager.getSSManager();
                 for(User u:sm.getAllUsers()){
                 	System.out.println("User:"+u.getId());
@@ -82,8 +65,9 @@ public class ServerBoard extends JFrame {
         					Stream stream=d.getStream(Sensors.SENSOR_TYPE_WIFI, "raw");
         					Filter filter=new Filter();
         					ArrayList<Condition> conditions=new ArrayList<Condition>();
-        					conditions.add(new Condition(ModalityType.physical_activity, Operator.equal_to, ModalValue.running));
-        					conditions.add(new Condition(ModalityType.neighbour, Operator.equal_to, ModalValue.isWithUser("A0:6C:EC:89:4C:01")));
+        					conditions.add(new Condition(ModalityType.physical_activity, Operator.equal_to, ModalValue.not_moving));
+        					conditions.add(new Condition(ModalityType.facebook_friends_location, Operator.equal_to, ModalValue.withinOSNFriendsLocationRange(1)));
+        					//conditions.add(new Condition(ModalityType.neighbour, Operator.equal_to, ModalValue.isWithNeigbourDevice("A0:6C:EC:89:4C:01")));
         					
         					
         					filter.addConditions(conditions);
@@ -99,7 +83,8 @@ public class ServerBoard extends JFrame {
         							
         						}
         					};
-        					sm.registerListener(l, s.getStreamId());
+//        					sm.registerListener(l, s.getStreamId());
+        					sm.registerListener(l, "1ef2152a-b0b5-4816-aae3-3790f77e4c38");
         					s.startStream();
         					
         				} catch (PPDException | SensorDataTypeException | XMLFileException e1) {
@@ -119,7 +104,8 @@ public class ServerBoard extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // disable the start button
-                startServer.setEnabled(false);
+                //startServer.setEnabled(false);
+            	DBDataAccess.getAllSavedStreams();
  
             }
         });

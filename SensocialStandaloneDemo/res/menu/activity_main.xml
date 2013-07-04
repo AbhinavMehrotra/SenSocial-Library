@@ -1,6 +1,36 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_settings"
-        android:title="@string/menu_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never" />
+    
+
+     <item
+        android:id="@+id/saccelerometer"
+        android:title="Subscribe to accelerometer"/>
+    <item
+        android:id="@+id/unsaccelerometer"
+        android:title="Unsubscribe to accelerometer"/>
+    <item
+        android:id="@+id/smicrophone"
+        android:title="Subscribe to microphone"/>
+    <item
+        android:id="@+id/unsmicrophone"
+        android:title="Unsubscribe to microphone"/>
+    <item
+        android:id="@+id/sbluetooth"
+        android:title="Subscribe to bluetooth"/>
+    <item
+        android:id="@+id/unsbluetooth"
+        android:title="Unsubscribe to bluetooth"/>
+    <item
+        android:id="@+id/slocation"
+        android:title="Subscribe to location"/>
+    <item
+        android:id="@+id/unslocation"
+        android:title="Unsubscribe to location"/>
+    <item
+        android:id="@+id/swifi"
+        android:title="Subscribe to wifi"/>
+    <item
+        android:id="@+id/unswifi"
+        android:title="Unsubscribe to wifi"/>
+        
+    
 </menu>

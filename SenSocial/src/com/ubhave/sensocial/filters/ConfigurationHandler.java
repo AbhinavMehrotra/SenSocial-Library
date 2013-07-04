@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Environment;
+import android.util.Log;
 
 import com.ubhave.sensocial.manager.SenSocialManager;
 import com.ubhave.sensocial.privacy.PPDDataType;
@@ -38,6 +39,7 @@ public class ConfigurationHandler {
 	 * and start subscription if required.
 	 * @param context
 	 */
+	//ConfigurationSet SensorSet
 	@SuppressLint("NewApi")
 	public static void run(Context context){
 		System.out.println("Configuration handler: run");
@@ -48,13 +50,13 @@ public class ConfigurationHandler {
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		configsMemory=sp.getStringSet("ConfigurationSet", null);
 
-		System.out.println("configsMemory"+configsMemory);
-		System.out.println("configsFilter"+configsFilter);
-		
-		//check for PPD
-		//configsFilter=checkForPPD(configsFilter);
-		
-		System.out.println("configsMemory"+configsMemory);
+		System.out.println("Before PPD parsing- ConfigsMemory"+configsMemory);
+		System.out.println("ConfigsFilter"+configsFilter);
+
+		//		check for PPD
+		configsFilter=checkForPPD(configsFilter);
+
+		System.out.println("After PPD parsing- ConfigsMemory"+configsMemory);
 		System.out.println("configsFilter"+configsFilter);
 
 		if(!configsFilter.equals(configsMemory) ){
@@ -76,8 +78,8 @@ public class ConfigurationHandler {
 			ArrayList<String> blank= new ArrayList<String>();
 
 			//if some configs has been added
-			if(newConfigs!=blank && newConfigs!=null){
-				System.out.println("New config found:" +newConfigs);
+			if(newConfigs!=blank && newConfigs!=null && newConfigs.size()>0){
+				System.out.println("New configs found:" +newConfigs);
 				Set<String> sensors= new HashSet<String>();
 				sensors=sp.getStringSet("SensorSet", sensors);
 				ArrayList<String> newSensors=new ArrayList<String>();
@@ -92,7 +94,7 @@ public class ConfigurationHandler {
 					System.out.println("Conditions: "+conditions);
 
 					//find new sensors for new-configs
-					AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
+					AllPullSensors aps=new AllPullSensors(context);
 					for(String condition:conditions){
 						if(condition.equalsIgnoreCase(ModalityType.null_condition)){
 							newSensors.add(getRequiredData(config));
@@ -114,7 +116,7 @@ public class ConfigurationHandler {
 				ed.commit();				
 			}
 			//if some configs has been removeds
-			if(removedConfigs!=blank && removedConfigs!=null){
+			if(removedConfigs!=blank && removedConfigs!=null && removedConfigs.size()>0){
 				System.out.println("Unused config found"+removedConfigs);
 				Set<String> sensors= new HashSet<String>();
 				sensors=getAllRequiredSensorsByFilter();
@@ -132,8 +134,8 @@ public class ConfigurationHandler {
 					//find usused sensors
 					AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
 					for(String condition:conditions){
-						
-						if(condition.equalsIgnoreCase("ALL")){
+
+						if(condition.equalsIgnoreCase("null")){
 							unusedSensors.add(getRequiredData(config));
 							continue;
 						}
@@ -156,6 +158,7 @@ public class ConfigurationHandler {
 			//subscribe new sensors
 			//there can be two sensor-lists
 			Map<String, Set<String>> filterConfigs=new HashMap<String, Set<String>>();
+			System.out.println("subscribing new sensors");
 			for(String c : configsFilter){
 				filterConfigs.put(c, getConditionString(c));
 				System.out.println(c);
@@ -170,7 +173,7 @@ public class ConfigurationHandler {
 		}
 
 	}
-	
+
 	private static Set<String> checkForPPD(Set<String> configsFilter){
 		String sName, reqData;
 		Map<String, String> lnt;
@@ -181,9 +184,11 @@ public class ConfigurationHandler {
 		AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
 		for(String con:configsFilter){
 			flag=false;
+			sensors.clear();
 			for(String conditions: getConditionString(con)){
 				Condition c=new Condition(conditions);
-				sensors.add(aps.getSensorNameById(ModalityType.getSensorId(c.getModalityType())));
+				if(!c.getModalityType().equalsIgnoreCase(ModalityType.null_condition))
+					sensors.add(aps.getSensorNameById(ModalityType.getSensorId(c.getModalityType())));
 			}
 			reqData=getRequiredData(con);
 			if(reqData!=null){
@@ -194,9 +199,11 @@ public class ConfigurationHandler {
 				lName=PPDLocation.SERVER;
 			else
 				lName=PPDLocation.CLIENT;
-			
-			for(String sen: sensors){				
+
+			for(String sen: sensors){	
+				System.out.println("Ckecking for sensor: "+sen);
 				if(!PPDParser.isAllowed(sen, lName, PPDDataType.CLASSIFIED)){
+					Log.e("SNnMB", "Sensor: "+sen +", is not allowed");
 					flag=true;
 					break;
 				}
@@ -238,7 +245,7 @@ public class ConfigurationHandler {
 						}
 					}
 				}
-				System.out.println("Get Configurations in C-Handler");
+				System.out.println("getConfigurations in C-Handler");
 			}		
 		} catch (Exception e) {
 			System.out.println("C-Handler getConfig: "+e.toString());
@@ -289,9 +296,7 @@ public class ConfigurationHandler {
 				for (int temp=0;temp<nList.getLength();temp++) {
 					Node nNode = nList.item(temp);
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-						System.out.println("it is element");	
 						Element eElement = (Element) nNode;
-						System.out.println("element is fine");	
 						if(eElement.getAttribute("name").equalsIgnoreCase(configName)){
 							//							for(int j=0;j<eElement.getChildNodes().getLength();j++){
 							//								if(eElement.getChildNodes().item(j).getNodeType()==Node.ELEMENT_NODE){
@@ -312,7 +317,7 @@ public class ConfigurationHandler {
 									else{
 										System.out.println("NOOOOO");	
 									}
-//									activities.add(((Element)nNode1.getChildNodes().item(j)).getAttribute("name"));
+									//									activities.add(((Element)nNode1.getChildNodes().item(j)).getAttribute("name"));
 								}
 							}
 						}
@@ -357,9 +362,9 @@ public class ConfigurationHandler {
 								Node nNode1 = nodeList.item(i);
 								sensor=((Element)nNode1).getAttribute("sensor");
 								System.out.println("Required-data found: "+sensor);		
-//								for(int j=0;j<nNode1.getChildNodes().getLength();j++){
-//									sensor=((Element)nNode1.getChildNodes().item(j)).getAttribute("name");
-//								}
+								//								for(int j=0;j<nNode1.getChildNodes().getLength();j++){
+								//									sensor=((Element)nNode1.getChildNodes().item(j)).getAttribute("name");
+								//								}
 							}
 						}
 					}
@@ -400,11 +405,11 @@ public class ConfigurationHandler {
 								String location=eElement1.getAttribute("location");
 								String data=eElement1.getAttribute("type");
 								map.put(location, data);
-//								for(int j=0;j<nNode1.getChildNodes().getLength();j++){
-//									String location=((Element)nNode1.getChildNodes().item(j)).getAttribute("location");
-//									String data=((Element)nNode1.getChildNodes().item(j)).getAttribute("data");
-//									map.put(location, data);
-//								}
+								//								for(int j=0;j<nNode1.getChildNodes().getLength();j++){
+								//									String location=((Element)nNode1.getChildNodes().item(j)).getAttribute("location");
+								//									String data=((Element)nNode1.getChildNodes().item(j)).getAttribute("data");
+								//									map.put(location, data);
+								//								}
 							}
 						}
 					}
@@ -423,7 +428,7 @@ public class ConfigurationHandler {
 		AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
 		for(String c:configs){
 			for(String s:getConditionString(c)){
-				if(s.equalsIgnoreCase("ALL")){
+				if(s.equalsIgnoreCase("null")){
 					sensors.add(getRequiredData(c));
 					break;
 				}

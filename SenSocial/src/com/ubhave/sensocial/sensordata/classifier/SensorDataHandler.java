@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -17,9 +19,9 @@ import com.ubhave.sensocial.filters.Condition;
 import com.ubhave.sensocial.filters.ConfigurationHandler;
 import com.ubhave.sensocial.filters.ModalityType;
 import com.ubhave.sensocial.manager.SSListenerManager;
+import com.ubhave.sensocial.mqtt.MQTTNotifitions;
 import com.ubhave.sensocial.sensormanager.AllPullSensors;
 import com.ubhave.sensocial.sensormanager.OneOffSensing;
-import com.ubhave.sensocial.sensormanager.SensorDataCollector;
 import com.ubhave.sensocial.tcp.ClientServerCommunicator;
 import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.classifier.SensorDataClassifier;
@@ -70,8 +72,8 @@ public class SensorDataHandler {
 				}				
 			}			
 		}
-		
-				
+
+
 		for(final String config:sp.getStringSet("StreamConfigurationSet", null)){
 			Boolean satisfied=true;
 			for(String condition:sp.getStringSet(config, null)){ //get all conditions for each config
@@ -89,162 +91,180 @@ public class SensorDataHandler {
 				AllPullSensors aps=new AllPullSensors(context);
 				final Map<String,String> map=ConfigurationHandler.getRequiredDataLocationNType(config);	
 				Log.i("SNnMB", "RequiredDataLocationNType: "+map);
-				
-				SensorData sensor_data=SensorDataCollector.getData(aps.getSensorIdByName(sensor));
-				SocialEvent se=new SocialEvent();
-				DeviceSensorData d=new DeviceSensorData();
-				d.setDeviceId(sp.getString("deviceid", null));
-				d.setStreamId(config);
-				if(map.containsValue("raw")){
-					d.setRawData(sensor_data);
-					Log.i("SNnMB", "Raw Data to be fired: "+sensor_data.toString());
 
-				}
-				else{
-					d.setClassifiedData(DummyClassifier.getClassifiedData(sensor_data));
-					Log.i("SNnMB", "Classified Data to be fired: "+DummyClassifier.getClassifiedData(sensor_data));
-				}
+				//												SensorData sensor_data=SensorDataCollector.getData(aps.getSensorIdByName(sensor));
+				//				ArrayList<Integer> SensorIds=new ArrayList<Integer>();
+				//				SensorIds.add(aps.getSensorIdByName(sensor));
+				//				new OneOffSensingList(context, SensorIds){
+				//					@Override
+				//					protected void onPostExecute(ArrayList<SensorData> result) {
+				//						super.onPostExecute(result);
+				//
+				//					}
+				//				}.execute();
+				//
+				//				SocialEvent se=new SocialEvent();
+				//				DeviceSensorData d=new DeviceSensorData();
+				//				d.setDeviceId(sp.getString("deviceid", null));
+				//				d.setStreamId(config);
+				//				if(map.containsValue("raw")){
+				//					d.setRawData(sensor_data);
+				//					Log.i("SNnMB", "Raw Data to be fired: "+sensor_data.toString());
+				//
+				//				}
+				//				else{
+				//					d.setClassifiedData(DummyClassifier.getClassifiedData(sensor_data));
+				//					Log.i("SNnMB", "Classified Data to be fired: "+DummyClassifier.getClassifiedData(sensor_data));
+				//				}
+				//
+				//				se.setFilteredSensorData(d);
+				//				if(map.containsKey("server")){
+				//					ClientServerCommunicator.sendStream(context, se.toJSONString()); 
+				//				}
+				//				else{
+				//					SSListenerManager.fireUpdate(se);
+				//				}	
 
-				se.setFilteredSensorData(d);
-				if(map.containsKey("server")){
-					ClientServerCommunicator.sendStream(context, se.toJSONString()); 
-				}
-				else{
-					SSListenerManager.fireUpdate(se);
-				}	
+				ArrayList<Integer> SensorIds=new ArrayList<Integer>();
+				SensorIds.add(aps.getSensorIdByName(sensor));
+				try {
+					new OneOffSensing(context, SensorIds){
+						@Override
+						public void onPreExecute()
+						{
+							Log.i("SNnMB", "Required data sensed:  onPreExecute");
+						}
+						@Override
+						public void onPostExecute(final ArrayList<SensorData> data){
+							Log.i("SNnMB", "Required data sensed:  onPostExecute");
+							SensorData sensor_data = null;
+							for(SensorData x:data){
+								Log.i("SNnMB", "Data to be fired: "+x.toString());
+								sensor_data=x;
+							}
+							SocialEvent se=new SocialEvent();
+							DeviceSensorData d=new DeviceSensorData();
+							d.setDeviceId(sp.getString("deviceid", null));
+							d.setStreamId(config);
+							if(map.containsValue("raw")){
+								d.setRawData(sensor_data);
+								Log.i("SNnMB", "Raw Data to be fired: "+sensor_data.toString());
 
-//				ArrayList<Integer> SensorIds=new ArrayList<Integer>();
-//				SensorIds.add(aps.getSensorIdByName(sensor));
-//				try {
-//					new OneOffSensing(context, SensorIds){
-//						@Override
-//						public void onPreExecute()
-//						{
-//							Log.i("SNnMB", "Required data sensed:  onPreExecute");
-//						}
-//						@Override
-//						public void onPostExecute(final ArrayList<SensorData> data){
-//							Log.i("SNnMB", "Required data sensed:  onPostExecute");
-//							SensorData sensor_data = null;
-//							for(SensorData x:data){
-//								Log.i("SNnMB", "Data to be fired: "+x.toString());
-//								sensor_data=x;
-//							}
-//							SocialEvent se=new SocialEvent();
-//							DeviceSensorData d=new DeviceSensorData();
-//							d.setDeviceId(sp.getString("deviceid", null));
-//							d.setStreamId(config);
-//							if(map.containsValue("raw")){
-//								d.setRawData(sensor_data);
-//								Log.i("SNnMB", "Raw Data to be fired: "+sensor_data.toString());
-//
-//							}
-//							else{
-//								d.setClassifiedData(DummyClassifier.getClassifiedData(sensor_data));
-//								Log.i("SNnMB", "Classified Data to be fired: "+DummyClassifier.getClassifiedData(sensor_data));
-//							}
-//
-//							se.setFilteredSensorData(d);
-//							if(map.containsKey("server")){
-//								ClientServerCommunicator.sendStream(context, se.toJSONString()); 
-//							}
-//							else{
-//								SSListenerManager.fireUpdate(se);
-//							}							
-//						}
-//					}.execute();
-//				} catch (ESException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}				
+							}
+							else{
+								d.setClassifiedData(DummyClassifier.getClassifiedData(sensor_data));
+								Log.i("SNnMB", "Classified Data to be fired: "+DummyClassifier.getClassifiedData(sensor_data));
+							}
+
+							se.setFilteredSensorData(d);
+							if(map.containsKey("server")){
+								ClientServerCommunicator.sendStream(context, se.toJSONString()); 
+							}
+							else{
+								SSListenerManager.fireUpdate(se);
+							}							
+						}
+					}.execute();
+				} catch (ESException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}				
 			}
-			
-			
+
+
 		}
-		
-		//classify all the data and send the classified data to check filter configs
-//		Set<String> cData=new HashSet<String>();
-//		for(SensorData sd:data){
-//			cData.add(DummyClassifier.getClassifiedData(sd));
-//		}
+
 	}
 
 
-		public static void handleOSNDependentData(ArrayList<SensorData> data, final Context context, final String message){
+	public static void handleOSNDependentData(ArrayList<SensorData> data, final Context context, final String message){
 
-			for(final String config:sp.getStringSet("OSNConfigurationSet", null)){
-				Boolean satisfied=true;
-				for(String condition:sp.getStringSet(config, null)){ //get all conditions for each config
-					Condition con=new Condition(condition);
-					String sensorName=ModalityType.getSensorName(con.getModalityType());
-					String operator=con.getOperator();
-					String value=con.getModalValue();
-					if(!DummyClassifier.isSatisfied(data,sensorName, operator,value)){
-						satisfied=false;
-					}				
-				}	
-				if(satisfied){
-					String sensor=ConfigurationHandler.getRequiredData(config);
-					AllPullSensors aps=new AllPullSensors(context);
-					final Map<String,String> map=ConfigurationHandler.getRequiredDataLocationNType(config);	
-					SensorData sensor_data=SensorDataCollector.getData(aps.getSensorIdByName(sensor));
-					SocialEvent se=new SocialEvent();
-					SocialData socialData=new SocialData();
-					//TODO: parse the message and set all different fields
-					socialData.setOSNFeed(message);
-					DeviceSensorData d=new DeviceSensorData();
-					d.setDeviceId(sp.getString("deviceid", null));
-					d.setStreamId(config);
-					if(map.containsValue("raw"))
-						d.setRawData(data.get(0));
-					else
-						d.setClassifiedData(DummyClassifier.getClassifiedData(data.get(0)));
+		for(final String config:sp.getStringSet("OSNConfigurationSet", null)){
+			Boolean satisfied=true;
+			for(String condition:sp.getStringSet(config, null)){ //get all conditions for each config
+				Condition con=new Condition(condition);
+				String sensorName=ModalityType.getSensorName(con.getModalityType());
+				String operator=con.getOperator();
+				String value=con.getModalValue();
+				if(!DummyClassifier.isSatisfied(data,sensorName, operator,value)){
+					satisfied=false;
+				}				
+			}	
+			if(satisfied){
+				String sensor=ConfigurationHandler.getRequiredData(config);
+				AllPullSensors aps=new AllPullSensors(context);
+				final Map<String,String> map=ConfigurationHandler.getRequiredDataLocationNType(config);	
+				//				SensorData sensor_data=SensorDataCollector.getData(aps.getSensorIdByName(sensor));
+				//				SocialEvent se=new SocialEvent();
+				//				SocialData socialData=new SocialData();
+				//				//TODO: parse the message and set all different fields
+				//				socialData.setOSNFeed(message);
+				//				DeviceSensorData d=new DeviceSensorData();
+				//				d.setDeviceId(sp.getString("deviceid", null));
+				//				d.setStreamId(config);
+				//				if(map.containsValue("raw"))
+				//					d.setRawData(data.get(0));
+				//				else
+				//					d.setClassifiedData(DummyClassifier.getClassifiedData(data.get(0)));
+				//
+				//				se.setFilteredSensorData(d);
+				//				se.setSocialData(socialData);
+				//				if(map.containsKey("server")){
+				//					ClientServerCommunicator.sendStream(context, se.toJSONString()); 
+				//				}
+				//				else{
+				//					SSListenerManager.fireUpdate(se);
+				//				}	
 
-					se.setFilteredSensorData(d);
-					se.setSocialData(socialData);
-					if(map.containsKey("server")){
-						ClientServerCommunicator.sendStream(context, se.toJSONString()); 
-					}
-					else{
-						SSListenerManager.fireUpdate(se);
-					}	
-					
-//					ArrayList<Integer> SensorIds=new ArrayList<Integer>();
-//					SensorIds.add(aps.getSensorIdByName(sensor));
-//					try {
-//						new OneOffSensing(context, SensorIds){
-//							@Override
-//							public void onPostExecute(ArrayList<SensorData> data){
-//								SocialEvent se=new SocialEvent();
-//								SocialData socialData=new SocialData();
-//								//TODO: parse the message and set all different fields
-//								socialData.setOSNFeed(message);
-//								DeviceSensorData d=new DeviceSensorData();
-//								d.setDeviceId(sp.getString("deviceid", null));
-//								d.setStreamId(config);
-//								if(map.containsValue("raw"))
-//									d.setRawData(data.get(0));
-//								else
-//									d.setClassifiedData(DummyClassifier.getClassifiedData(data.get(0)));
-//
-//								se.setFilteredSensorData(d);
-//								se.setSocialData(socialData);
-//								if(map.containsKey("server")){
-//									ClientServerCommunicator.sendStream(context, se.toJSONString()); 
-//								}
-//								else{
-//									SSListenerManager.fireUpdate(se);
-//								}							
-//							}
-//						}.execute();
-//					} catch (ESException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}		
-				}
+				ArrayList<Integer> SensorIds=new ArrayList<Integer>();
+				SensorIds.add(aps.getSensorIdByName(sensor));
+				try {
+					new OneOffSensing(context, SensorIds){
+						@Override
+						public void onPostExecute(ArrayList<SensorData> data){
+							SocialEvent se=new SocialEvent();
+							SocialData socialData=new SocialData();
+							//TODO: parse the message and set all different fields
+							try{
+							JSONObject obj=new JSONObject(message.substring(MQTTNotifitions.facebook_update.getMessage().length()+1));
+							socialData.setOSNFeed(obj.getString("message"));
+							socialData.setFeedType(obj.getString("notificationtype"));
+							socialData.setTime(obj.getString("time"));
+							socialData.setOSNName(obj.getString("osnname"));
+							}
+							catch(Exception e){
+								Log.e("SNnMB", "Errror in sensor-data-handler: "+e.toString());
+								socialData.setOSNFeed("not available");
+								socialData.setFeedType("not available");
+								socialData.setTime("not available");
+								socialData.setOSNName("not available");
+							}
+							DeviceSensorData d=new DeviceSensorData();
+							d.setDeviceId(sp.getString("deviceid", null));
+							d.setStreamId(config);
+							if(map.containsValue("raw"))
+								d.setRawData(data.get(0));
+							else
+								d.setClassifiedData(DummyClassifier.getClassifiedData(data.get(0)));
+
+							se.setFilteredSensorData(d);
+							se.setSocialData(socialData);
+							if(map.containsKey("server")){
+								ClientServerCommunicator.sendStream(context, se.toJSONString()); 
+							}
+							else{
+								SSListenerManager.fireUpdate(se);
+							}							
+						}
+					}.execute();
+				} catch (ESException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}		
 			}
 		}
 	}
+}
 
 
 

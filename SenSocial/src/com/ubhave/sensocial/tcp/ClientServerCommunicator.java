@@ -8,6 +8,7 @@ import com.ubhave.sensocial.privacy.PPDParser;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 public class ClientServerCommunicator {
 
@@ -78,6 +79,10 @@ public class ClientServerCommunicator {
 	}
 	
 	public static void updateLocation(Context context, String latitude, String longitude){
+		if(latitude.equalsIgnoreCase("unknown") || longitude.equalsIgnoreCase("unknown")){
+			Log.e("SNnMB", "Location is unknown");		
+			return;
+		}
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		JSONObject obj = new JSONObject();
 		JSONObject location = new JSONObject();
@@ -105,7 +110,7 @@ public class ClientServerCommunicator {
 		try {
 			obj.put("name", "stream");
 			obj.put("userid", sp.getString("userid", "null"));
-			obj.put("deviceid", sp.getString("uuid", "null"));
+			obj.put("deviceid", sp.getString("deviceid", "null"));
 			obj.put("stream",socialEventString);
 			if(sp.getString("userid", "null").equals("null")){
 				System.out.println("Not able to send the stream because the user id is null");

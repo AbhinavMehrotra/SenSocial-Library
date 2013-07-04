@@ -17,6 +17,17 @@ public class AggregatorRegistrar {
 	}
 	
 
+	public static void addIfExists(String aggregatedStreamId, String streamId){
+		for(Map.Entry<String, Set<String>> e: aggregators.entrySet()){
+			if(e.getKey().equalsIgnoreCase(aggregatedStreamId)){
+				Set<String> s= e.getValue();
+				s.add(streamId);
+				aggregators.put(aggregatedStreamId, s);
+				break;
+			}
+		}
+	}
+	
 	protected static void remove(String aggregatedStreamId) {
 		aggregators.remove(aggregatedStreamId);
 	}

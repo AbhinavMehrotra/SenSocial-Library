@@ -7,6 +7,16 @@ public class SocialData {
 	private String OSNName;
 
 	private String feedType;
+	
+	private String time;
+
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
+	}
 
 	/**
 	 * @return the oSNFeed

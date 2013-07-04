@@ -27,14 +27,14 @@ public class NotificationParser {
 		this.context=context;
 		sp=context.getSharedPreferences("SSDATA", 0);
 	}
-	
+
 	protected void takeAction(final String message){		
 		Log.i("SNnMB", "MQTT message: "+message);
 		if(message.startsWith(MQTTNotifitions.start_stream.getMessage())){
 			String streamId=message.substring(13);  //<<message --> start_stream:streamId>>
 			ServerStreamRegistrar.addStreamId(streamId);
 			String url=sp.getString("serverurl", null)+"ClientFilters/Filter"+streamId+".xml";
-//			String url=sp.getString("serverurl", null)+"ClientFilters/Filter"+"abc.xml";
+			//			String url=sp.getString("serverurl", null)+"ClientFilters/Filter"+"abc.xml";
 			String destination=streamId+".xml";
 			new DownloadFilter(context, url, destination).execute();
 		}
@@ -60,25 +60,25 @@ public class NotificationParser {
 			ArrayList<Integer> sensorIds=new ArrayList<Integer>();
 			for(String s:sp.getStringSet("OSNSensorSet", null))
 				sensorIds.add(aps.getSensorIdByName(s));
-			ArrayList<SensorData> data=SensorDataCollector.getData(sensorIds);
-			SensorDataHandler.handleOSNDependentData(data, context, message);
-//			try {
-//				new OneOffSensing(context, sensorIds){
-//					@Override
-//					public void onPostExecute(ArrayList<SensorData> data){
-//						Log.d("SNnMB","Stopped sensing");
-//						if(data!=null){
-//							SensorDataHandler.handleOSNDependentData(data, context, message);
-//						}
-//						
-//					}
-//				}.execute();
-//			} catch (ESException e) {
-//				Log.e("SNnMB","Error at Notification parser: "+e.toString());
-//			}
+			//			ArrayList<SensorData> data=SensorDataCollector.getData(sensorIds);
+			//			SensorDataHandler.handleOSNDependentData(data, context, message);
+			try {
+				new OneOffSensing(context, sensorIds){
+					@Override
+					public void onPostExecute(ArrayList<SensorData> data){
+						Log.d("SNnMB","Stopped sensing");
+						if(data!=null){
+							SensorDataHandler.handleOSNDependentData(data, context, message);
+						}
+
+					}
+				}.execute();
+			} catch (ESException e) {
+				Log.e("SNnMB","Error at Notification parser: "+e.toString());
+			}
 		}
 		else if(message.startsWith(MQTTNotifitions.nearby_bluetooths.getMessage())){
-			
+
 		}
 	}
 }

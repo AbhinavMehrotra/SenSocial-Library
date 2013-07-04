@@ -228,11 +228,20 @@ containing a value of this type.
         public static final int com_facebook_usersettingsfragment_logo_image=0x7f070016;
         public static final int com_facebook_usersettingsfragment_profile_name=0x7f070017;
         public static final int large=0x7f070002;
-        public static final int menu_settings=0x7f070019;
         public static final int normal=0x7f070001;
         public static final int picker_subtitle=0x7f070015;
+        public static final int saccelerometer=0x7f070019;
+        public static final int sbluetooth=0x7f07001d;
         public static final int search_box=0x7f070014;
+        public static final int slocation=0x7f07001f;
         public static final int small=0x7f070000;
+        public static final int smicrophone=0x7f07001b;
+        public static final int swifi=0x7f070021;
+        public static final int unsaccelerometer=0x7f07001a;
+        public static final int unsbluetooth=0x7f07001e;
+        public static final int unslocation=0x7f070020;
+        public static final int unsmicrophone=0x7f07001c;
+        public static final int unswifi=0x7f070022;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;

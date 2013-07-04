@@ -60,6 +60,14 @@ public class UserRegistrar {
 
 	public static void registerFacebook(String userId, String deviceId, String userName, String facebookId, String facebookToken){
 		try {
+			//access_token=CAAHXrtWdQicBAEU3XgYJoXXJfBFkhqJ5q1iGZBJPHH54vObUw6ctNmz0lNZCSljv8peD53NI1yrLeeIms9RmMAmhULmpIp0pBXI
+				//	0FqUnvOWEDuCD0hrLAiW3TkvvXZCPcHGV1WcVZBGI5KdZCpSL6&expires=5182338;
+			
+			String str1=facebookToken.substring(13);
+			String token= str1.substring(0, str1.indexOf("&expires"));
+			String expires= str1.substring(str1.indexOf("&expires")+ "&expires=".length());		
+					
+					
 			MongoClient mongoClient = new MongoClient();
 			DB db = mongoClient.getDB( "SenSocial" );
 			DBCollection coll = db.getCollection("User");
@@ -67,10 +75,11 @@ public class UserRegistrar {
 			DBObject obj = coll.find(doc).next();
 			ArrayList<String> fbFriends= new ArrayList<String>();
 			//TODO: create logic to update friends
-			fbFriends = getFacebookFriends(facebookId, facebookToken);
+			fbFriends = getFacebookFriends(facebookId, token);
 			obj.put("username", userName);
 			obj.put("facebookid", facebookId);
-			obj.put("facebooktoken", facebookToken);
+			obj.put("facebooktoken", token);
+			obj.put("facebookexpires", expires);
 			obj.put("facebookfriends", fbFriends);
 			coll.save(obj);
 
@@ -647,7 +656,10 @@ public class UserRegistrar {
 			MongoClient mongoClient = new MongoClient();
 			DB db = mongoClient.getDB( "SenSocial" );
 			DBCollection coll = db.getCollection("User");			
-			BasicDBObject doc = new BasicDBObject("userid", userId);	
+			BasicDBObject doc = new BasicDBObject("userid", userId);
+			if(!coll.find(doc).hasNext()){
+				return null;
+			}
 			DBObject obj = coll.find(doc).next();
 			name=obj.get("name").toString();
 			id=obj.get("userid").toString();
@@ -695,6 +707,8 @@ public class UserRegistrar {
 	}
 
 	private static ArrayList<String> getFacebookFriends(String id, String token){
+		System.out.println("Inside getFacebookFriends, id: "+id+", token: "+token);
+		
 		ArrayList<String> friends = new ArrayList<String>();
 		try {
 			String path="https://graph.facebook.com/"+id+"/friends?access_token="+token+"&fields=username";
@@ -707,12 +721,13 @@ public class UserRegistrar {
 			JSONObject obj;
 			for(int i=0;i<ar.length();i++){
 				obj=ar.getJSONObject(i);
-				if(obj.has("username"))
-					friends.add(obj.get("username").toString());
+				if(obj.has("id"))
+					friends.add(obj.get("id").toString());
 			}			
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}		
+		System.out.println("Inside getFacebookFriends, friend-ids: "+friends);
 		return friends;
 	}
 
@@ -738,4 +753,40 @@ public class UserRegistrar {
 		return friends;
 	}
 
+	/*
+	 * This method will called when FBserver notifies for friend list change
+	 */
+	public static void updateFacebookFriendList(String facebookId){
+		try {
+			MongoClient mongoClient = new MongoClient();
+			DB db = mongoClient.getDB( "SenSocial" );
+			DBCollection coll = db.getCollection("User");
+			BasicDBObject doc = new BasicDBObject("facebookid", facebookId);
+			DBObject obj = coll.find(doc).next();
+			String token=obj.get("facebooktoken").toString();
+			ArrayList<String> fbFriends= new ArrayList<String>();
+			fbFriends = getFacebookFriends(facebookId, token);
+			obj.removeField("facebookfriends");
+			obj.put("facebookfriends", fbFriends);
+			coll.save(obj);
+		} catch (UnknownHostException e) {
+			System.out.println(TAG+" error: "+e.toString());
+		}
+	}
+	
+	public static Boolean isFacebookIdPresent(String facebookId){
+		try {
+			MongoClient mongoClient = new MongoClient();
+			DB db = mongoClient.getDB( "SenSocial" );
+			DBCollection coll = db.getCollection("User");
+			BasicDBObject doc = new BasicDBObject("facebookid", facebookId);
+			if(coll.find(doc).hasNext())
+				return true;
+			else
+				return false;
+		} catch (UnknownHostException e) {
+			System.out.println(TAG+" error: "+e.toString());
+			return false;
+		}
+	}
 }

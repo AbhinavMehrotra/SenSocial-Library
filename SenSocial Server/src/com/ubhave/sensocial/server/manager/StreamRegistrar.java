@@ -53,4 +53,19 @@ private static Map<String, Set<Stream>> streamRecord = new HashMap<String, Set<S
 		}
 		return streams;
 	}
+	
+	public static Stream getStreamById(String streamId){
+		Stream s=null;
+		for (Map.Entry<String, Set<Stream>> entry: streamRecord.entrySet()) {
+			for(Stream stream: entry.getValue()){
+				if(stream.getStreamId().equalsIgnoreCase(streamId)){
+					s=stream;
+					break;
+				}
+			}
+		}
+		return s;
+	}
+	
+	
 }

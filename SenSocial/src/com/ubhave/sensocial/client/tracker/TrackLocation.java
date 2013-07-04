@@ -2,6 +2,7 @@ package com.ubhave.sensocial.client.tracker;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -20,7 +21,10 @@ import android.util.Log;
 
 import com.ubhave.dataformatter.DataFormatter;
 import com.ubhave.dataformatter.json.JSONFormatter;
+import com.ubhave.sensocial.manager.SenSocialManager;
+import com.ubhave.sensocial.sensordata.classifier.SensorDataHandler;
 import com.ubhave.sensocial.sensormanager.AllPullSensors;
+import com.ubhave.sensocial.sensormanager.OneOffSensing;
 import com.ubhave.sensocial.sensormanager.SensorDataCollector;
 import com.ubhave.sensocial.tcp.ClientServerCommunicator;
 import com.ubhave.sensormanager.ESException;
@@ -36,7 +40,7 @@ public class TrackLocation {
 	private Timer timer;
 	private Context context;
 	private ESSensorManager sensorManager;
-	private SensorData sensorData;
+//	private SensorData sensorData;
 	private String serverUrl;
 	private SharedPreferences sp;
 	private String uuid;
@@ -60,28 +64,40 @@ public class TrackLocation {
 				handler.post(new Runnable() {
 					public void run() {       
 						try {
-//							sensorData=sensorManager.getDataFromSensor(AllPullSensors.SENSOR_TYPE_LOCATION);
-							sensorData=SensorDataCollector.getData(AllPullSensors.SENSOR_TYPE_LOCATION);
-							JSONFormatter formatter = DataFormatter.getJSONFormatter(AllPullSensors.SENSOR_TYPE_LOCATION);
-							JSONObject jsondata=formatter.toJSON(sensorData);
-							System.out.print("location: "+jsondata.get("latitude"));
-							
+							AllPullSensors aps=new AllPullSensors(context);
+							ArrayList<Integer> SensorIds=new ArrayList<Integer>();
+							SensorIds.add(AllPullSensors.SENSOR_TYPE_LOCATION);
+							try {
+								new OneOffSensing(context, SensorIds){
+									@Override
+									public void onPostExecute(ArrayList<SensorData> data){
+										Log.d("SNnMB","Stopped sensing for location tracking");
+										if(data!=null){
+											JSONFormatter formatter = DataFormatter.getJSONFormatter(AllPullSensors.SENSOR_TYPE_LOCATION);
+											JSONObject jsondata=formatter.toJSON(data.get(0));
+											System.out.print("location: "+jsondata.get("latitude"));
+											
 
-							JSONFormatter formatter1 = DataFormatter.getJSONFormatter(sensorData.getSensorType());
-							String str=formatter1.toJSON(sensorData).toJSONString();
-							System.out.print("str: "+str);
-							System.out.print("sensorData: "+sensorData);
-							
-							
-							latitude=jsondata.get("latitude").toString();
-							longitude=jsondata.get("longitude").toString();
-							StrictMode.ThreadPolicy old = StrictMode.getThreadPolicy();
-							StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(old)
-							.permitNetwork()
-							.build());
-//							sendLocationToServer(latitude,longitude);
-							ClientServerCommunicator.updateLocation(context, latitude, longitude);
-							StrictMode.setThreadPolicy(old);
+											JSONFormatter formatter1 = DataFormatter.getJSONFormatter(data.get(0).getSensorType());
+											String str=formatter1.toJSON(data.get(0)).toJSONString();
+											System.out.print("str: "+str);
+											System.out.print("sensorData: "+data.get(0));											
+											
+											latitude=jsondata.get("latitude").toString();
+											longitude=jsondata.get("longitude").toString();
+											StrictMode.ThreadPolicy old = StrictMode.getThreadPolicy();
+											StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(old)
+											.permitNetwork()
+											.build());
+											ClientServerCommunicator.updateLocation(context, latitude, longitude);
+											StrictMode.setThreadPolicy(old);
+										}
+
+									}
+								}.execute();
+							} catch (ESException e) {
+								Log.e("SNnMB","Error at Notification parser: "+e.toString());
+							}							
 						} catch (Exception e) {
 							Log.e(TAG, e.toString());
 						}
@@ -92,27 +108,27 @@ public class TrackLocation {
 		timer.schedule(doAsynchronousTask, 0, UPDATE_INTERVAL); 
 	}
 
-
-	/**
-	 * Method to send the ScreenName for Social Network  and the Unique Id.
-	 */
-	private void sendLocationToServer(final String newlatitude, final String newlongitude){
-		Thread th= new Thread(){
-			public void run(){
-				try{
-					HttpClient httpclient = new DefaultHttpClient();
-					String uri=serverUrl+"LocationReciever.php?uuid="+uuid+"&latitude="+newlatitude+"&longitude="+newlongitude;
-					Log.d(TAG, "Sending names to: "+uri);
-					HttpPost httppost = new   HttpPost(uri);  
-					HttpResponse response = httpclient.execute(httppost);
-					Log.d(TAG, "Success"+response.getParams());
-				} catch (MalformedURLException e) {
-					Log.e(TAG, e.toString());
-				} catch (IOException e) {
-					Log.e(TAG, e.toString());
-				}
-			}
-		};
-		th.start();		
-	}
+//
+//	/**
+//	 * Method to send the ScreenName for Social Network  and the Unique Id.
+//	 */
+//	private void sendLocationToServer(final String newlatitude, final String newlongitude){
+//		Thread th= new Thread(){
+//			public void run(){
+//				try{
+//					HttpClient httpclient = new DefaultHttpClient();
+//					String uri=serverUrl+"LocationReciever.php?uuid="+uuid+"&latitude="+newlatitude+"&longitude="+newlongitude;
+//					Log.d(TAG, "Sending names to: "+uri);
+//					HttpPost httppost = new   HttpPost(uri);  
+//					HttpResponse response = httpclient.execute(httppost);
+//					Log.d(TAG, "Success"+response.getParams());
+//				} catch (MalformedURLException e) {
+//					Log.e(TAG, e.toString());
+//				} catch (IOException e) {
+//					Log.e(TAG, e.toString());
+//				}
+//			}
+//		};
+//		th.start();		
+//	}
 }

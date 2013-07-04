@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import com.ubhave.sensocial.server.data.SocialEvent;
 import com.ubhave.sensocial.server.filters.ServerFilterParser;
+import com.ubhave.sensocial.server.filters.ServerFilterRegistrar;
 import com.ubhave.sensocial.server.manager.AggregatorRegistrar;
 import com.ubhave.sensocial.server.manager.SensorListenerManager;
 
@@ -14,19 +15,26 @@ public class StreamReceiver {
 			JSONObject obj=new JSONObject(socialEventString);
 			String streamId=obj.getString("streamid");
 			
-			if(AggregatorRegistrar.isAggregated(streamId)){
-				streamId=AggregatorRegistrar.getAggregatedStreamId(streamId);
-				obj.put("streamid", streamId);
-			}
-			SocialEvent socialEvent= SocialEvent.getSocialEvent(obj);	
 			
-			if(ServerFilterParser.isPresent(socialEvent)){
-				System.out.println("Stream present is server filter");
-				ServerFilterParser.handleData(socialEvent);
-			}
-			else{
-				System.out.println("Stream present is server filter");
-				SensorListenerManager.fireUpdate(socialEvent);				
+			SocialEvent socialEvent= SocialEvent.getSocialEvent(obj);	
+			SensorListenerManager.fireUpdate(socialEvent);	
+			
+			if(AggregatorRegistrar.isAggregated(streamId)){				
+				streamId=AggregatorRegistrar.getAggregatedStreamId(streamId);
+				System.out.println("This is aggregated stream: "+streamId);
+				obj.put("streamid", streamId);
+				socialEvent= SocialEvent.getSocialEvent(obj);
+				SensorListenerManager.fireUpdate(socialEvent);	
+				
+				if(ServerFilterRegistrar.isPresent(streamId)){
+					System.out.println("Stream present in server filter");
+					String id=ServerFilterRegistrar.getStreamId(streamId);
+					if(ServerFilterParser.isSatisfied(id, socialEvent)){
+						obj.put("streamid", id);
+						socialEvent= SocialEvent.getSocialEvent(obj);
+						SensorListenerManager.fireUpdate(socialEvent);
+					}
+				}
 			}
 			
 		} catch (JSONException e) {

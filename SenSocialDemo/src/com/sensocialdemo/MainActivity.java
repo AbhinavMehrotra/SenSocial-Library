@@ -1,5 +1,7 @@
 package com.sensocialdemo;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,11 +21,20 @@ import com.ubhave.sensocial.configuration.ServerConfiguration;
 import com.ubhave.sensocial.configuration.TwitterConfiguration;
 import com.ubhave.sensocial.data.SocialEvent;
 import com.ubhave.sensocial.exceptions.IllegalUserAccess;
+import com.ubhave.sensocial.exceptions.PPDException;
+import com.ubhave.sensocial.exceptions.SensorDataTypeException;
 import com.ubhave.sensocial.exceptions.ServerException;
+import com.ubhave.sensocial.filters.Condition;
+import com.ubhave.sensocial.filters.Filter;
+import com.ubhave.sensocial.filters.ModalValue;
+import com.ubhave.sensocial.filters.ModalityType;
+import com.ubhave.sensocial.filters.Operator;
 import com.ubhave.sensocial.http.SendSensorDataToServer;
 import com.ubhave.sensocial.manager.SSListener;
 import com.ubhave.sensocial.manager.SenSocialManager;
 import com.ubhave.sensocial.manager.Stream;
+import com.ubhave.sensocial.manager.User;
+import com.ubhave.sensocial.sensormanager.AllPullSensors;
 
 public class MainActivity extends Activity implements SSListener{
 
@@ -56,21 +67,23 @@ public class MainActivity extends Activity implements SSListener{
 		updateButton();
 		try {
 			ServerConfiguration sc=new ServerConfiguration(getApplicationContext());
-			sc.setServerIP("192.168.0.10");
+//			sc.setServerIP("192.168.0.10");
+			sc.setServerIP("10.4.71.106");
 			sc.setServerProjectURL("http://abhinavtest.net76.net/");
 			sc.setMQTTBrokerURL("tcp://broker.mqttdashboard.com:1883");
 			sc.setRefreshInterval(60*60);
 			sc.setServerPort(4444);
 			ssm=SenSocialManager.getSenSocialManager(getApplicationContext(), true);
 			String uid=ssm.setUserId("abhinav");
-//			System.out.println(uid);
-//			User user=ssm.getUser(uid);
-//			stream=user.getMyDevice().getStream(AllPullSensors.SENSOR_TYPE_ACCELEROMETER, "classified");
-//			ssm.registerListener(this, stream.getStreamId());
-//		} catch (PPDException e) {
-//			Log.e(TAG, "Main activity, 1: "+e.toString());
-//		} catch (SensorDataTypeException e) {
-//			Log.e(TAG, "Main activity, 2: "+e.toString());
+			System.out.println(uid);
+			User user=ssm.getUser(uid);
+			stream=user.getMyDevice().getStream(AllPullSensors.SENSOR_TYPE_ACCELEROMETER, "classified");
+			
+			ssm.registerListener(this, stream.getStreamId());
+		} catch (PPDException e) {
+			Log.e(TAG, "Main activity, 1: "+e.toString());
+		} catch (SensorDataTypeException e) {
+			Log.e(TAG, "Main activity, 2: "+e.toString());
 		} catch (ServerException e) {
 			Log.e(TAG, "Main activity, 3: "+e.toString());
 		} catch (IllegalUserAccess e) {
@@ -88,23 +101,35 @@ public class MainActivity extends Activity implements SSListener{
 		return true;
 	}
 
+	public void start_sensing(View v){
+		ArrayList<Condition> conditions=new ArrayList<Condition>();
+		conditions.add(new Condition(ModalityType.physical_activity, Operator.equal_to, ModalValue.not_moving));
+		conditions.add(new Condition(ModalityType.neighbour, Operator.equal_to, ModalValue.isWithNeigbourDevice("A0:6C:EC:89:4C:01")));
+		Filter f=new Filter(conditions);
+		try {
+			stream=stream.setFilter(f);
+			stream.startStream();
+		} catch (PPDException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void onDataSensed(SocialEvent sensor_event) {
 
 		Log.e("SNnMB", "Received: "+ sensor_event.getFilteredSensorData().getRawData());
-		//Toast.makeText(getApplicationContext(), "Social Event: " +sensor_event.getFilteredSensorData().getStreamId(),Toast.LENGTH_LONG).show();
+		Toast.makeText(getApplicationContext(), "Social Event: " +sensor_event.getFilteredSensorData().getStreamId(),Toast.LENGTH_LONG).show();
 
 	}
 
 	public void fblogin(View v){
-//		if(!sp.getString("fbname", "null").equals("null")){
-//			Toast.makeText(getApplicationContext(), "Already logged-in!", Toast.LENGTH_LONG).show();
-//			return;			
-//		}
-//		fbconfig.setFacebookId("518620884845095", "647777d181d707d4d2993be83c8489d0");
-//		ssm.authenticateFacebook(MainActivity.this, fbconfig);
+		if(!sp.getString("fbname", "null").equals("null")){
+			Toast.makeText(getApplicationContext(), "Already logged-in!", Toast.LENGTH_LONG).show();
+			return;			
+		}
+		fbconfig.setFacebookId("518620884845095", "647777d181d707d4d2993be83c8489d0");
+		ssm.authenticateFacebook(MainActivity.this, fbconfig);
 
-		new SendSensorDataToServer("", "http://10.4.190.245:90/get_file/GetSensorData.php", getApplicationContext()).execute();
+//		new SendSensorDataToServer("", "http://10.4.190.245:90/get_file/GetSensorData.php", getApplicationContext()).execute();
 	}
 //192.168.0.10:90
 
@@ -154,69 +179,5 @@ public class MainActivity extends Activity implements SSListener{
 
 
 
-		//	public boolean onOptionsItemSelected(MenuItem item) 
-		//	{
-		//		try {
-		//			switch (item.getItemId()) 
-		//			{
-		//			case R.id.saccelerometer:
-		//				sensorConfig.setAccelerometer(true);
-		//				Toast.makeText(getApplicationContext(), "Subscribed to accelerometer", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.unsaccelerometer:
-		//				ssm.stopSensingFromThisSensor("accelerometer");
-		//				Toast.makeText(getApplicationContext(), "Unsubscribed to accelerometer", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.sbluetooth:
-		//				sensorConfig.setBluetooth(true);
-		//				Toast.makeText(getApplicationContext(), "Subscribed to bluetooth", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.unsbluetooth:
-		//				ssm.stopSensingFromThisSensor("bluetooth");
-		//				Toast.makeText(getApplicationContext(), "Unsubscribed to bluetooth", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.smicrophone:
-		//				sensorConfig.setMicrophone(true);
-		//				Toast.makeText(getApplicationContext(), "Subscribed to microphone", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.unsmicrophone:
-		//				ssm.stopSensingFromThisSensor("microphone");
-		//				Toast.makeText(getApplicationContext(), "Unsubscribed to microphone", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.slocation:
-		//				sensorConfig.setLocation(true);
-		//				Toast.makeText(getApplicationContext(), "Subscribed to location", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.unslocation:
-		//				ssm.stopSensingFromThisSensor("location");
-		//				Toast.makeText(getApplicationContext(), "Unsubscribed to location", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.swifi:
-		//				sensorConfig.setWifi(true);
-		//				Toast.makeText(getApplicationContext(), "Subscribed to wifi", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.unswifi:
-		//				ssm.stopSensingFromThisSensor("wifi");
-		//				Toast.makeText(getApplicationContext(), "Unsubscribed to wifi", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.tenri:
-		//				serverConfig.setRefreshInterval(10);
-		//				Toast.makeText(getApplicationContext(), "RI set as 10sec", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.sixtyri:
-		//				serverConfig.setRefreshInterval(60);
-		//				Toast.makeText(getApplicationContext(), "RI set as 60sec", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			case R.id.delete:
-		//				DataBaseMethods dbm=new DataBaseMethods(getApplication());
-		//				dbm.deleteAll();
-		//				Toast.makeText(getApplicationContext(), "All records deleted!", Toast.LENGTH_LONG).show();
-		//				return true;
-		//			}
-		//		} catch (InvalidSensorNameException e) {
-		//			Toast.makeText(getApplicationContext(), "Invalid Sensor Name", Toast.LENGTH_LONG).show();
-		//		}
-		//		return false;
-		//	}
-
+		
 	}

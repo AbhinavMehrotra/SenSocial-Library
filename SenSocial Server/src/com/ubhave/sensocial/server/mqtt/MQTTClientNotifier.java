@@ -3,21 +3,28 @@ package com.ubhave.sensocial.server.mqtt;
 import java.util.ArrayList;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.ubhave.sensocial.server.database.UserRegistrar;
 import com.ubhave.sensocial.server.manager.Device;
 
 public class MQTTClientNotifier {
 
-	public static void sendFacebookUpdate(String id, String message,long time){
+	public static void sendFacebookUpdate(String id, String message,long time, String notificationType){
 		ArrayList<Device> devices=UserRegistrar.getUser(id).getDevices();
 		for(Device d:devices){
 			try {
+				JSONObject obj=new JSONObject();
+				obj.put("message", message);
+				obj.put("notificationtype", notificationType);
+				obj.put("time", time);
+				obj.put("osnname", "FACEBOOK");
+				
 				MQTTManager mqtt = new MQTTManager(d.getDeviceId());
 				mqtt.connect();
-				mqtt.publishToDevice(MQTTNotifitions.facebook_update.getMessage()+":"+ 
-										message +":" + time);
-			} catch (MqttException e) {
+				mqtt.publishToDevice(MQTTNotifitions.facebook_update.getMessage()+":"+ obj.toString());
+			} catch (MqttException | JSONException e) {
 				e.printStackTrace();
 			}
 		}			

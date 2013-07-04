@@ -4,6 +4,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import com.ubhave.sensocial.exceptions.ServerException;
+import com.ubhave.sensocial.manager.SenSocialManager;
 import com.ubhave.sensormanager.ESException;
 
 public class LocationTrackerService extends Service {
@@ -16,8 +18,11 @@ public class LocationTrackerService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		try {
+			SenSocialManager.getSenSocialManager(getApplicationContext(), true);
 			new TrackLocation(getApplicationContext()).startTracking();
 		} catch (ESException e) {
+			e.printStackTrace();
+		} catch (ServerException e) {
 			e.printStackTrace();
 		}
 		return START_STICKY;

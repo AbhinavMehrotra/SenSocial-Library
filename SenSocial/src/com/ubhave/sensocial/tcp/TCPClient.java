@@ -53,7 +53,7 @@ public class TCPClient{
 		protected Void doInBackground(String... data) {
 			try {
 				InetAddress serverAddr = InetAddress.getByName(SERVERIP);
-				Log.e("TCP Client", "Connecting to the server...");
+				Log.e("TCP Client", "Connecting to the server..."+serverAddr);
 				socket = new Socket(serverAddr, SERVERPORT);
 
 				try {

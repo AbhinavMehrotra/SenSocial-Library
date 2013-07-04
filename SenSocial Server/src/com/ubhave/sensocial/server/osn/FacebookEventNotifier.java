@@ -4,48 +4,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.ubhave.sensocial.server.database.UserRegistrar;
 import com.ubhave.sensocial.server.mqtt.MQTTClientNotifier;
 
 public class FacebookEventNotifier{
 
-//	public FacebookEventNotifier() {
-//		super("FacebookEventNotifier");
-//	}
-//	
-//	 public void run() {
-//		 System.out.print("FacebookEventNotifier: run");
-//		 checkEvent();
-//	 }
-//	
-//	protected void checkEvent() {
-//		Timer timer =new Timer();
-//		timer.scheduleAtFixedRate(new TimerTask() {
-//			public void run() {
-//				 System.out.print("FacebookEventNotifier: check-event timer");
-//				checkMemcached("localhost", 11211);				
-//			}
-//		}, 10*1000,10*1000);
-//
-//	}
-//
-//	private void checkMemcached(String host, int port){
-//		try {
-//			InetSocketAddress ia= new InetSocketAddress(host, port);
-//			MemcachedClient c = new MemcachedClient(ia);
-//			if(c.get("FBINFO")!=null){
-//				JSONObject json=new JSONObject(c.get("FBINFO").toString());
-//				System.out.println("Received event notification from Facebook: "+c.get("FBINFO").toString());
-//				parseJSON(json);
-//				Future<Boolean> fo=c.delete("FBINFO");
-//				System.out.println("Is the event deleted from Memcached: "+fo.get());
-//				c.shutdown();
-//			}
-//		}
-//		catch(Exception e){
-//			System.out.println("Error with facebook updates: "+e.toString());
-//		}
-//	}
-	
 	public static void parseJSON(JSONObject json){
 		try {
 			JSONArray entries= json.getJSONArray("entry");
@@ -53,30 +16,41 @@ public class FacebookEventNotifier{
 			String id,message;
 			long time;
 			JSONArray fields;
-			for(int i=0; i<entries.length();i++){
+			//most of the time it will be single entry, but due to network issue facebook server may collect previous unsent ones
+			//and send them all together
+			for(int i=0; i<entries.length();i++){ 
 				entry=entries.getJSONObject(i);
 				id=entry.get("uid").toString();
 				time=entry.getLong("time");
 				fields=entry.getJSONArray("changed_fields");
-				for(int j=0;j<fields.length();j++){
-					System.out.println("Entry "+ j+1 +": "+id+","+time+","+fields.getString(j));
-					
-					//TODO: check if the trigger is for facebook freinds then just update the friend list in db and 
-					// no need to send trigger to client device.
-					if(fields.getString(j).equalsIgnoreCase("friends")){
-						//update friend list
-						
-						continue;
+				if(isInteresting(id)){
+					for(int j=0;j<fields.length();j++){
+						System.out.println("Entry "+ j+1 +": "+id+","+time+","+fields.getString(j));
+						FacebookGetters fg=new FacebookGetters(id);
+						message=fg.getUpdatedData(fields.getString(j), time);
+						//check for friend list update
+						if(message.contains("are now friends") || message.contains("is now friends with")){
+							UserRegistrar.updateFacebookFriendList(id);
+						}
+						else{
+							MQTTClientNotifier.sendFacebookUpdate(id, message,time, fields.getString(j));
+						}
 					}
-					FacebookGetters fg=new FacebookGetters(id);
-					message=fg.getUpdatedData(fields.get(j).toString(), time);
-					MQTTClientNotifier.sendFacebookUpdate(id, message,time);
 				}
-				
+				else{
+					for(int j=0;j<fields.length();j++){
+						System.out.println("Entry not interesting (user not registered)- id: "+id+", time: "+time+", "+fields.getString(j));					
+					}
+				}
 			}
 		} catch (JSONException e) {
 			System.out.println("Error with parsing facebook updates: "+e.toString());
 		}
+	}
+
+	//check whether the userid is registered
+	private static Boolean isInteresting(String uid){
+		return UserRegistrar.isFacebookIdPresent(uid);
 	}
 
 }

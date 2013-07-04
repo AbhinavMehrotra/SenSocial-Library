@@ -14,8 +14,11 @@ import com.ubhave.sensormanager.data.SensorData;
 public class SensorDataCollector {
 
 	private static Map<Integer, SensorData> sensorDataMap=new HashMap<Integer, SensorData>();
-	private static SensorData sensor_data;
 
+	public static void deleteData(int sensorId){
+		sensorDataMap.remove(sensorId);
+	}
+	
 	public static void addData(SensorData data){
 		sensorDataMap.put(data.getSensorType(), data);
 	}
@@ -26,14 +29,14 @@ public class SensorDataCollector {
 	}
 
 
-	public static ArrayList<SensorData> getData(ArrayList<Integer> sensorIds){
-		ArrayList<SensorData> sensordata=new ArrayList<SensorData>();
-		for(int id:sensorIds){
-			sensordata.add(getData(id));
-		}
-		return sensordata;
-	}
-	
+//	public static ArrayList<SensorData> getData(ArrayList<Integer> sensorIds){
+//		ArrayList<SensorData> sensordata=new ArrayList<SensorData>();
+//		for(int id:sensorIds){
+//			sensordata.add(getData(id));
+//		}
+//		return sensordata;
+//	}
+//	
 	public static SensorData getData(int sensorId){
 		SensorData data=null;
 		if(isRegistered(sensorId)){
@@ -45,22 +48,22 @@ public class SensorDataCollector {
 			}
 			return data;
 		}
-		else{
-			try {
-				sensor_data=null;
-				ArrayList<Integer> ids=new ArrayList<Integer>();
-				ids.add(sensorId);
-				new OneOffSensing(SenSocialManager.getContext(), ids){
-					@Override
-					public void onPostExecute(ArrayList<SensorData> result){
-						sensor_data= result.get(0);							
-					}
-				}.execute();
-			} catch (ESException e) {
-				e.printStackTrace();
-			}		
-		}
-		return sensor_data;
+//		else{
+//			try {
+//				sensor_data=null;
+//				ArrayList<Integer> ids=new ArrayList<Integer>();
+//				ids.add(sensorId);
+//				new OneOffSensing(SenSocialManager.getContext(), ids){
+//					@Override
+//					public void onPostExecute(ArrayList<SensorData> result){
+//						sensor_data= result.get(0);							
+//					}
+//				}.execute();
+//			} catch (ESException e) {
+//				e.printStackTrace();
+//			}		
+//		}
+		return null;
 	}
 
 	public static Boolean isRegistered(int sensorId){
@@ -70,6 +73,18 @@ public class SensorDataCollector {
 		Set<String> sensors=sp.getStringSet("StreamSensorSet", null);
 		if(sensors==null || !sensors.contains(sensorName))
 			return false;
+		SensorData data = null;
+		for(Map.Entry<Integer, SensorData> map: sensorDataMap.entrySet()){
+			if(map.getKey()==sensorId){
+				data=map.getValue();
+				break;
+			}
+		}
+		long currentTime=System.currentTimeMillis();
+		if(data==null || currentTime - data.getTimestamp()>60000){ //data is sensed before last 60seconds
+			deleteData(sensorId);
+			return false;
+		}			
 		return true;		
 	}
 

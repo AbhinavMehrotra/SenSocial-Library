@@ -13,7 +13,8 @@ else if ($method == 'POST') {
         $data = file_get_contents("php://input");
 	$json = json_decode($data); 	
 
-	/*Format of data received from facebook-		{"object":"user","entry"[{"uid":"100000609105612","id":"100000609105612","time":1363643824,"changed_fields":["statuses"]}]}';
+	/*Format of data received from facebook-		
+	{"object":"user","entry"[{"uid":"100000609105612","id":"100000609105612","time":1363643824,"changed_fields":["statuses"]}]}';
 	*/
 	$message = '{"name":"facebook", "facebook":'.$json.'}';
 	$service_port = '4444';

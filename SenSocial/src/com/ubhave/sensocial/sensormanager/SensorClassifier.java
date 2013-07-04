@@ -153,7 +153,7 @@ public class SensorClassifier {
 			if(config==null || !config.contains(c.getKey())){
 				//new element found
 				for(String s:c.getValue()){
-					if(s.equalsIgnoreCase("ALL")){
+					if(s.equalsIgnoreCase("null")){
 						sensorNew.add(ConfigurationHandler.getRequiredData(c.getKey()));
 						System.out.println("Sensor name (for ALL): " + ConfigurationHandler.getRequiredData(c.getKey()));
 						System.out.println("Set- Sensor: "+sensorNew);

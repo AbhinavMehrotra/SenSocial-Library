@@ -23,7 +23,7 @@ class HandleClient extends Thread {
 	    				System.out.println("Stream is blank");
 	    				continue;            		
 	            	}
-					System.out.println(inputLine);
+					System.out.println("TCP Client class: "+inputLine);
 					MessageParser.run(inputLine);
 	            }
 	            br.close();

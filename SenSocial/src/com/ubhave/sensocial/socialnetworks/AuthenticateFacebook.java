@@ -110,6 +110,7 @@ public class AuthenticateFacebook {
 				editor.putString("name", userName);
 				editor.commit();
 				Log.d(TAG, "FB name: "+sp.getString("name", null));
+				Log.d(TAG, "AT old: "+sp.getString("access_token", null));
 				URL url=new URL("https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id="+appId+
 						"&client_secret="+clientSecretId+"&fb_exchange_token="+sp.getString("access_token", null));
 				InputStream Istream=url.openConnection().getInputStream();
@@ -122,8 +123,9 @@ public class AuthenticateFacebook {
 				String new_access_token= total.toString();
 				editor.putString("fbtoken", new_access_token);
 				editor.commit();
+				Log.d(TAG, "AT new: "+sp.getString("fbtoken", null));
 
-				if(sp.getBoolean("useridbyparam", false)==false){
+				if(sp.getBoolean("useridbyfacebook", false)==false){
 					ClientServerCommunicator.registerFacebook(context, sp.getString("name", "null"), 
 							sp.getString("userid", "null"),	sp.getString("fbusername", "null"),  sp.getString("fbtoken", "null"));					
 				}

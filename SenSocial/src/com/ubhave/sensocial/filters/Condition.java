@@ -19,12 +19,19 @@ public class Condition {
 
 	public Condition(String fullConditionString){
 		//parse the string and set all values
-		String str=fullConditionString;
-		this.modalityType=fullConditionString.substring(0, str.indexOf(":"));
-		str=str.substring(str.indexOf(":")+1);
-		this.operator=fullConditionString.substring(0, str.indexOf(":"));
-		str=str.substring(str.indexOf(":")+1);
-		this.modalValue=str;
+		if(fullConditionString.equalsIgnoreCase("null")){
+			this.modalityType="null";
+			this.operator="";
+			this.modalValue="";
+		}
+		else{
+			String str=fullConditionString;
+			this.modalityType=fullConditionString.substring(0, str.indexOf(":"));
+			str=str.substring(str.indexOf(":")+1);
+			this.operator=fullConditionString.substring(0, str.indexOf(":"));
+			str=str.substring(str.indexOf(":")+1);
+			this.modalValue=str;
+		}		
 	}
 
 	/**

@@ -18,6 +18,7 @@ public class SensorListenerManager {
 	 * @param configuration Configuration name
 	 */
 	protected static void add(SensorListener listener, String streamId) {
+		System.out.println("New stream is registered!");	
 		listeners.put(listener,streamId);
 	}
 
@@ -27,6 +28,7 @@ public class SensorListenerManager {
 	 * @param listener SocialNetworkPostListner object
 	 */
 	protected static void remove(SensorListener listener) {
+		System.out.println("A stream is removed!");	
 		listeners.remove(listener);
 	}
 
@@ -35,9 +37,20 @@ public class SensorListenerManager {
 	 * @param socialEvent 
 	 */
 	public static void fireUpdate(SocialEvent socialEvent){
-		for (Map.Entry<SensorListener, String> listener: listeners.entrySet()) {
-			if(listener.getValue().equalsIgnoreCase(socialEvent.getFilteredSensorData().getStreamId())){
-				listener.getKey().onDataReceived(socialEvent);
+		if(listeners.isEmpty()){
+			System.out.println("No stream is registered!");			
+		}
+		else{
+			System.out.println("In fire-update looking for stream id: "+ socialEvent.getFilteredSensorData().getStreamId());
+			for (Map.Entry<SensorListener, String> listener: listeners.entrySet()) {
+				System.out.println("Stream id present: "+ listener.getValue());
+				if(listener.getValue().equalsIgnoreCase(socialEvent.getFilteredSensorData().getStreamId())){
+					System.out.println("Listener found");
+					listener.getKey().onDataReceived(socialEvent);
+				}
+				else{
+					System.out.println("Stream not found");					
+				}
 			}
 		}
 

@@ -40,15 +40,15 @@ public class SSManager {
 		new TCPServer().start();		
 	}
 	
-	public static User getUser(String osn_name){
+	public User getUser(String osn_name){
 		return UserRegistrar.getUser(osn_name);
 	}
 	
-	public static Set<User> getAllUsers(String userName){
+	public Set<User> getAllUsers(String userName){
 		return UserRegistrar.getAllUsers(userName);
 	}
 	
-	public static Set<User> getAllUsers(){
+	public Set<User> getAllUsers(){
 		return UserRegistrar.getAllUsers();
 	}	
 

@@ -6,12 +6,17 @@ import com.ubhave.sensocial.server.manager.Location;
 import com.ubhave.sensocial.server.manager.User;
 
 public class ModalValue {
-
-	public static String running="moving";
-	public static String walking="not_moving";
-	public static String sitting="talking";
+	
+	public static String moving ="moving";
+	public static String not_moving="not_moving";
+	public static String running="running";
+	public static String walking="walking";
+	public static String sitting="sitting";
+	public static String talking="talking";
 	public static String silent="silent";
 	public static String active="active";
+
+
 	
 
 	public static String isWithUser(String userId){
@@ -19,6 +24,11 @@ public class ModalValue {
 		for(Device d:UserRegistrar.getUserById(userId).getDevices()){
 			str+=d.getBluetoothMAC();
 		}
+		return str;
+	}
+	
+	public static String isWithNeigbourDevice(String bluetooth_MAC_or_Name){
+		String str="neighbour_"+bluetooth_MAC_or_Name;
 		return str;
 	}
 	
@@ -48,6 +58,11 @@ public class ModalValue {
 	
 	public static String withinUserLocation(String userId, double range){
 		String str="range_"+range+"_userid_"+userId;
+		return str;
+	}
+	
+	public static String withinOSNFriendsLocationRange(double range){
+		String str="range_"+range;
 		return str;
 	}
 

@@ -18,6 +18,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.ubhave.sensocial.server.manager.Aggregator;
+import com.ubhave.sensocial.server.manager.AggregatorRegistrar;
 import com.ubhave.sensocial.server.manager.Sensors;
 import com.ubhave.sensocial.server.manager.Stream;
 import com.ubhave.sensocial.server.manager.StreamCollection;
@@ -31,8 +32,43 @@ public class GenerateFilter {
 		//check for filter (server or client)
 		//filter types: device specific, relational, and combinational(two streams
 		//on a device requires similar data with different frequency)
-
-		if(isDeviceSpecific(conditions)){
+		if(isRelational(conditions)){ //example- get activity of all friends who are in the same location
+			System.out.println("Relational FILTER");	
+			for(Condition c:conditions){
+				if(c.getModalityType().equals(ModalityType.facebook_friends_location)){
+					conditions.remove(c);
+					if(conditions.size()<1){
+						conditions.add(new Condition("Null", "", ""));
+					}
+					createClientFilter(conditions, streamId, sensorName, sensorDataType);
+					conditions.clear();
+					conditions.add(c);
+					createServerFilter(conditions, streamId, sensorName, sensorDataType);
+					break;
+				}
+			}
+			Filter f=new Filter();
+			f.addConditions(conditions);
+			Set<Stream> streams=new HashSet<Stream>();
+			StreamCollection sc=new StreamCollection(Sensors.getSensorIdByName(sensorName), sensorDataType);
+			try {
+				streams=sc.getStreamSet(user, UserRelation.facebook_friends);
+				if(streams!=null)
+				System.out.println("Streams for UserRelation.facebook_friends: "+ streams.size());
+				else
+					System.out.println("Streams for UserRelation.facebook_friends: No streams");
+					
+				Aggregator ag=new Aggregator(streams);
+				Stream stream=ag.createStream();
+				//AggregatorRegistrar.addIfExists(stream.getStreamId(), streamId);
+				Stream newstream=stream.setFilter(f);
+				ServerFilterRegistrar.add(streamId, newstream.getStreamId());
+				newstream.startStream();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		else if(isDeviceSpecific(conditions)){
 			if(isCombinational(conditions, deviceId, sensorName)){
 				//there exists a stream with similar filter settings 
 				String sid=getHighFrequencyStream(deviceId, sensorName, conditions, streamId);
@@ -92,36 +128,7 @@ public class GenerateFilter {
 				createClientFilter(conditions, streamId, sensorName, sensorDataType);				
 			}
 		}
-		else if(isRelational(conditions)){ //example- get activity of all friends who are in the same location
-			System.out.println("Relational FILTER");	
-			for(Condition c:conditions){
-				if(c.getModalityType().equals(ModalityType.facebook_friends_location)){
-					conditions.remove(c);
-					if(conditions.size()<1){
-						conditions.add(new Condition("Null", "", ""));
-					}
-					createClientFilter(conditions, streamId, sensorName, sensorDataType);
-					conditions.clear();
-					conditions.add(c);
-					createServerFilter(conditions, streamId, sensorName, sensorDataType);
-					break;
-				}
-			}
-			Filter f=new Filter();
-			f.addConditions(conditions);
-			Set<Stream> streams=new HashSet<Stream>();
-			StreamCollection sc=new StreamCollection(Sensors.getSensorIdByName(sensorName), sensorDataType);
-			try {
-				streams=sc.getStreamSet(user, UserRelation.facebook_friends);
-				Aggregator ag=new Aggregator(streams);
-				Stream stream=ag.createStream();
-				Stream newstream=stream.setFilter(f);
-				ServerFilterRegistrar.add(streamId, newstream.getStreamId());
-				newstream.startStream();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		
 	}
 
 	private static Boolean isDeviceSpecific(ArrayList<Condition> conditions){

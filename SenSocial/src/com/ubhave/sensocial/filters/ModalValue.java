@@ -27,8 +27,9 @@ public class ModalValue {
 		String str="frequency_"+seconds;
 		return str;
 	}
-	public static String isWithUser(String bluetoothMAC){
-		String str="neighbour_"+bluetoothMAC;
+	
+	public static String isWithNeigbourDevice(String bluetooth_MAC_or_Name){
+		String str="neighbour_"+bluetooth_MAC_or_Name;
 		return str;
 	}
 

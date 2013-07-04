@@ -1,6 +1,7 @@
 package com.ubhave.sensocial.server.tcp;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 
 
@@ -17,7 +18,8 @@ public class TCPServer extends Thread{
         running =true;
  
             try {
-                System.out.println("S: Connecting...");
+				InetAddress serverAddr = InetAddress.getByName("localhost");
+                System.out.println("S: Connecting..."+serverAddr);
 				serverSocket = new ServerSocket(SERVERPORT);
 			} catch (IOException e1) {
                 System.out.println(e1.toString());
