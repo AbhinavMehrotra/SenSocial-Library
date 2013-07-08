@@ -42,16 +42,17 @@ public class SenSocialManager{
 	private String deviceId, TAG="SNnMB", mac;
 	private SharedPreferences sp;
 	private static SenSocialManager sensocialManager;
-	private static Boolean isServerClient;
+	private static Boolean ServerClient, LocationTrackerRequired;
 
 
 	public static Context getContext(){
 		return context;
 	}
 
-	public static SenSocialManager getSenSocialManager(Context context, Boolean isServerClientApp) throws ServerException {
-		isServerClient=isServerClientApp;
-		if(isServerClient){
+	public static SenSocialManager getSenSocialManager(Context context, Boolean isServerClientApp, Boolean isLocationTrackerRequired) throws ServerException {
+		ServerClient=isServerClientApp;
+		LocationTrackerRequired=isLocationTrackerRequired;
+		if(ServerClient || LocationTrackerRequired){
 			ServerConfiguration sc=new ServerConfiguration(context);
 			if(sc.getServerIP().isEmpty() || sc.getServerProjectURL().isEmpty() || sc.getServerPort()==0){
 				throw new ServerException("Server configuration missing!! Help: create ServerConfiguration object and " +
@@ -73,11 +74,18 @@ public class SenSocialManager{
 	private SenSocialManager(Context context){
 		this.context=context;
 		sp=context.getSharedPreferences("SSDATA",0);
+		Editor ed=sp.edit();
+		ed.putBoolean("accelerometerenabled", true);
+		ed.putBoolean("microphoneenabled", true);
+		ed.putBoolean("wifienabled", true);
+		ed.putBoolean("locationenabled", true);
+		ed.putBoolean("bluetoothenabled", true);
+		ed.commit();
 		if(sp.getString("deviceid", "null").equals("null") || sp.getString("bluetoothmac", "null").equals("null")){
 			this.deviceId= Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);    //UUID.randomUUID().toString().substring(0, 6);//"abhinav123";//
 			BluetoothAdapter a=BluetoothAdapter.getDefaultAdapter();
 			mac= a.getAddress();
-			Editor ed=sp.edit();
+			ed=sp.edit();
 			ed.putString("deviceid", deviceId);
 			ed.putString("bluetoothmac", mac);
 			ed.commit();
@@ -92,9 +100,14 @@ public class SenSocialManager{
 		//create a default ppd
 		PPDGenerator.createDefaultPPD();
 
-		//context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
-		if(isServerClient)
+		if(LocationTrackerRequired){
+			Log.i(TAG, "Strating Location tracking service!");
+			context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
+		}	
+		if(ServerClient){
+			Log.i(TAG, "Strating MQTT push notification service!");
 			context.startService(new Intent(context, com.ubhave.sensocial.mqtt.MQTTService.class));
+		}
 	}
 
 	/**
@@ -184,7 +197,7 @@ public class SenSocialManager{
 			throw new IllegalUserAccess("User id already set once. Cannot set a new id again");
 		}
 
-		if(isServerClient && !sp.getBoolean("userregistered", false)){
+		if(ServerClient && !sp.getBoolean("userregistered", false)){
 			ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
 			context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
 		}
@@ -205,7 +218,7 @@ public class SenSocialManager{
 			if(!sp.getString("userid", "null").equals("null") &&  !sp.getString("userid", "null").equals(user_id)){
 				throw new IllegalUserAccess("User id already set once. Cannot set a new id again");
 			}
-			if(isServerClient && !sp.getBoolean("userregistered", false)){
+			if(ServerClient && !sp.getBoolean("userregistered", false)){
 				ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
 				ClientServerCommunicator.registerFacebook(context, sp.getString("name", "null"), user_id,
 						sp.getString("fbusername", "null"),  sp.getString("fbtoken", "null"));
@@ -229,7 +242,7 @@ public class SenSocialManager{
 			if(!sp.getString("userid", "null").equals("null") &&  !sp.getString("userid", "null").equals(user_id)){
 				throw new IllegalUserAccess("User id already set once. Cannot set a new id again");
 			}
-			if(isServerClient && !sp.getBoolean("userregistered", false)){
+			if(ServerClient && !sp.getBoolean("userregistered", false)){
 				ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
 				ClientServerCommunicator.registerTwitter(context, sp.getString("name", "null"), user_id,
 						sp.getString("twitterusername", "null"),  sp.getString("twittertoken", "null"));

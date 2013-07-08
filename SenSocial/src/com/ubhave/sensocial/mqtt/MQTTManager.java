@@ -99,8 +99,7 @@ public class MQTTManager {
 
 		public void messageArrived(MqttTopic arg0, MqttMessage arg1)
 				throws Exception {
-			// argo-> device id
-			//arg1 --> message
+			// argo-> device id		//arg1 --> message
 			Log.i("SNnMB",arg0.toString()+":"+arg1.toString());
 			new NotificationParser(context).takeAction(arg1.toString());
 		}

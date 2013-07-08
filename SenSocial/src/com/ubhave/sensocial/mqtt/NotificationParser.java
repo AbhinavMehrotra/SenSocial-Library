@@ -2,11 +2,11 @@ package com.ubhave.sensocial.mqtt;
 
 import java.util.ArrayList;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.StrictMode;
 import android.util.Log;
 
 import com.ubhave.sensocial.filters.ConfigurationHandler;
@@ -18,6 +18,7 @@ import com.ubhave.sensocial.sensormanager.AllPullSensors;
 import com.ubhave.sensocial.sensormanager.OneOffSensing;
 import com.ubhave.sensocial.sensormanager.SensorDataCollector;
 import com.ubhave.sensormanager.ESException;
+import com.ubhave.sensormanager.ESSensorManager;
 import com.ubhave.sensormanager.data.SensorData;
 
 public class NotificationParser {
@@ -55,14 +56,20 @@ public class NotificationParser {
 			ConfigurationHandler.run(context);
 		}
 		else if(message.startsWith(MQTTNotifitions.facebook_update.getMessage())){
+			Log.i("SNnMB", "Facebook update recieved!");
 			AllPullSensors aps=new AllPullSensors(context);
 			SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
-			ArrayList<Integer> sensorIds=new ArrayList<Integer>();
+			final ArrayList<Integer> sensorIds=new ArrayList<Integer>();
 			for(String s:sp.getStringSet("OSNSensorSet", null))
 				sensorIds.add(aps.getSensorIdByName(s));
-			//			ArrayList<SensorData> data=SensorDataCollector.getData(sensorIds);
-			//			SensorDataHandler.handleOSNDependentData(data, context, message);
+			Log.i("SNnMB", "Sensors: "+sp.getStringSet("OSNSensorSet", null));
+			Log.i("SNnMB", "Sensor ids: "+sensorIds);
 			try {
+				StrictMode.ThreadPolicy old = StrictMode.getThreadPolicy();
+	    		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(old)
+	    		.permitNetwork()
+	    		.build());
+				Log.d("SNnMB","Start sensing");
 				new OneOffSensing(context, sensorIds){
 					@Override
 					public void onPostExecute(ArrayList<SensorData> data){
@@ -73,12 +80,34 @@ public class NotificationParser {
 
 					}
 				}.execute();
-			} catch (ESException e) {
+	            StrictMode.setThreadPolicy(old);
+			} catch (Exception e) {
 				Log.e("SNnMB","Error at Notification parser: "+e.toString());
 			}
+//			ArrayList<SensorData> sensorData=new ArrayList<SensorData>();
+//			try {
+//				ESSensorManager sensorManager = ESSensorManager.getSensorManager(context);
+//				for(int i=0;i<sensorIds.size();i++){
+//					if(SensorDataCollector.isRegistered(sensorIds.get(i))){
+//						Log.i("SNnMB", "One-Off sensing process, found the latest data available for: "+sensorIds.get(i));
+//						sensorData.add(SensorDataCollector.getData(sensorIds.get(i)));
+//					}
+//					else{
+//						Log.i("SNnMB", "One-Off sensing process, latest data not available & sensing for: "+sensorIds.get(i));
+//						sensorData.add(sensorManager.getDataFromSensor(sensorIds.get(i)));
+//					}
+//				}
+//			} catch (Exception e) {
+//				Log.e("SNnMB","Error at Notification parser: "+e.toString());
+//			}
+//			if(sensorData!=null){
+//				Log.i("SNnMB", "Sensor data: "+sensorData);
+//				SensorDataHandler.handleOSNDependentData(sensorData, context, message);
+//			}
 		}
 		else if(message.startsWith(MQTTNotifitions.nearby_bluetooths.getMessage())){
 
 		}
 	}
 }
+

@@ -73,13 +73,13 @@ public class TrackLocation {
 									public void onPostExecute(ArrayList<SensorData> data){
 										Log.d("SNnMB","Stopped sensing for location tracking");
 										if(data!=null){
-											JSONFormatter formatter = DataFormatter.getJSONFormatter(AllPullSensors.SENSOR_TYPE_LOCATION);
+											JSONFormatter formatter = DataFormatter.getJSONFormatter(context,AllPullSensors.SENSOR_TYPE_LOCATION);
 											JSONObject jsondata=formatter.toJSON(data.get(0));
 											System.out.print("location: "+jsondata.get("latitude"));
 											
 
-											JSONFormatter formatter1 = DataFormatter.getJSONFormatter(data.get(0).getSensorType());
-											String str=formatter1.toJSON(data.get(0)).toJSONString();
+											JSONFormatter formatter1 = DataFormatter.getJSONFormatter(context, data.get(0).getSensorType());
+											String str=formatter1.toJSON(data.get(0)).toString();
 											System.out.print("str: "+str);
 											System.out.print("sensorData: "+data.get(0));											
 											

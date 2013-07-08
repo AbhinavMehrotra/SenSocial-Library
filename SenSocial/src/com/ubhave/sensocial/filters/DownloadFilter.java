@@ -8,10 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-
-import com.facebook.override;
-import com.ubhave.sensormanager.data.SensorData;
 
 import android.content.Context;
 import android.os.AsyncTask;

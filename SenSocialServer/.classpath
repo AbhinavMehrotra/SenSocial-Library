@@ -2,10 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/Desktop/JARs/mongo-2.10.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/Desktop/JARs/org.eclipse.paho.client.mqttv3.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/Desktop/JARs/java-json.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/Desktop/JARs/sensordatamanager.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/Desktop/JARs/sensormanager.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/workspace/JARs/java-json.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/workspace/JARs/mongo-2.10.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/workspace/JARs/org.eclipse.paho.client.mqttv3.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/workspace/JARs/sensordatamanager.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/workspace/JARs/sensormanager.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

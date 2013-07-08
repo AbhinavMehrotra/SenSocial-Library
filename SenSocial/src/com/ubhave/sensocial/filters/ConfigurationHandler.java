@@ -117,7 +117,7 @@ public class ConfigurationHandler {
 			}
 			//if some configs has been removeds
 			if(removedConfigs!=blank && removedConfigs!=null && removedConfigs.size()>0){
-				System.out.println("Unused config found"+removedConfigs);
+				System.out.println("Unused config found "+removedConfigs);
 				Set<String> sensors= new HashSet<String>();
 				sensors=getAllRequiredSensorsByFilter();
 				ArrayList<String> unusedSensors=new ArrayList<String>();
@@ -130,7 +130,7 @@ public class ConfigurationHandler {
 					ed.remove(config);
 					ed.commit();
 
-					System.out.println("New activities: "+conditions);	
+					System.out.println("Dependent modalities: "+conditions);	
 					//find usused sensors
 					AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
 					for(String condition:conditions){
@@ -161,7 +161,7 @@ public class ConfigurationHandler {
 			System.out.println("subscribing new sensors");
 			for(String c : configsFilter){
 				filterConfigs.put(c, getConditionString(c));
-				System.out.println(c);
+				System.out.println("Condition: "+c);
 				for(String s:getConditionString(c))
 					System.out.println(s);
 			}			
@@ -187,7 +187,8 @@ public class ConfigurationHandler {
 			sensors.clear();
 			for(String conditions: getConditionString(con)){
 				Condition c=new Condition(conditions);
-				if(!c.getModalityType().equalsIgnoreCase(ModalityType.null_condition))
+				if(!c.getModalityType().equalsIgnoreCase(ModalityType.null_condition) &&
+						!c.getModalityType().equalsIgnoreCase(ModalityType.facebook_activity))
 					sensors.add(aps.getSensorNameById(ModalityType.getSensorId(c.getModalityType())));
 			}
 			reqData=getRequiredData(con);
@@ -352,21 +353,36 @@ public class ConfigurationHandler {
 				for (int temp=0;temp<nList.getLength();temp++) {
 					Node nNode = nList.item(temp);
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-						System.out.println("Config nodes found");		
+
 						Element eElement = (Element) nNode;
+						System.out.println("Config nodes found"+eElement.getAttribute("name"));	
 						if(eElement.getAttribute("name").equalsIgnoreCase(configName)){
 							System.out.println("Config found: "+configName);		
-							NodeList nodeList = doc.getElementsByTagName("required_data");
-							System.out.println("Required-data node found");	
-							for(int i=0;i<nodeList.getLength();i++){
-								Node nNode1 = nodeList.item(i);
-								sensor=((Element)nNode1).getAttribute("sensor");
-								System.out.println("Required-data found: "+sensor);		
-								//								for(int j=0;j<nNode1.getChildNodes().getLength();j++){
-								//									sensor=((Element)nNode1.getChildNodes().item(j)).getAttribute("name");
-								//								}
+
+							NodeList configChilds=nNode.getChildNodes();
+							for(int j=0;j<configChilds.getLength();j++){
+								if(configChilds.item(j).getNodeName().equalsIgnoreCase("required_data")){
+									System.out.println("Required-data node found");	
+									sensor=((Element)configChilds.item(j)).getAttribute("sensor");
+									System.out.println("Required-data found: "+sensor);										
+								}
+								else{
+									System.out.println("Node Name: "+configChilds.item(j).getNodeName());										
+								}
 							}
+
+							//							NodeList nodeList = doc.getElementsByTagName("required_data");
+							//							
+							//							
+							//							System.out.println("Required-data node found");	
+							//							for(int i=0;i<nodeList.getLength();i++){
+							//								Node nNode1 = nodeList.item(i);
+							//								sensor=((Element)nNode1).getAttribute("sensor");
+							//								System.out.println("Required-data found: "+sensor);		
+							//							}
+
 						}
+
 					}
 				}
 			}		
@@ -398,19 +414,32 @@ public class ConfigurationHandler {
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 						Element eElement = (Element) nNode;
 						if(eElement.getAttribute("name").equalsIgnoreCase(configName)){
-							NodeList nodeList = doc.getElementsByTagName("required_data");
-							for(int i=0;i<nodeList.getLength();i++){
-								Node nNode1 = nodeList.item(i);
-								Element eElement1 = (Element) nNode1;
-								String location=eElement1.getAttribute("location");
-								String data=eElement1.getAttribute("type");
-								map.put(location, data);
-								//								for(int j=0;j<nNode1.getChildNodes().getLength();j++){
-								//									String location=((Element)nNode1.getChildNodes().item(j)).getAttribute("location");
-								//									String data=((Element)nNode1.getChildNodes().item(j)).getAttribute("data");
-								//									map.put(location, data);
-								//								}
+
+							System.out.println("Config found: "+configName);		
+
+							NodeList configChilds=nNode.getChildNodes();
+							for(int j=0;j<configChilds.getLength();j++){
+								if(configChilds.item(j).getNodeName().equalsIgnoreCase("required_data")){
+									System.out.println("Required-data node found");	
+									Element eElement1=(Element)configChilds.item(j);
+									String location=eElement1.getAttribute("location");
+									String data=eElement1.getAttribute("type");
+									map.put(location, data);
+									System.out.println("Required-data location and type: "+location+", "+data);										
+								}
+								else{
+									System.out.println("Node Name: "+configChilds.item(j).getNodeName());										
+								}
 							}
+//
+//							NodeList nodeList = doc.getElementsByTagName("required_data");
+//							for(int i=0;i<nodeList.getLength();i++){
+//								Node nNode1 = nodeList.item(i);
+//								Element eElement1 = (Element) nNode1;
+//								String location=eElement1.getAttribute("location");
+//								String data=eElement1.getAttribute("type");
+//								map.put(location, data);
+//							}
 						}
 					}
 				}

@@ -22,21 +22,25 @@ public class OneOffSensing extends AsyncTask<Void, Void, ArrayList<SensorData>>
 	{
 		this.SensorIds=SensorIds;
 		sensorManager = ESSensorManager.getSensorManager(context);
+		Log.d(TAG, "One-off sensing constructor, sensor ids: "+SensorIds);
 	}
 
 	@Override
 	protected ArrayList<SensorData> doInBackground(Void... params)
 	{
+		Log.d(TAG, "One-off sensing doInBackground, sensor ids: "+SensorIds);
 		try{		
 			for(int i=0;i<SensorIds.size();i++){
 				Log.d(TAG, "Sampling from Sensor");
 				if(SensorDataCollector.isRegistered(SensorIds.get(i))){
-					Log.i(TAG, "One-Off sensing process, found the latest data available for: "+SensorIds.get(i));
+					Log.e(TAG, "One-Off sensing process, found the latest data available for: "+SensorIds.get(i));
 					sensorData.add(SensorDataCollector.getData(SensorIds.get(i)));
 				}
 				else{
-					Log.i(TAG, "One-Off sensing process, latest data not available & sensing for: "+SensorIds.get(i));
-					sensorData.add(sensorManager.getDataFromSensor(SensorIds.get(i)));
+					Log.e(TAG, "One-Off sensing process, latest data not available & sensing for: "+SensorIds.get(i));
+					SensorData sd=sensorManager.getDataFromSensor(SensorIds.get(i));
+					sensorData.add(sd);
+					SensorDataCollector.addData(sd);
 				}
 			}
 		}
@@ -49,11 +53,6 @@ public class OneOffSensing extends AsyncTask<Void, Void, ArrayList<SensorData>>
 			Log.i(TAG, x.toString());
 		return(sensorData);
 	}
-
-//	protected void onPostExecute(ArrayList<SensorData> result) {
-//		// TODO Auto-generated method stub
-//		super.onPostExecute(result);
-//	}
 
 
 }

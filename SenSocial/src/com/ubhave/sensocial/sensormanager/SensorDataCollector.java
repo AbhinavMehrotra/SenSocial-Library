@@ -80,11 +80,11 @@ public class SensorDataCollector {
 				break;
 			}
 		}
-		long currentTime=System.currentTimeMillis();
-		if(data==null || currentTime - data.getTimestamp()>60000){ //data is sensed before last 60seconds
-			deleteData(sensorId);
-			return false;
-		}			
+//		long currentTime=System.currentTimeMillis();
+//		if(data==null || currentTime - data.getTimestamp()>60000){ //data is sensed before last 60seconds
+//			deleteData(sensorId);
+//			return false;
+//		}			
 		return true;		
 	}
 

@@ -13,8 +13,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.facebook.override;
-import com.sensocial.R;
 import com.ubhave.sensocial.configuration.FacebookConfiguration;
 import com.ubhave.sensocial.configuration.MQTTServerConfiguration;
 import com.ubhave.sensocial.configuration.ServerConfiguration;
@@ -116,7 +114,7 @@ public class MainActivity extends Activity implements SSListener{
 
 	public void onDataSensed(SocialEvent sensor_event) {
 
-		Log.e("SNnMB", "Received: "+ sensor_event.getFilteredSensorData().getRawData());
+		Log.e("SNnMB", "Received: "+ sensor_event.getFilteredSensorData().getClassifiedData());
 		Toast.makeText(getApplicationContext(), "Social Event: " +sensor_event.getFilteredSensorData().getStreamId(),Toast.LENGTH_LONG).show();
 
 	}
@@ -166,7 +164,6 @@ public class MainActivity extends Activity implements SSListener{
 	}
 
 
-		@override
 		protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 			super.onActivityResult(requestCode, resultCode, data);
 			if(data!=null){

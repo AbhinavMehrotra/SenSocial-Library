@@ -18,13 +18,10 @@ public class LocationTrackerService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		try {
-			SenSocialManager.getSenSocialManager(getApplicationContext(), true);
 			new TrackLocation(getApplicationContext()).startTracking();
-		} catch (ESException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (ServerException e) {
-			e.printStackTrace();
-		}
+		} 
 		return START_STICKY;
 	}
 

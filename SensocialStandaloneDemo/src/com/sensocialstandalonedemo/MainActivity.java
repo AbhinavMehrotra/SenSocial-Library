@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.sensocial.R;
 import com.ubhave.sensocial.data.SocialEvent;
 import com.ubhave.sensocial.filters.Condition;
 import com.ubhave.sensocial.filters.Filter;
@@ -45,7 +44,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		try{
-			sm=SenSocialManager.getSenSocialManager(getApplicationContext(), false);
+			sm=SenSocialManager.getSenSocialManager(getApplicationContext(), false, false);
 			SharedPreferences sp=getSharedPreferences("SSdemo", 0);
 			if(sp.getString("userid", "null").equals("null")){
 				userId=sm.setUserId("abhinav");
@@ -85,43 +84,43 @@ public class MainActivity extends Activity {
 			switch (item.getItemId()) 
 			{
 			case R.id.saccelerometer:
-				PrivacySettings.startSensing(getApplicationContext(), "accelerometer", "client", "raw");
-				Toast.makeText(getApplicationContext(), "Subscribed to accelerometer", Toast.LENGTH_LONG).show();
+				PrivacySettings.enableSensing(getApplicationContext(), "accelerometer", "client", "raw");
+				Toast.makeText(getApplicationContext(), "Enable accelerometer", Toast.LENGTH_LONG).show();
 				return true;
 			case R.id.unsaccelerometer:
-				PrivacySettings.stopSensing(getApplicationContext(), "accelerometer", "client");
+				PrivacySettings.disableSensing(getApplicationContext(), "accelerometer", "client");
 				Toast.makeText(getApplicationContext(), "Unsubscribed to accelerometer", Toast.LENGTH_LONG).show();
 				return true;
 			case R.id.sbluetooth:
-				PrivacySettings.startSensing(getApplicationContext(), "bluetooth", "client", "raw");
-				Toast.makeText(getApplicationContext(), "Subscribed to bluetooth", Toast.LENGTH_LONG).show();
+				PrivacySettings.enableSensing(getApplicationContext(), "bluetooth", "client", "raw");
+				Toast.makeText(getApplicationContext(), "Enable bluetooth", Toast.LENGTH_LONG).show();
 				return true;
 			case R.id.unsbluetooth:
-				PrivacySettings.stopSensing(getApplicationContext(), "bluetooth", "client");
+				PrivacySettings.disableSensing(getApplicationContext(), "bluetooth", "client");
 				Toast.makeText(getApplicationContext(), "Unsubscribed to bluetooth", Toast.LENGTH_LONG).show();
 				return true;
 			case R.id.smicrophone:
-				PrivacySettings.startSensing(getApplicationContext(), "microphone", "client", "raw");
-				Toast.makeText(getApplicationContext(), "Subscribed to microphone", Toast.LENGTH_LONG).show();
+				PrivacySettings.enableSensing(getApplicationContext(), "microphone", "client", "raw");
+				Toast.makeText(getApplicationContext(), "Enable microphone", Toast.LENGTH_LONG).show();
 				return true;
 			case R.id.unsmicrophone:
-				PrivacySettings.stopSensing(getApplicationContext(), "microphone", "client");
+				PrivacySettings.disableSensing(getApplicationContext(), "microphone", "client");
 				Toast.makeText(getApplicationContext(), "Unsubscribed to microphone", Toast.LENGTH_LONG).show();
 				return true;
 			case R.id.slocation:
-				PrivacySettings.startSensing(getApplicationContext(), "location", "client", "raw");
+				PrivacySettings.enableSensing(getApplicationContext(), "location", "client", "raw");
 				Toast.makeText(getApplicationContext(), "Subscribed to location", Toast.LENGTH_LONG).show();
 				return true;
 			case R.id.unslocation:
-				PrivacySettings.stopSensing(getApplicationContext(), "location", "client");
+				PrivacySettings.disableSensing(getApplicationContext(), "location", "client");
 				Toast.makeText(getApplicationContext(), "Unsubscribed to location", Toast.LENGTH_LONG).show();
 				return true;
 			case R.id.swifi:
-				PrivacySettings.startSensing(getApplicationContext(), "wifi", "client", "raw");
+				PrivacySettings.enableSensing(getApplicationContext(), "wifi", "client", "raw");
 				Toast.makeText(getApplicationContext(), "Subscribed to wifi", Toast.LENGTH_LONG).show();
 				return true;
 			case R.id.unswifi:
-				PrivacySettings.stopSensing(getApplicationContext(), "wifi", "client");
+				PrivacySettings.disableSensing(getApplicationContext(), "wifi", "client");
 				Toast.makeText(getApplicationContext(), "Unsubscribed to wifi", Toast.LENGTH_LONG).show();
 				return true;
 			}

@@ -23,7 +23,7 @@ public class ModalityType {
 	}
 	
 	public static String getSensorName(String modalityType){
-		String str="";
+		String str="null";
 		AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
 		if(modalityType.equalsIgnoreCase("physical_activity")) str=aps.getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER);
 		if(modalityType.equalsIgnoreCase("noise")) str=aps.getSensorNameById(AllPullSensors.SENSOR_TYPE_MICROPHONE);

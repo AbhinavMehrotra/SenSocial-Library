@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-
-    <classpathentry
-        kind="src"
-        path="src" />
-
-    <classpathentry
-        kind="src"
-        path="gen" />
-
-    <classpathentry
-        kind="con"
-        path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK" />
-
-    <classpathentry
-        kind="con"
-        path="com.android.ide.eclipse.adt.LIBRARIES" />
-
-    <classpathentry
-        kind="output"
-        path="bin/classes" />
-
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry exported="true" kind="lib" path="D:/workplace/JARs/sensocial.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Abhinav/Desktop/android/adt-bundle-windows-x86_64-20130522/sdk/platforms/android-16/android.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://developer.android.com/reference/"/>
+		</attributes>
+		<accessrules>
+			<accessrule kind="nonaccessible" pattern="com/android/internal/**"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry exported="true" kind="lib" path="D:/workplace/JARs/twitter4j-core-3.0.3.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

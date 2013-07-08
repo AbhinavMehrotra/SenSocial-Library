@@ -14,8 +14,10 @@ import android.util.Log;
 
 import com.ubhave.sensocial.filters.Condition;
 import com.ubhave.sensocial.filters.ConfigurationHandler;
+import com.ubhave.sensocial.filters.ModalValue;
 import com.ubhave.sensocial.filters.Modality;
 import com.ubhave.sensocial.filters.ModalityType;
+import com.ubhave.sensocial.filters.Operator;
 import com.ubhave.sensormanager.ESException;
 
 public class SensorClassifier {
@@ -33,13 +35,15 @@ public class SensorClassifier {
 	@SuppressLint("NewApi")
 	public static void run(Context context, Map<String, Set<String>> filterConfigs) {
 		System.out.println("Sensor classifier: run");
+		System.out.println("Map recieved: "+filterConfigs);
 		Map<String, Set<String>> osnConfigs =new HashMap<String, Set<String>>();
 		Map<String, Set<String>> streamConfigs =new HashMap<String, Set<String>>();
 		Set<String> blankSet=new HashSet<String>();
 		//Classify new configurations as OSN & Stream
 		for(Map.Entry<String, Set<String>> c: filterConfigs.entrySet()){
-			if(c.getValue().contains(ModalityType.facebook_activity) ||
-					c.getValue().contains(ModalityType.twitter_activity)){
+			//			if(c.getValue().contains(ModalityType.facebook_activity+Operator.equal_to+ModalValue.active) ||
+			//					c.getValue().contains(ModalityType.facebook_activity+Operator.equal_to+ModalValue.active)){
+			if(isOSNConfig(c.getValue())){
 				System.out.println("OSN config: "+c.getKey());
 				osnConfigs.put(c.getKey(), c.getValue());
 			}
@@ -83,50 +87,88 @@ public class SensorClassifier {
 		}
 	}
 
+	private static Boolean isOSNConfig(Set<String> conditions){
+		Boolean flag=false;
+		for(String s:conditions){
+			if(s.startsWith(ModalityType.facebook_activity) || s.startsWith(ModalityType.twitter_activity)){
+				flag=true;
+				break;
+			}
+		}
+		return flag;
+	}
 	//This method adds new elements to the OSN configuration and OSN sensor set
 	private static void addOSNConfig(Context context, Map<String, Set<String>> osnConfigs){
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		Editor ed=sp.edit();
 		Set<String> config=new HashSet<String>();
+		Set<String> temp_config=new HashSet<String>();
 		Set<String> sensor=new HashSet<String>();
-		Set<String> blankSet=new HashSet<String>();
-		config=sp.getStringSet("OSNConfigurationSet", blankSet);
-		sensor=sp.getStringSet("OSNSensorSet", blankSet);
+		Set<String> blankSet1=new HashSet<String>();
+		Set<String> blankSet2=new HashSet<String>();
+		config=sp.getStringSet("OSNConfigurationSet", blankSet1);
+		for(String c:config)
+			temp_config.add(c);
+		sensor=sp.getStringSet("OSNSensorSet", blankSet2);
 		for(Map.Entry<String, Set<String>> c: osnConfigs.entrySet()){
-			if(!config.contains(c.getKey())){
+			if(!temp_config.contains(c.getKey())){
 				//new element found
+				config.add(c.getKey());
 				for(String s:c.getValue()){
+					if(!s.startsWith(ModalityType.facebook_activity) && !s.startsWith(ModalityType.twitter_activity)){
 					Condition newC=new Condition(s);
 					sensor.add(ModalityType.getSensorName(newC.getModalityType()));
+					}
 				}
+				sensor.add(ConfigurationHandler.getRequiredData(c.getKey()));
 			}
 		}
+		Log.e("SNnMB","Setting OSN Sensor Set:"+ sensor);
+		System.out.println("remove stream config");
 		ed.putStringSet("OSNSensorSet", sensor);
 		ed.putStringSet("OSNConfigurationSet", config);
 		ed.commit();
+		Log.e("SNnMB","OSN Sensor Set:"+ sp.getStringSet("OSNSensorSet", null));
+		Log.e("SNnMB","OSN Config Set:"+ sp.getStringSet("OSNConfigurationSet", null));
 	}
 
 	//This method removes unused elements to the OSN configuration and OSN sensor set
 	private static void removeOSNConfig(Context context, Map<String, Set<String>> osnConfigs){
+		Log.e("SNnMB", "Map osn configs: "+osnConfigs);
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		Editor ed=sp.edit();
 		Set<String> config=new HashSet<String>();
 		Set<String> sensor=new HashSet<String>();
 		Set<String> blankSet=new HashSet<String>();
 		config=sp.getStringSet("OSNConfigurationSet", blankSet);
-		sensor=sp.getStringSet("OSNSensorSet", blankSet);
-		for(String c:config){
+		Set<String> temp_config=new HashSet<String>();
+		for(String t:config){
+			temp_config.add(t);
+		}
+		Log.e("SNnMB", "Current OSN configs: "+config);
+		//sensor=sp.getStringSet("OSNSensorSet", blankSet);
+		for(String c:temp_config){
 			if(!osnConfigs.containsKey(c)){
 				//removed element found
+				Log.e("SNnMB", "CONFIG TO BE REMOVED FOUND: "+c);
 				config.remove(c);
 			}
 		}
-		for(Map.Entry<String, Set<String>> e:osnConfigs.entrySet()){
-			for(String s:e.getValue()){
-				Condition newC=new Condition(s);
-				sensor.add(ModalityType.getSensorName(newC.getModalityType()));				
+		
+		for(Map.Entry<String, Set<String>> c: osnConfigs.entrySet()){
+			if(!config.contains(c.getKey())){
+				//new element found
+				for(String s:c.getValue()){
+					if(!s.startsWith(ModalityType.facebook_activity) && !s.startsWith(ModalityType.twitter_activity)){
+					Condition newC=new Condition(s);
+					sensor.add(ModalityType.getSensorName(newC.getModalityType()));
+					}
+				}
+				sensor.add(ConfigurationHandler.getRequiredData(c.getKey()));
 			}
 		}
+		Log.e("SNnMB","Setting OSN Sensor Set:"+ sensor);
+		
 		ed.putStringSet("OSNSensorSet", sensor);
 		ed.putStringSet("OSNConfigurationSet", config);
 		ed.commit();
@@ -147,7 +189,7 @@ public class SensorClassifier {
 			sensorNew.add(s);
 		System.out.println("Sensor: "+sensor);
 		System.out.println("Sensor New: "+sensorNew);
-		
+
 		for(Map.Entry<String, Set<String>> c: streamConfigs.entrySet()){
 			System.out.println("Map: "+c);
 			if(config==null || !config.contains(c.getKey())){
@@ -233,23 +275,38 @@ public class SensorClassifier {
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		Editor ed=sp.edit();
 		Set<String> config=new HashSet<String>();
+		Set<String> temp_config=new HashSet<String>();
 		Set<String> sensor=new HashSet<String>();
 		Set<String> blankSet=new HashSet<String>();
 		config=sp.getStringSet("StreamConfigurationSet", blankSet);
+		for(String t:config)
+			temp_config.add(t);
+
 		sensor=sp.getStringSet("StreamSensorSet", blankSet);
-		for(String c:config){
+		Log.i("SNnMB", "Configs: "+temp_config);
+		for(String c:temp_config){
+			Log.i("SNnMB", "Checking config: "+c);
 			if(!streamConfigs.containsKey(c)){
-				//removed element found
-				Log.i("SNnMB", "CONFIG TO BE REMOVED FOUND"+c);
+				//removed config found
+				Log.e("SNnMB", "CONFIG TO BE REMOVED FOUND: "+c);
 				config.remove(c);
 			}
 		}
+		Log.i("SNnMB", "Finally, Remaining configs: "+config);
 		Set<String> sensorNew=new HashSet<String>();
 		for(Map.Entry<String, Set<String>> e: streamConfigs.entrySet()){
 			for(String s:e.getValue()){
-				Condition newC=new Condition(s);
-				sensor.add(ModalityType.getSensorName(newC.getModalityType()));
-				//sensorNew.add(Modality.valueOf(s).getSensorName());
+				if(s.equalsIgnoreCase("null")){
+					sensorNew.add(ConfigurationHandler.getRequiredData(e.getKey()));
+					System.out.println("Sensor name (for ALL): " + ConfigurationHandler.getRequiredData(e.getKey()));
+					System.out.println("Set- Sensor: "+sensorNew);
+				}
+				else{
+					Condition newC=new Condition(s);
+					System.out.println("ModalityType is: "+newC.getModalityType());					
+					sensorNew.add(ModalityType.getSensorName(newC.getModalityType()));
+					System.out.println("Sensor name: "+ModalityType.getSensorName(newC.getModalityType()));
+				}
 			}
 		}
 		Log.i("SNnMB", "New sensors: "+sensorNew);

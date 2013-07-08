@@ -13,6 +13,7 @@ import android.util.Log;
 import com.ubhave.dataformatter.DataFormatter;
 import com.ubhave.dataformatter.json.JSONFormatter;
 import com.ubhave.sensocial.manager.Location;
+import com.ubhave.sensocial.manager.SenSocialManager;
 import com.ubhave.sensocial.sensormanager.AllPullSensors;
 import com.ubhave.sensormanager.data.SensorData;
 
@@ -31,8 +32,9 @@ public class DummyClassifier {
 
 	private static String classifyData(SensorData data){
 		String result = "";
-		JSONFormatter formatter = DataFormatter.getJSONFormatter(data.getSensorType());
-		String str=formatter.toJSON(data).toJSONString();
+		JSONFormatter formatter = DataFormatter.getJSONFormatter(SenSocialManager.getContext(), data.getSensorType());
+		String str=formatter.toJSON(data).toString();
+		Log.i("SNnMB", "Data(string) to be classified: "+str);
 		if(data.getSensorType()==AllPullSensors.SENSOR_TYPE_ACCELEROMETER)
 			result=classifyAccelerometer(str);
 		if(data.getSensorType()==AllPullSensors.SENSOR_TYPE_MICROPHONE)
@@ -41,7 +43,8 @@ public class DummyClassifier {
 	}
 
 	public static Boolean isSatisfied(ArrayList<SensorData> data,String sensorName, String operator,String value){
-		
+		if(sensorName.equalsIgnoreCase("null"))
+			return true;
 		return classifyWithModality(data, sensorName, operator, value);
 	}
 
@@ -92,8 +95,8 @@ public class DummyClassifier {
 				str=str.substring(str.indexOf("_")+1);
 				str=str.substring(str.indexOf("_")+1);			
 				String range=str;				
-				JSONFormatter formatter = DataFormatter.getJSONFormatter(loc.getSensorType());
-				String currentLoc=formatter.toJSON(loc).toJSONString();
+				JSONFormatter formatter = DataFormatter.getJSONFormatter(SenSocialManager.getContext(), loc.getSensorType());
+				String currentLoc=formatter.toJSON(loc).toString();
 				System.out.print("Sensed location string:"+currentLoc);
 				JSONObject obj=new JSONObject(currentLoc);			
 				Location l1=new Location(Double.parseDouble(lat),Double.parseDouble(lon));
@@ -128,14 +131,26 @@ public class DummyClassifier {
 		int count=0;
 		try {
 			JSONObject obj=new JSONObject(str);
-			temp=obj.getString("amplitude");
-
-			String[] tempAr=temp.split(",");
-			for(int i=0;i<tempAr.length;i++){
-				ar.add(Double.parseDouble(tempAr[i]));
-				mean+=Double.parseDouble(tempAr[i]);
+//			temp=obj.getString("amplitude");
+//			Log.e("SNnMB", "1 Microphone Amplitude: "+ temp);
+//			temp.replace('[', '0');
+//			temp.replace(']', '0');
+//			Log.e("SNnMB", "2 Microphone Amplitude: "+ temp);
+//			String[] tempAr=temp.split(",");
+			
+//			for(int i=0;i<tempAr.length;i++){
+//				ar.add(Double.parseDouble(tempAr[i]));
+//				mean+=Double.parseDouble(tempAr[i]);
+//			}
+//			mean=mean/tempAr.length;
+			
+			JSONArray tempAr=obj.getJSONArray("amplitude");
+			Log.e("SNnMB", "Microphone Amplitude: "+ tempAr);
+			for(int i=0;i<tempAr.length();i++){
+				ar.add(Double.parseDouble(tempAr.getString(i)));
+				mean+=Double.parseDouble(tempAr.getString(i));
 			}
-			mean=mean/tempAr.length;
+			mean=mean/tempAr.length();
 			if(mean > MEAN+1000){
 				System.out.println("Talking");
 				return "talking";
@@ -260,8 +275,8 @@ public class DummyClassifier {
 	//bluetoothmac
 	private static Boolean isBluetoothPresent(SensorData data, String mac) { 
 		try{
-		JSONFormatter formatter = DataFormatter.getJSONFormatter(data.getSensorType());
-		String json_string=formatter.toJSON(data).toJSONString();
+		JSONFormatter formatter = DataFormatter.getJSONFormatter(SenSocialManager.getContext(), data.getSensorType());
+		String json_string=formatter.toJSON(data).toString();
 		JSONObject obj=new JSONObject(json_string);
 		JSONArray devices= obj.getJSONArray("devices");
 		Set<String> macs=new HashSet<String>();

@@ -1,0 +1,23 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+
+     <item
+        android:id="@+id/saccelerometer"
+        android:title="Enable accelerometer sensor"/>
+    <item
+        android:id="@+id/unsaccelerometer"
+        android:title="Disable accelerometer sensor"/>
+    <item
+        android:id="@+id/smicrophone"
+        android:title="Enable microphone sensor"/>
+    <item
+        android:id="@+id/unsmicrophone"
+        android:title="Disable microphone sensor"/>
+    <item
+        android:id="@+id/slocation"
+        android:title="Enable location sensor"/>
+    <item
+        android:id="@+id/unslocation"
+        android:title="Disable location sensor"/>        
+
+</menu>

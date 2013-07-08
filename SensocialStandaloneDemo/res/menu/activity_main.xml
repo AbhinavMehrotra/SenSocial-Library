@@ -3,34 +3,34 @@
 
      <item
         android:id="@+id/saccelerometer"
-        android:title="Subscribe to accelerometer"/>
+        android:title="Enable accelerometer sensor"/>
     <item
         android:id="@+id/unsaccelerometer"
-        android:title="Unsubscribe to accelerometer"/>
+        android:title="Disable accelerometer sensor"/>
     <item
         android:id="@+id/smicrophone"
-        android:title="Subscribe to microphone"/>
+        android:title="Enable microphone sensor"/>
     <item
         android:id="@+id/unsmicrophone"
-        android:title="Unsubscribe to microphone"/>
+        android:title="Disable microphone sensor"/>
     <item
         android:id="@+id/sbluetooth"
-        android:title="Subscribe to bluetooth"/>
+        android:title="Enable bluetooth sensor"/>
     <item
         android:id="@+id/unsbluetooth"
-        android:title="Unsubscribe to bluetooth"/>
+        android:title="Disable bluetooth sensor"/>
     <item
         android:id="@+id/slocation"
-        android:title="Subscribe to location"/>
+        android:title="Enable location sensor"/>
     <item
         android:id="@+id/unslocation"
-        android:title="Unsubscribe to location"/>
+        android:title="Disable location sensor"/>
     <item
         android:id="@+id/swifi"
-        android:title="Subscribe to wifi"/>
+        android:title="Enable wifi sensor"/>
     <item
         android:id="@+id/unswifi"
-        android:title="Unsubscribe to wifi"/>
+        android:title="Disable wifi sensor"/>
         
     
 </menu>
