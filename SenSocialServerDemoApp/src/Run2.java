@@ -47,7 +47,7 @@ public class Run2 {
 					sm.registerListener(l, s.getStreamId());
 					s.startStream();
 					
-				} catch (PPDException | SensorDataTypeException | XMLFileException e1) {
+				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
         	}

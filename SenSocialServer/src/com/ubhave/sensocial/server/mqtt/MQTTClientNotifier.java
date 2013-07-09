@@ -24,7 +24,7 @@ public class MQTTClientNotifier {
 				MQTTManager mqtt = new MQTTManager(d.getDeviceId());
 				mqtt.connect();
 				mqtt.publishToDevice(MQTTNotifitions.facebook_update.getMessage()+":"+ obj.toString());
-			} catch (MqttException | JSONException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}			

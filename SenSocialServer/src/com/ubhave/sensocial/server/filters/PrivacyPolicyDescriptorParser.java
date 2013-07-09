@@ -32,7 +32,7 @@ public class PrivacyPolicyDescriptorParser {
 		Map<String,String> ppd= new HashMap<String, String>();
 		try {
 			ppd=parseXML(deviceId);
-		} catch (ParserConfigurationException | SAXException | IOException e) {
+		} catch (Exception e) {
 			System.out.println("PPD parser error. "+e.toString());
 		}
 		for (Map.Entry<String, String> stream : sensorNameAndType.entrySet()) {

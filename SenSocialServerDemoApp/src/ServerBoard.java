@@ -26,6 +26,7 @@ import com.ubhave.sensocial.server.manager.SensorListener;
 import com.ubhave.sensocial.server.manager.Sensors;
 import com.ubhave.sensocial.server.manager.Stream;
 import com.ubhave.sensocial.server.manager.User;
+import com.ubhave.sensormanager.data.SensorData;
  
  
 public class ServerBoard extends JFrame {
@@ -78,7 +79,7 @@ public class ServerBoard extends JFrame {
         							System.out.println("Social Event received");
         							System.out.println("Stream id: "+socialEvent.getFilteredSensorData().getStreamId());
         							System.out.println("Raw data: "+socialEvent.getFilteredSensorData().getRawData());
-        							com.ubhave.sensormanager.data.SensorData d=socialEvent.getFilteredSensorData().getRawData();
+        							SensorData d=socialEvent.getFilteredSensorData().getRawData();
         							
         							
         						}
@@ -87,7 +88,7 @@ public class ServerBoard extends JFrame {
         					sm.registerListener(l, "1ef2152a-b0b5-4816-aae3-3790f77e4c38");
         					s.startStream();
         					
-        				} catch (PPDException | SensorDataTypeException | XMLFileException e1) {
+        				} catch (Exception e1) {
         					e1.printStackTrace();
         				}
                 	}
