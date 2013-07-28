@@ -4,6 +4,9 @@ import java.util.Set;
 
 import android.content.Context;
 
+/**
+ * User class allows accessing 
+ */
 public class User {
 
 	private String name;
@@ -13,7 +16,16 @@ public class User {
 	private Set<String> fbFriends;
 	private Set<String> twFollowers;
 	
-	public User(Context context, String name, String fbName, String twName, 
+	/**
+	 * Constructor
+	 * @param Context Application context
+	 * @param String user-name 
+	 * @param String facebook name
+	 * @param String twitter name
+	 * @param String facebook friends
+	 * @param String twitter followers
+	 */
+	protected User(Context context, String name, String fbName, String twName, 
 			Set<String> fbFriends, Set<String> twFollowers){
 		this.name=name;
 		this.fbName=fbName;
@@ -24,8 +36,11 @@ public class User {
 	}
 
 	
-	
-
+	/**
+	 * Getter for userName
+	 * It returns null if user is not logged-in to any OSN.
+	 * @return String userName
+	 */
 	public String getUserName() {
 		return name;
 	}
@@ -33,7 +48,7 @@ public class User {
 
 
 	/**
-	 * Method to retrieve Facebook username, after successful login.
+	 * Getter for Facebook userName
 	 * It returns null if user is not logged-in.
 	 * @return String Facebook userName
 	 */
@@ -44,7 +59,7 @@ public class User {
 
 
 	/**
-	 * Method to retrieve Twitter username, after successful login.
+	 * Getter for Twitter userName
 	 * It returns null if user is not logged-in.
 	 * @return String Twitter userName
 	 */
@@ -52,24 +67,12 @@ public class User {
 		return twName;
 	}
 
-
-
-
+	/**
+	 * Getter for MyDevice
+	 * @return MyDevice object
+	 */
 	public MyDevice getMyDevice() {
 		return device;
-	}
-
-
-
-
-	public Set<String> getFacebookFriends() {
-		return fbFriends;
-	}
-
-	
-	
-	public Set<String> getTwitterFollowers() {
-		return twFollowers;
 	}
 	
 }

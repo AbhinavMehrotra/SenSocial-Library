@@ -8,6 +8,10 @@ import com.ubhave.sensocial.exceptions.ServerException;
 import com.ubhave.sensocial.manager.SenSocialManager;
 import com.ubhave.sensormanager.ESException;
 
+/**
+ * LocationTrackerService class is service which runs in the background to track the 
+ * user's location and send it to the server.
+ */
 public class LocationTrackerService extends Service {
 
 	public IBinder onBind(Intent arg0) {

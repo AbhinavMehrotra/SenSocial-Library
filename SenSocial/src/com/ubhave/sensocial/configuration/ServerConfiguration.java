@@ -13,6 +13,7 @@ public class ServerConfiguration {
 	private Context context;
 	private String brokerUrl;
 
+	
 	/**
 	 * Constructor for ServerConfiguration.
 	 * @param context Application Context
@@ -26,16 +27,27 @@ public class ServerConfiguration {
 		ed.commit();
 	}
 	
+	
+	/**
+	 * Sets MQTT broker URL
+	 * @param urlWithPort
+	 */
 	public void setMQTTBrokerURL(String urlWithPort){
 		Editor ed=sp.edit();
 		ed.putString("mqqt_broker_url", urlWithPort);
 		ed.commit();
 	}
 	
+	
+	/**
+	 * Gets MQTT broker URL
+	 * @return
+	 */
 	public String getMQTTBrokerURL(){
 		return sp.getString("mqqt_broker_url", "");
 	}
 
+	
 	/**
 	 * Method to set the server address. <br/>
 	 * This URL should be the path of the server where all the PHP scripts are hosted. <br/>
@@ -48,40 +60,61 @@ public class ServerConfiguration {
 			throw new ServerException(url+" is not a valid URL. \nURL should contain / at the end, eg- https//:cs.bham.ac.uk/sensocial/");
 		}
 		else{
+			Log.i(TAG, "Server url: "+ url);
 			Editor ed=sp.edit();
 			ed.putString("serverurl", url);
 			ed.commit();
 		}
 	}
 
+	
 	/**
-	 * Method to get the server address where the project is hosted.
+	 * Gets the server address where the project is hosted.
 	 * @return String
 	 */
 	public String getServerProjectURL(){
 		return sp.getString("serverurl", "");
 	}
 	
-	public void setServerIP(String ip){
-			Editor ed=sp.edit();
-			ed.putString("serverip", ip);
-			ed.commit();
+	/**
+	 * Setter
+	 * @param serverIP
+	 */
+	public void setServerIP(String serverIP){
+		Log.i(TAG, "ServerIP: "+ serverIP);
+		Editor ed=sp.edit();
+		ed.putString("serverip", serverIP);
+		ed.commit();
 	}
-
+	/**
+	 * Gets MQTT broker URL
+	 * @return
+	 */
 	public String getServerIP(){
 		return sp.getString("serverip", "");
 	}
 	
+	
+	/**
+	 * Sets server port
+	 * @param port
+	 */
 	public void setServerPort(int port){
+		Log.i(TAG, "Server port: "+ port);
 			Editor ed=sp.edit();
 			ed.putInt("serverport", port);
 			ed.commit();
 	}
 
 	
+	/**
+	 * Gets server port
+	 * @return
+	 */
 	public int getServerPort(){
 		return sp.getInt("serverport", 0);
 	}
+	
 	
 	/**
 	 * Method to set the interval to check for trigger. <br/>
@@ -89,7 +122,7 @@ public class ServerConfiguration {
 	 * @param secondss Seconds
 	 */
 	public void setRefreshInterval(int seconds){
-//		sp=context.getSharedPreferences("SSDATA",0);
+		Log.i(TAG, "RefreshInterval: "+ seconds);
 		Editor ed=sp.edit();
 		ed.putInt("refreshinterval", seconds*1000);
 		ed.commit();

@@ -28,7 +28,9 @@ import com.facebook.android.FacebookError;
 import com.facebook.android.Util;
 import com.ubhave.sensocial.tcp.ClientServerCommunicator;
 
-
+/**
+ * Provides the methods to authenticate user with their Facebook account.
+ */
 @SuppressWarnings({ "deprecation", "unused" })
 public class AuthenticateFacebook {
 
@@ -129,6 +131,15 @@ public class AuthenticateFacebook {
 					ClientServerCommunicator.registerFacebook(context, sp.getString("name", "null"), 
 							sp.getString("userid", "null"),	sp.getString("fbusername", "null"),  sp.getString("fbtoken", "null"));					
 				}
+				else if(sp.getString("userid", "null").equals("null")){
+					String user_id=  generateUserId(sp.getString("fbusername", "null"));
+					Editor ed=sp.edit();
+					ed.putString("userid", user_id);
+					ed.commit();
+					ClientServerCommunicator.registerUser(context,user_id, sp.getString("deviceid", "null"), sp.getString("bluetoothmac", "null"));
+					ClientServerCommunicator.registerFacebook(context, sp.getString("name", "null"), 
+							user_id, sp.getString("fbusername", "null"),  sp.getString("fbtoken", "null"));					
+				}
 			} catch (NullPointerException e) {
 		    	Log.e(TAG, "NullPointerException Error:"+e.toString());
             }catch (FacebookError e) {
@@ -142,6 +153,11 @@ public class AuthenticateFacebook {
 			}
 			return null; 	
 
+		}
+		
+		private String generateUserId(String id){
+			id="ssuid"+ id.trim();
+			return id;
 		}
 		
 	}

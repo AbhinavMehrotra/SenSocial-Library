@@ -1,7 +1,7 @@
 package com.ubhave.sensocial.filters;
 
 import com.ubhave.sensocial.manager.SenSocialManager;
-import com.ubhave.sensocial.sensormanager.AllPullSensors;
+import com.ubhave.sensocial.sensormanager.SensorUtils;
 
 public class ModalityType {
 	public final static String null_condition="null";
@@ -15,20 +15,20 @@ public class ModalityType {
 
 	public static int getSensorId(String modalityType){
 		int id=0;
-		if(modalityType.equalsIgnoreCase("physical_activity")) id=AllPullSensors.SENSOR_TYPE_ACCELEROMETER;
-		if(modalityType.equalsIgnoreCase("noise")) id= AllPullSensors.SENSOR_TYPE_MICROPHONE;
-		if(modalityType.equalsIgnoreCase("location")) id= AllPullSensors.SENSOR_TYPE_LOCATION;
-		if(modalityType.equalsIgnoreCase("neighnour")) id= AllPullSensors.SENSOR_TYPE_BLUETOOTH;
+		if(modalityType.equalsIgnoreCase("physical_activity")) id=SensorUtils.SENSOR_TYPE_ACCELEROMETER;
+		if(modalityType.equalsIgnoreCase("noise")) id= SensorUtils.SENSOR_TYPE_MICROPHONE;
+		if(modalityType.equalsIgnoreCase("location")) id= SensorUtils.SENSOR_TYPE_LOCATION;
+		if(modalityType.equalsIgnoreCase("neighnour")) id= SensorUtils.SENSOR_TYPE_BLUETOOTH;
 		return id;
 	}
 	
 	public static String getSensorName(String modalityType){
 		String str="null";
-		AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
-		if(modalityType.equalsIgnoreCase("physical_activity")) str=aps.getSensorNameById(AllPullSensors.SENSOR_TYPE_ACCELEROMETER);
-		if(modalityType.equalsIgnoreCase("noise")) str=aps.getSensorNameById(AllPullSensors.SENSOR_TYPE_MICROPHONE);
-		if(modalityType.equalsIgnoreCase("location")) str=aps.getSensorNameById(AllPullSensors.SENSOR_TYPE_LOCATION);
-		if(modalityType.equalsIgnoreCase("neighbour")) str=aps.getSensorNameById(AllPullSensors.SENSOR_TYPE_BLUETOOTH);
+		SensorUtils aps=new SensorUtils(SenSocialManager.getContext());
+		if(modalityType.equalsIgnoreCase("physical_activity")) str=aps.getSensorNameById(SensorUtils.SENSOR_TYPE_ACCELEROMETER);
+		if(modalityType.equalsIgnoreCase("noise")) str=aps.getSensorNameById(SensorUtils.SENSOR_TYPE_MICROPHONE);
+		if(modalityType.equalsIgnoreCase("location")) str=aps.getSensorNameById(SensorUtils.SENSOR_TYPE_LOCATION);
+		if(modalityType.equalsIgnoreCase("neighbour")) str=aps.getSensorNameById(SensorUtils.SENSOR_TYPE_BLUETOOTH);
 		return str;
 	}
 

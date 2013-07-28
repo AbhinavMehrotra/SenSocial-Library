@@ -7,6 +7,9 @@ import java.util.Set;
 
 import com.ubhave.sensocial.server.data.SocialEvent;
 
+/**
+ * FrequencyFilterRegistrar class is used to register the frequency based streams
+ */
 public class FrequencyFilterRegistrar {
 	
 	private static Map<String, String> freqFilter = new HashMap<String, String>();

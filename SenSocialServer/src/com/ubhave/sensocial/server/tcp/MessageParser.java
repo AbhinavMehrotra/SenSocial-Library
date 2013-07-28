@@ -6,7 +6,15 @@ import org.json.JSONObject;
 import com.ubhave.sensocial.server.database.UserRegistrar;
 import com.ubhave.sensocial.server.osn.FacebookEventNotifier;
 
+/**
+ * Messagge parser for message received from the clients via TCP socket
+ */
 public class MessageParser {
+	
+	/**
+	 * Parses the message received via TCP socket and takes actions to handle it
+	 * @param message
+	 */
 	protected static void run(String message){
 		try {
 			JSONObject obj= new JSONObject(message);

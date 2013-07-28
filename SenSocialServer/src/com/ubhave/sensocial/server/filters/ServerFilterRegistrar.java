@@ -23,6 +23,11 @@ public class ServerFilterRegistrar {
 		filterRecord.remove(streamId);
 	}
 	
+	/**
+	 * Returns if the aggregated stream is present in the ServerFilterRegistrar.
+	 * @param aggrStreamId (String) STream id of the aggregated stream
+	 * @return Boolean
+	 */
 	public static Boolean isPresent(String aggrStreamId){
 		Boolean flag =false;
 		for (Map.Entry<String, String> entry: filterRecord.entrySet()) {
@@ -34,6 +39,11 @@ public class ServerFilterRegistrar {
 		return flag;
 	}
 	
+	/**
+	 * Returns the real stream id of the given aggregated stream id 
+	 * @param aggrStreamId (String) Aggregated stream id
+	 * @return (String) Stream  id
+	 */
 	public static String getStreamId(String aggrStreamId){
 		String id=null;
 		for (Map.Entry<String, String> entry: filterRecord.entrySet()) {

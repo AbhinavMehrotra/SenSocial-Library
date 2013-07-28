@@ -2,8 +2,6 @@ package com.ubhave.sensocial.privacy;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,6 +11,13 @@ import android.util.Log;
 
 public class PPDParser {
 
+	/**
+	 * Returns whether the sensor is allowed for the location and with given granularity.
+	 * @param ppdSensorName
+	 * @param ppdLocation
+	 * @param ppdDataType
+	 * @return
+	 */
 	public static Boolean isAllowed(String ppdSensorName, String ppdLocation, String ppdDataType){
 		try{
 			Boolean flag=false;
@@ -61,6 +66,10 @@ public class PPDParser {
 		}
 	}
 	
+	/**
+	 * Returns PPD in JSON string format
+	 * @return
+	 */
 	public static String getPPDJSONString(){
 		try{
 			File file=new File(Environment.getExternalStorageDirectory(), "ppd.txt");

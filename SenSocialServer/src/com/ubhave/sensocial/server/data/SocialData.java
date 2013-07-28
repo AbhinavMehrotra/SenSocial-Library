@@ -1,12 +1,35 @@
 package com.ubhave.sensocial.server.data;
 
 public class SocialData {
+	
+	protected SocialData(){}
 
 	private String OSNFeed;
 	
 	private String OSNName;
 
 	private String feedType;
+	
+	private String time;
+	
+	private String userName;
+	
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
+	}
 
 	/**
 	 * @return the oSNFeed

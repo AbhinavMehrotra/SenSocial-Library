@@ -12,11 +12,12 @@ import com.ubhave.sensocial.filters.Condition;
 import com.ubhave.sensocial.filters.ConfigurationHandler;
 import com.ubhave.sensocial.filters.Filter;
 import com.ubhave.sensocial.filters.FilterSettings;
-import com.ubhave.sensocial.filters.Modality;
 import com.ubhave.sensocial.filters.ModalityType;
-import com.ubhave.sensocial.sensormanager.AllPullSensors;
+import com.ubhave.sensocial.sensormanager.SensorUtils;
 
-
+/**
+ * Stream class can be used to instantiate the stream of sensor data on device
+ */
 public class Stream {
 
 	private int sensorId;
@@ -26,6 +27,14 @@ public class Stream {
 	private Filter filter;
 	private final String TAG = "SNnMB";
 
+	/**
+	 * Constructor
+	 * @param StringsensorId
+	 * @param String dataType
+	 * @param Context Appplication context
+	 * @throws PPDException
+	 * @throws SensorDataTypeException
+	 */
 	protected Stream(int sensorId, String dataType, Context context) throws PPDException,SensorDataTypeException{
 		this.sensorId=sensorId;
 		this.dataType=dataType;
@@ -50,8 +59,8 @@ public class Stream {
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * Sets filter on stream and returns new stream with the filter
+	 * @return Stream object
 	 * @throws PPDException If there exists any activity of which the associated sensor 
 	 * (or SensorData from this sensor on client) is not declared in PPD.
 	 */
@@ -70,22 +79,41 @@ public class Stream {
 	}
 
 
+	/**
+	 * Getter for sensor-id
+	 * @return String sensor-id
+	 */
 	public int getSensorId() {
 		return sensorId;
 	}
-	
+
+	/**
+	 * Getter for stream-id
+	 * @return String stream-id
+	 */
 	public String getStreamId() {
 		return streamId;
 	}
 
+	/**
+	 * Getter for stream's required data type
+	 * @return String data-type
+	 */
 	public String getDataType() {
 		return dataType;
 	}
 
+	/**
+	 * Getter for filter
+	 * @return Filter object
+	 */
 	public Filter getFilter(){
 		return (this.filter);
 	}
 
+	/**
+	 * Starts the stream
+	 */
 	public void startStream(){
 		Log.e(TAG, "Start stream: "+ getStreamId());
 		if(this.getFilter()==null){
@@ -94,7 +122,7 @@ public class Stream {
 			conditions.add(new Condition(ModalityType.null_condition, "", ""));
 			
 			GenerateFilter.createXML(context,conditions, this.getStreamId(), 
-					new AllPullSensors(context).getSensorNameById(this.sensorId), dataType);
+					new SensorUtils(context).getSensorNameById(this.sensorId), dataType);
 			
 		}
 		else{
@@ -112,7 +140,7 @@ public class Stream {
 
 
 			GenerateFilter.createXML(context, conditions, getStreamId(), 
-					new AllPullSensors(context).getSensorNameById(this.sensorId), dataType);
+					new SensorUtils(context).getSensorNameById(this.sensorId), dataType);
 			
 		}
 		
@@ -120,13 +148,18 @@ public class Stream {
 		ConfigurationHandler.run(context);	
 	}
 
-
+	/**
+	 * Pauses the stream
+	 */
 	public void pauseStream(){
 		Log.e(TAG, "Pause stream: "+ getStreamId());
 		FilterSettings.stopConfiguration(this.getStreamId()); 
 		ConfigurationHandler.run(context);	
 	}
 
+	/**
+	 * Unpauses the stream
+	 */
 	public void unpauseStream(){
 		Log.e(TAG, "Unpause stream: "+ getStreamId());
 		FilterSettings.startConfiguration(this.getStreamId());

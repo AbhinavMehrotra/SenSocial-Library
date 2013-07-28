@@ -15,12 +15,24 @@ public class StreamCollection {
 	static int sensorId; 
 	static String dataType;
 
-
+	/**
+	 * Constructor
+	 * @param sensorId (int) Sensor id of the required sensor data
+	 * @param dataType (String) Data type of the required sensor data
+	 */
 	public StreamCollection(int sensorId, String dataType){
 		this.sensorId=sensorId;
 		this.dataType=dataType;
 	}
 
+	/**
+	 * Returns stream collection based on the User-Relations {@link UserRelation}.
+	 * @param user {@link User}
+	 * @param relation {@link UserRelation}
+	 * @return Set<Stream> Stream collection based on the User-Relation
+	 * @throws PPDException
+	 * @throws SensorDataTypeException
+	 */
 	public Set<Stream> getStreamSet(User user, UserRelation relation) throws PPDException, SensorDataTypeException{
 		Set<Stream> streams= new HashSet<Stream>();
 		Set<Device> devices= new HashSet<Device>();
@@ -68,6 +80,14 @@ public class StreamCollection {
 		return streams;
 	}
 
+	/**
+	 * Returns stream collection based on the Geo-Relations {@link GeoRelation}.
+	 * @param location {@link Location}
+	 * @param relation {@link GeoRelation}
+	 * @return Set<Stream> Stream collection based on the Geo-Relation
+	 * @throws PPDException
+	 * @throws SensorDataTypeException
+	 */
 	public Set<Stream> getStreamSet(Location location, GeoRelation relation) throws PPDException, SensorDataTypeException{
 		Set<Stream> streams= new HashSet<Stream>();
 		Set<Device> devices= new HashSet<Device>();

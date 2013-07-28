@@ -1,67 +1,84 @@
 package com.ubhave.sensocial.manager;
 
-import java.util.UUID;
-
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.util.Log;
 
 import com.ubhave.sensocial.exceptions.PPDException;
 import com.ubhave.sensocial.exceptions.SensorDataTypeException;
 import com.ubhave.sensocial.filters.ConfigurationHandler;
 import com.ubhave.sensocial.filters.FilterSettings;
 
+/**
+ * MyDevice class allows to access the properties of the local device, and creation,
+ * removal of streams .
+ */
 public class MyDevice {
 
-	private String uuid;
+	private String deviceId;
 	private Context context;
 	private User user;
 
+	/**
+	 * Constructor
+	 * @param context Application context
+	 * @param user User of the device
+	 */
 	protected MyDevice(Context context, User user) {
 		this.context=context;
 		this.user=user;
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
-	
-
-		uuid=sp.getString("deviceid", "null");
-		Log.e("SNnMB", "Device id in MYDevice is: "+uuid);
-		
-//		if(sp.getString("deviceid", "null").equals("null")){
-//			uuid=UUID.randomUUID().toString().substring(0, 6);
-//			Editor ed=sp.edit();
-//			ed.putString("deviceid", uuid);
-//			ed.commit();
-//		}
-//		else{
-//			uuid=sp.getString("deviceid", "null");
-//		}
+		deviceId=sp.getString("deviceid", "null");
 	}
 
 
+	/**
+	 * Getter for Stream
+	 * @param sensorId
+	 * @param dataType
+	 * @return Stream object
+	 * @throws PPDException
+	 * @throws SensorDataTypeException
+	 */
 	public Stream getStream(int sensorId, String dataType) throws PPDException, SensorDataTypeException{
 		Stream stream=new Stream(sensorId, dataType, context);
 		return stream;
 	}
 
 
+	/**
+	 * Removes the stream from the device
+	 * @param stream
+	 */
 	public void removeStream(Stream stream){
 		FilterSettings.removeConfiguration(stream.getStreamId());
 		ConfigurationHandler.run(context);	 
 	}
 
+	/**
+	 * Getter for device-id
+	 * @return String device-id
+	 */
 	public String getDeviceId(){
-		return uuid;
+		return deviceId;
 	}
 
+	/**
+	 * Getter for User
+	 * @return User object
+	 */
 	public User getUser(){
 		return this.user;
 	}
 
+	/**
+	 * Getter for Location
+	 * @return Location object
+	 */
 	public Location getLastKnownLocation(){		
 		Location location;
 		//look for location in shared prefrences
 		location= new Location(0, 0);
+		//TODO: logic here
 		return location;
 	}
 

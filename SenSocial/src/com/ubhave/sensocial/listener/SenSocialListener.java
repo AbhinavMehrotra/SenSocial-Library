@@ -1,5 +1,5 @@
-package com.ubhave.sensocial.listener;
-
-public interface SenSocialListener {
-
-}
+//package com.ubhave.sensocial.listener;
+//
+//public interface SenSocialListener {
+//
+//}

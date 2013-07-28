@@ -10,8 +10,19 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+/**
+ * Provides the way to  access TCP client class.
+ * Used for sending data to the server.
+ */
 public class ClientServerCommunicator {
 
+	/**
+	 * Registers user on the server by sending the basic information passed as arguments.
+	 * @param context Application context
+	 * @param userId User-id
+	 * @param deviceId Device-id
+	 * @param mac Bluetooth-MAC
+	 */
 	public static void registerUser(Context context, String userId, String deviceId, String mac){
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		JSONObject obj = new JSONObject();
@@ -27,6 +38,14 @@ public class ClientServerCommunicator {
 		}
 	}
 	
+	/**
+	 * Registers user's Facebook account on the server by sending the basic information passed as arguments.
+	 * @param context Application context
+	 * @param name User-name
+	 * @param userId User-id
+	 * @param facebookName Facebook-name
+	 * @param token Facebook-token
+	 */
 	public static void registerFacebook(Context context, String name, String userId, String facebookName, String token){
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		JSONObject obj = new JSONObject();
@@ -53,6 +72,14 @@ public class ClientServerCommunicator {
 	}
 	
 	
+	/**
+	 * Registers user's Twitter account on the server by sending the basic information passed as arguments.
+	 * @param context Application context
+	 * @param name User-name
+	 * @param userId User-id
+	 * @param twitterName Twitter-name
+	 * @param token Twitter-token
+	 */
 	public static void registerTwitter(Context context, String name, String userId, String twitterName, String token){
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		JSONObject obj = new JSONObject();
@@ -78,6 +105,12 @@ public class ClientServerCommunicator {
 		}
 	}
 	
+	/**
+	 * Sends the location data to the server
+	 * @param context Application context
+	 * @param latitude location latitude
+	 * @param longitude Location longitude
+	 */
 	public static void updateLocation(Context context, String latitude, String longitude){
 		if(latitude.equalsIgnoreCase("unknown") || longitude.equalsIgnoreCase("unknown")){
 			Log.e("SNnMB", "Location is unknown");		
@@ -104,6 +137,11 @@ public class ClientServerCommunicator {
 		}
 	}
 	
+	/**
+	 * Sends the streams data to the server.
+	 * @param context Application context
+	 * @param socialEventString Social-event in string format
+	 */
 	public static void sendStream(Context context, String socialEventString){
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		JSONObject obj = new JSONObject();

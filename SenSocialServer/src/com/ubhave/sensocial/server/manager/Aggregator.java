@@ -1,17 +1,10 @@
 package com.ubhave.sensocial.server.manager;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.ubhave.sensocial.server.exception.AggregatorNullPointerException;
 import com.ubhave.sensocial.server.exception.IncompatibleStreamTypeException;
-import com.ubhave.sensocial.server.exception.PPDException;
-import com.ubhave.sensocial.server.exception.SensorDataTypeException;
-import com.ubhave.sensocial.server.filters.Modality;
-import com.ubhave.sensocial.server.filters.Filter;
-import com.ubhave.sensocial.server.filters.GenerateFilter;
-import com.ubhave.sensocial.server.filters.PrivacyPolicyDescriptorParser;
 
 public class Aggregator {
 
@@ -46,10 +39,18 @@ public class Aggregator {
 		AggregatorRegistrar.add(aggregatedStream.getStreamId(), streamIds);	
 	}
 
+	/**
+	 * Returns single aggregated streams
+	 * @return (Stream) Aggregated stream
+	 */
 	public Stream createStream(){	
 		return this.aggregatedStream;
 	}
 
+	/**
+	 * Removes all the streams from the aggregator
+	 * @throws AggregatorNullPointerException
+	 */
 	public void removeAllStreams() throws AggregatorNullPointerException{
 		if(this.aggregatedStream==null){
 			throw new AggregatorNullPointerException("All ready deleted");
@@ -62,6 +63,11 @@ public class Aggregator {
 		this.aggregatedStream=null;
 	}
 
+	/**
+	 * Removes the stream from the aggregator
+	 * @param streamId (String) Stream id
+	 * @throws AggregatorNullPointerException
+	 */
 	public void removeStream(String streamId) throws AggregatorNullPointerException{
 		Boolean found=false;
 		Set<String> newStreamIds= new HashSet<String>();
@@ -84,6 +90,10 @@ public class Aggregator {
 		AggregatorRegistrar.add(aggregatedStream.getStreamId(), newStreamIds);
 	}
 
+	/**
+	 * Returns the set of streams aggregated by this aggregator
+	 * @return Set<Stream> Set of streams 
+	 */
 	public Set<Stream> getAgrregatedStreams() {
 		return streams;
 	}

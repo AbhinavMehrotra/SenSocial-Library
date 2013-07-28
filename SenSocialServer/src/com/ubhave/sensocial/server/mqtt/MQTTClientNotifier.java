@@ -11,6 +11,13 @@ import com.ubhave.sensocial.server.manager.Device;
 
 public class MQTTClientNotifier {
 
+	/**
+	 * Sends Facebook update notification to the clients.
+	 * @param id (String) User-id
+	 * @param message (String) Facebook update
+	 * @param time (long) time of update of the Facebook message
+	 * @param notificationType (String) Feed type
+	 */
 	public static void sendFacebookUpdate(String id, String message,long time, String notificationType){
 		ArrayList<Device> devices=UserRegistrar.getUser(id).getDevices();
 		for(Device d:devices){
@@ -30,6 +37,13 @@ public class MQTTClientNotifier {
 		}			
 	}
 	
+	/**
+	 * Sends stream notification to the clients.
+	 * It notifies clients to start/stop/pause/un-pause streams.
+	 * @param deviceId (String) Device id
+	 * @param message (MQTTNotifications) Notification message that needs to be pushed to the client
+	 * @param streamId (String) Stream id
+	 */
 	public static void sendStreamNotification(String deviceId, MQTTNotifitions message, String streamId){
 		//the notified client should check this stream id in the exsiting filters and it is not there the request for new file
 		try {
@@ -42,6 +56,11 @@ public class MQTTClientNotifier {
 		
 	}
 
+	/**
+	 * Not in use.
+	 * Sends request to clients to get real-time data which is device specific
+	 * @param message
+	 */
 	public static void sendQueryNotifications(MQTTNotifitions message){
 		// send notifications to query something and get result
 		//example-> get all bluetooths available nearby

@@ -9,13 +9,29 @@ public class SocialData {
 	private String feedType;
 	
 	private String time;
+	
+	private String userName;
+	
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
 	public String getTime() {
 		return time;
 	}
 
 	public void setTime(String time) {
-		this.time = time;
+		try{
+			this.time = SocialEvent.convertTime(Long.parseLong(time));
+		}
+		catch(Exception e){
+			this.time=time;
+		}
 	}
 
 	/**

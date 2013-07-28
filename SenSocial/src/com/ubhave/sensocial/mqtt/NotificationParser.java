@@ -10,25 +10,32 @@ import android.os.StrictMode;
 import android.util.Log;
 
 import com.ubhave.sensocial.filters.ConfigurationHandler;
-import com.ubhave.sensocial.filters.DownloadFilter;
 import com.ubhave.sensocial.filters.FilterSettings;
 import com.ubhave.sensocial.filters.ServerStreamRegistrar;
 import com.ubhave.sensocial.sensordata.classifier.SensorDataHandler;
-import com.ubhave.sensocial.sensormanager.AllPullSensors;
+import com.ubhave.sensocial.sensormanager.SensorUtils;
 import com.ubhave.sensocial.sensormanager.OneOffSensing;
 import com.ubhave.sensocial.sensormanager.SensorDataCollector;
 import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
 import com.ubhave.sensormanager.data.SensorData;
 
+/**
+ * NotificationParser class parses the message received via mqtt service
+ */
 public class NotificationParser {
 	private Context context;
 	private SharedPreferences sp;
+	
 	protected NotificationParser(Context context){
 		this.context=context;
 		sp=context.getSharedPreferences("SSDATA", 0);
 	}
 
+	/**
+	 * Parse the message and take action accordingly.
+	 * @param message
+	 */
 	protected void takeAction(final String message){		
 		Log.i("SNnMB", "MQTT message: "+message);
 		if(message.startsWith(MQTTNotifitions.start_stream.getMessage())){
@@ -57,7 +64,7 @@ public class NotificationParser {
 		}
 		else if(message.startsWith(MQTTNotifitions.facebook_update.getMessage())){
 			Log.i("SNnMB", "Facebook update recieved!");
-			AllPullSensors aps=new AllPullSensors(context);
+			SensorUtils aps=new SensorUtils(context);
 			SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 			final ArrayList<Integer> sensorIds=new ArrayList<Integer>();
 			for(String s:sp.getStringSet("OSNSensorSet", null))

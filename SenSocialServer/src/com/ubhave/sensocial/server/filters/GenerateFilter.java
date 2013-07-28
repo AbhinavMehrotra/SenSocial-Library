@@ -26,8 +26,20 @@ import com.ubhave.sensocial.server.manager.StreamRegistrar;
 import com.ubhave.sensocial.server.manager.User;
 import com.ubhave.sensocial.server.manager.UserRelation;
 
+/**
+ * GenerateFilter class is used for creating filter in XML format
+ */
 public class GenerateFilter {
 
+	/**
+	 * Creates the XML filter for the given conditions on the provided user's device.
+	 * @param user {@link User}
+	 * @param deviceId (String) Device id
+	 * @param conditions (ArrayList<Condition>) {@link Condition} 
+	 * @param streamId (String) Stream id
+	 * @param sensorName (String) Sensor name for the required data
+	 * @param sensorDataType (String) Data type of the required data
+	 */
 	public static void createXML(User user, String deviceId, ArrayList<Condition> conditions, String streamId, String sensorName, String sensorDataType){
 		//check for filter (server or client)
 		//filter types: device specific, relational, and combinational(two streams
@@ -188,6 +200,8 @@ public class GenerateFilter {
 		}
 		return true;
 	}
+	
+	
 	private static String getHighFrequencyStream(String deviceId, String sensorName, ArrayList<Condition> conditions, String streamid){
 		double existingTime, newTime;
 		Boolean flag;
@@ -276,7 +290,7 @@ public class GenerateFilter {
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource source = new DOMSource(doc);
 
-			File newFile=new File("ClientFilters\\Filter"+streamId+".xml");
+			File newFile=new File("ClientFilters/Filter"+streamId+".xml");
 			System.out.println("File path: "+newFile.getAbsolutePath());
 
 			if(newFile.createNewFile())
@@ -398,6 +412,10 @@ public class GenerateFilter {
 	//		}
 	//	}
 
+	/**
+	 * Merges new filter into the existing filter
+	 * @param newFilter (String) Name of new filter
+	 */
 	public static void mergeFilters(String newFilter){
 		//add new filter-config
 		try

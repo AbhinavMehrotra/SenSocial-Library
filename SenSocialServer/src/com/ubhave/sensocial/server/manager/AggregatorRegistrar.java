@@ -17,7 +17,7 @@ public class AggregatorRegistrar {
 	}
 	
 
-	public static void addIfExists(String aggregatedStreamId, String streamId){
+	protected static void addIfExists(String aggregatedStreamId, String streamId){
 		for(Map.Entry<String, Set<String>> e: aggregators.entrySet()){
 			if(e.getKey().equalsIgnoreCase(aggregatedStreamId)){
 				Set<String> s= e.getValue();
@@ -33,7 +33,11 @@ public class AggregatorRegistrar {
 	}
 
 
-	
+	/**
+	 * Returns whether the given stream is an aggregated stream
+	 * @param streamId (string) Stream id
+	 * @return Boolean
+	 */
 	public static Boolean isAggregated(String streamId){
 		for (Map.Entry<String, Set<String>> entry: aggregators.entrySet()) {
 			if(entry.getValue().contains(streamId)){
@@ -43,7 +47,11 @@ public class AggregatorRegistrar {
 		return false;
 	}
 	
-	
+	/**
+	 * Returns the  Streams associated with the given aggregated stream 
+	 * @param streamId (String) Aggregated stream id
+	 * @return (Set<String>) Streams associated with the given aggregated stream 
+	 */
 	public static Set<String> getStreamIds(String streamId){
 		Set<String> streamIds = new HashSet<String>();
 		for (Map.Entry<String, Set<String>> entry: aggregators.entrySet()) {
@@ -52,7 +60,11 @@ public class AggregatorRegistrar {
 		return streamIds;
 	}
 
-	
+	/**
+	 * Return the Aggregated stream id with which the given stream id is associated.
+	 * @param streamId (String) Stream id
+	 * @return (String) Aggregated stream id
+	 */
 	public static String getAggregatedStreamId(String streamId){
 		String aggretorId=null;
 		for (Map.Entry<String, Set<String>> entry: aggregators.entrySet()) {

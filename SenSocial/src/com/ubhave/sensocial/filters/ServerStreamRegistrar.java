@@ -3,7 +3,7 @@ package com.ubhave.sensocial.filters;
 import java.util.ArrayList;
 
 /**
- * This class is used for register all streams requested by server
+ * This class is used for register all streams requested by server  <Not used now: remove dependency>
  *
  */
 public class ServerStreamRegistrar {

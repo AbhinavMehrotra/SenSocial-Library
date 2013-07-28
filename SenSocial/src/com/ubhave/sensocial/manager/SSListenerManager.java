@@ -11,6 +11,10 @@ import android.util.Log;
 import com.ubhave.sensocial.data.SocialEvent;
 import com.ubhave.sensormanager.data.SensorData;
 
+/**
+ * SSListenerManager class allows registration of {@link SSListener} interface and firing 
+ * social events to the registered listeners.
+ */
 public class SSListenerManager {
 
 
@@ -19,14 +23,14 @@ public class SSListenerManager {
 	/**
 	 * Method to add an instance of  listener (SensorListner) with its associated configuration name
 	 * @param listener SocialListner object
-	 * @param configuration Configuration name
+	 * @param streamId Configuration name
 	 */
-	protected static void add(SSListener listener, String configuration) {
+	protected static void add(SSListener listener, String streamId) {
 		if(listeners.containsKey(listener)){
 			for( Map.Entry<SSListener, Set<String>> entry : listeners.entrySet() ) {
 				if( entry.getKey().equals(listener)) {
 					Set<String> configs=entry.getValue();
-					configs.add(configuration);
+					configs.add(streamId);
 					entry.setValue(configs);
 					break;
 				}
@@ -34,7 +38,7 @@ public class SSListenerManager {
 		}
 		else{
 			Set<String> configs=new HashSet<String>();
-			configs.add(configuration);
+			configs.add(streamId);
 			listeners.put(listener,configs);
 		}
 	}
@@ -47,21 +51,8 @@ public class SSListenerManager {
 		listeners.remove(listener);
 	}
 
-	//	/**
-	//	 * Method to fire updates to the registered SensorListeners on specific configuration.
-	//	 * @param sensor_data Sensor Data for which the listener is configured
-	//	 * @param configuration Configuration name
-	//	 */
-	//	protected static void fireUpdate(Object sensor_data, String configuration) {
-	//		for (Map.Entry<SensorListener, String> listener: listeners.entrySet()) {
-	//			if(listener.getValue().equalsIgnoreCase(configuration)){
-	//				listener.getKey().onDataSensed(sensor_data);
-	//			}
-	//		}
-	//	}
-
 	/**
-	 * Method to fire updates to the registered SensorListeners on specific configuration.
+	 * Fire list of social event to the registered SensorListeners on specific configuration.
 	 * @param socialEvent ArrayList
 	 */
 	public static void fireUpdate(ArrayList<SocialEvent> socialEvent){
@@ -77,6 +68,10 @@ public class SSListenerManager {
 		}
 	}
 
+	/**
+	 * Fire social events to the registered SensorListeners on specific configuration.
+	 * @param socialEvent ArrayList
+	 */
 	public static void fireUpdate(SocialEvent socialEvent){
 		Log.e("SNnMB", "Firing data to listeners!");
 		for (Map.Entry<SSListener, Set<String>> listener: listeners.entrySet()) {

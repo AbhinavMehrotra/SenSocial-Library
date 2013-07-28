@@ -1,5 +1,8 @@
 package com.ubhave.sensocial.server.manager;
 
+/**
+ * UserRelation enum is used to create stream collections
+ */
 public enum UserRelation {
 	facebook_friends("facebook_friends"),
 	twitter_followers("twitter_followers"),

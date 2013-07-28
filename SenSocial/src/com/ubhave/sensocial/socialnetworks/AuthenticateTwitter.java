@@ -22,6 +22,9 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * Provides the methods to authenticate user with their Twitter account.
+ */
 public class AuthenticateTwitter {
 
 	private final String consumerKey, consumerKeySecret, callbackURL;
@@ -119,6 +122,15 @@ public class AuthenticateTwitter {
 						ClientServerCommunicator.registerTwitter(context, sp.getString("name", "null"), 
 								sp.getString("userid", "null"),	sp.getString("twitterusername", "null"),  sp.getString("twittertoken", "null"));					
 					}
+					else if(sp.getString("userid", "null").equals("null")){
+						String user_id=  generateUserId(sp.getString("twitterusername", "null"));
+						Editor ed=sp.edit();
+						ed.putString("userid", user_id);
+						ed.commit();
+						ClientServerCommunicator.registerUser(context,user_id, sp.getString("deviceid", "null"), sp.getString("bluetoothmac", "null"));
+						ClientServerCommunicator.registerFacebook(context, sp.getString("name", "null"), 
+								user_id, sp.getString("twitterusername", "null"),  sp.getString("twittertoken", "null"));					
+					}
 				}
 				Log.d(Tag, "Twitter name: "+sp.getString("twitterusername", "null"));
 				Log.d(Tag, "Twitter token: "+sp.getString("twittertoken", "null"));
@@ -130,6 +142,11 @@ public class AuthenticateTwitter {
 			StrictMode.setThreadPolicy(old);
 		}
 		return this.user;		
+	}
+	
+	private String generateUserId(String id){
+		id="ssuid"+ id.trim();
+		return id;
 	}
 
 }

@@ -13,37 +13,43 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+/**
+ * MQTTManager class provide methods to connect, subscribe, publish, and listen to MQTT broker
+ */
 public class MQTTManager {
 
 	private final String TAG = "SNnMB";
-//	private static String BROKER_URL="tcp://broker.mqttdashboard.com:1883";
 	private static String BROKER_URL;
 	private MqttClient mqttClient;
-	private String deviceId;
-	private String clientId;
 	private String topic;
 	private int keepAliveInterval=60*5;
 	private MqttConnectOptions opt;
 	private Context context;
 	
-	public MQTTManager(Context context, String deviceId) throws MqttException {
+	/**
+	 * Constructor
+	 * @param context Application context
+	 * @param Sting Device id
+	 * @throws MqttException
+	 */
+	protected MQTTManager(Context context, String deviceId) throws MqttException {
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
-		this.BROKER_URL=sp.getString("mqqt_broker_url", "null");
+		BROKER_URL=sp.getString("mqqt_broker_url", "null");
 		this.context=context;
-		this.deviceId=deviceId;
 		this.topic="topic"+deviceId;
-//		this.topic="sensocial";
 		Log.i(TAG, "device id is: "+deviceId);
 		opt=new MqttConnectOptions();
-//		opt.setUserName("axm_mos");
-//		opt.setPassword("Mos2013".toCharArray());
+		opt.setUserName("axm_mos");
+		opt.setPassword("Mos2013".toCharArray());
 		opt.setKeepAliveInterval(keepAliveInterval);
 		opt.setConnectionTimeout(10);
 		mqttClient = new MqttClient(BROKER_URL, deviceId, new MemoryPersistence());
-//		mqttClient = new MqttClient(BROKER_URL, "client", new MemoryPersistence());
 		mqttClient.setCallback(new MQTTCallback(BROKER_URL, deviceId, this.topic));
 	}
 	
+	/**
+	 * Connects to the MQTT broker service on server side.
+	 */
 	public void connect(){
 		try {
 			mqttClient.connect(opt);
@@ -53,7 +59,10 @@ public class MQTTManager {
 		}
 	}
 	
-	public void subscribeToDevice(){
+	/**
+	 * Subscribes the device to the topic provided via constructor
+	 */
+	public void subscribeDevice(){
 		try {
 			mqttClient.subscribe(this.topic);
 		} catch (MqttException e) {
@@ -61,6 +70,10 @@ public class MQTTManager {
 		}
 	}
 
+	/**
+	 * Publishes the message to the MQTT broker service.
+	 * @param String Message that needs to be published 
+	 */
 	public void publishToDevice(String message){
 		try {
 			MqttTopic mtopic=mqttClient.getTopic(this.topic);
@@ -73,7 +86,9 @@ public class MQTTManager {
 	}
 	
 	
-	//inner class for callback
+	/**
+	 * Inner class for mqtt callback
+	 */
 	public class MQTTCallback implements MqttCallback{
 
 		final private String TAG = "SNnMB";

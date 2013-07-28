@@ -27,9 +27,16 @@ import com.ubhave.sensocial.privacy.PPDDataType;
 import com.ubhave.sensocial.privacy.PPDLocation;
 import com.ubhave.sensocial.privacy.PPDParser;
 import com.ubhave.sensocial.privacy.PPDSensor;
-import com.ubhave.sensocial.sensormanager.AllPullSensors;
+import com.ubhave.sensocial.sensormanager.SensorUtils;
 import com.ubhave.sensocial.sensormanager.SensorClassifier;
 
+/**
+ * ConfigurationHandler class handles the set of all configurations in the filter. 
+ * It looks for any new changes to the filter, and if there is any changes then handles it accordingly.
+ * It basically restarts the configurations. <br>
+ * Also, it checks every configuration with PPD. The configuration which does not meet the criteria 
+ * is set to be inactive or pause.
+ */
 public class ConfigurationHandler {
 
 	/**
@@ -39,7 +46,6 @@ public class ConfigurationHandler {
 	 * and start subscription if required.
 	 * @param context
 	 */
-	//ConfigurationSet SensorSet
 	@SuppressLint("NewApi")
 	public static void run(Context context){
 		System.out.println("Configuration handler: run");
@@ -94,7 +100,7 @@ public class ConfigurationHandler {
 					System.out.println("Conditions: "+conditions);
 
 					//find new sensors for new-configs
-					AllPullSensors aps=new AllPullSensors(context);
+					SensorUtils aps=new SensorUtils(context);
 					for(String condition:conditions){
 						if(condition.equalsIgnoreCase(ModalityType.null_condition)){
 							newSensors.add(getRequiredData(config));
@@ -132,7 +138,7 @@ public class ConfigurationHandler {
 
 					System.out.println("Dependent modalities: "+conditions);	
 					//find usused sensors
-					AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
+					SensorUtils aps=new SensorUtils(SenSocialManager.getContext());
 					for(String condition:conditions){
 
 						if(condition.equalsIgnoreCase("null")){
@@ -174,6 +180,11 @@ public class ConfigurationHandler {
 
 	}
 
+	/**
+	 * Checks every configuration with PPD
+	 * @param Set<String> configs filter
+	 * @return Set<String> configurations which meets the criteria.
+	 */
 	private static Set<String> checkForPPD(Set<String> configsFilter){
 		String sName, reqData;
 		Map<String, String> lnt;
@@ -181,7 +192,7 @@ public class ConfigurationHandler {
 		Boolean flag;
 		Set<String> sensors= new HashSet<String>();
 		Set<String> configsPPD= new HashSet<String>();	
-		AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
+		SensorUtils aps=new SensorUtils(SenSocialManager.getContext());
 		for(String con:configsFilter){
 			flag=false;
 			sensors.clear();
@@ -221,6 +232,10 @@ public class ConfigurationHandler {
 		return configsFilter;
 	}
 
+	/**
+	 * Returns set of configuration in filter.
+	 * @return Set<String> configurations
+	 */
 	private static Set<String> getConfigurations(){
 		Set<String> configs= new HashSet<String>();
 		try
@@ -254,6 +269,12 @@ public class ConfigurationHandler {
 		return configs;
 	}
 
+	/**
+	 * Returns the list of new configurations which does not exists in memory but in filter.
+	 * @param ArrayList<String> filter configurations
+	 * @param ArrayList<String> memory configurations
+	 * @return ArrayList<String> new configurations
+	 */
 	private static ArrayList<String> getNewConfigs(Set<String> filter, Set<String> mem){
 		ArrayList<String> configs=new ArrayList<String>();
 		for(String f : filter){
@@ -264,6 +285,12 @@ public class ConfigurationHandler {
 		return configs;
 	}
 
+	/**
+	 * Returns the list of removed configurations which does not exists in filter but in memory
+	 * @param ArrayList<String> filter configurations
+	 * @param ArrayList<String> memory configurations
+	 * @return ArrayList<String> removed configurations
+	 */
 	private static ArrayList<String> getRemovedConfigs(Set<String> filter, Set<String> mem){
 		ArrayList<String> configs=new ArrayList<String>();
 		if(mem!=null){
@@ -276,6 +303,11 @@ public class ConfigurationHandler {
 		return configs;
 	}
 
+	/**
+	 * Returns the set of condition strings in the given configuration.
+	 * @param String configuration name
+	 * @return Set<String> set of condition strings
+	 */
 	private static Set<String> getConditionString(String configName){
 		Set<String> conditions= new HashSet<String>();
 		try
@@ -331,7 +363,11 @@ public class ConfigurationHandler {
 		return conditions;
 	}
 
-
+	/**
+	 * Returns the required data by the given configuration
+	 * @param String configuration name
+	 * @return String required data
+	 */
 	public static String getRequiredData(String configName){
 		String sensor=null;
 		System.out.println("getRequiredData: " + configName);
@@ -392,6 +428,11 @@ public class ConfigurationHandler {
 		return sensor;
 	}
 
+	/**
+	 * Returns the required data-type and location for the configuration
+	 * @param String configuration name
+	 * @return Map<String,String> Map of data-type and location
+	 */
 	public static Map<String,String> getRequiredDataLocationNType(String configName){
 		Map<String,String> map= new HashMap<String,String>();
 
@@ -431,15 +472,15 @@ public class ConfigurationHandler {
 									System.out.println("Node Name: "+configChilds.item(j).getNodeName());										
 								}
 							}
-//
-//							NodeList nodeList = doc.getElementsByTagName("required_data");
-//							for(int i=0;i<nodeList.getLength();i++){
-//								Node nNode1 = nodeList.item(i);
-//								Element eElement1 = (Element) nNode1;
-//								String location=eElement1.getAttribute("location");
-//								String data=eElement1.getAttribute("type");
-//								map.put(location, data);
-//							}
+							//
+							//							NodeList nodeList = doc.getElementsByTagName("required_data");
+							//							for(int i=0;i<nodeList.getLength();i++){
+							//								Node nNode1 = nodeList.item(i);
+							//								Element eElement1 = (Element) nNode1;
+							//								String location=eElement1.getAttribute("location");
+							//								String data=eElement1.getAttribute("type");
+							//								map.put(location, data);
+							//							}
 						}
 					}
 				}
@@ -450,11 +491,15 @@ public class ConfigurationHandler {
 		return map;
 	}
 
+	/**
+	 * Returns set of all required sensor by the given filter
+	 * @return Set<String> Set of sensor names
+	 */
 	private static Set<String> getAllRequiredSensorsByFilter(){
 		Set<String> sensors= new HashSet<String>();
 		Set<String> configs= new HashSet<String>();
 		configs=getConfigurations();
-		AllPullSensors aps=new AllPullSensors(SenSocialManager.getContext());
+		SensorUtils aps=new SensorUtils(SenSocialManager.getContext());
 		for(String c:configs){
 			for(String s:getConditionString(c)){
 				if(s.equalsIgnoreCase("null")){

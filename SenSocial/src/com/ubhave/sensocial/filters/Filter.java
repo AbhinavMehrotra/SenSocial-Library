@@ -4,39 +4,33 @@ import java.util.ArrayList;
 
 
 public class Filter {
-
-	//	private ArrayList<Modality> activities;
-	//	
-	//	public Filter(){
-	//	}
-	//
-	//	
-	//	public void addConditions(ArrayList<Modality> activity){
-	//		this.activities=activity;
-	//	}
-	//	
-	//	public void addLogicalOR(){
-	//		this.activities.add(Modality.logicalOR);
-	//	}
-	//	
-	//	public ArrayList<Modality> getConditions(){
-	//		return activities;
-	//	}
-
+	
 	ArrayList<Condition> conditions= new ArrayList<Condition>();
 
 	public Filter(){
 		//do nothing
 	}
 
+	/**
+	 * Adds given list of conditions to the filter.
+	 * @param ArrayList of Condition
+	 */
 	public void addConditions(ArrayList<Condition> condition){
 		this.conditions=condition;
 	}
 
+	/**
+	 * Constructor
+	 * @param ArrayList of Condition
+	 */
 	public Filter(ArrayList<Condition> condotions){
 		this.conditions=condotions;
 	}
 
+	/**
+	 * Returns the list of condition in the filter
+	 * @return ArrayList of Condition
+	 */
 	public ArrayList<Condition> getConditions(){
 		return this.conditions;
 	}

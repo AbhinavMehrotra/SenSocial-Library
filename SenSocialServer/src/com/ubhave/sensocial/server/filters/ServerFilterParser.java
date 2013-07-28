@@ -6,9 +6,17 @@ import com.ubhave.sensocial.server.manager.Location;
 import com.ubhave.sensocial.server.manager.StreamRegistrar;
 import com.ubhave.sensocial.server.manager.User;
 
+/**
+ * ServerFilterParser class is the parser used for server filters
+ */
 public class ServerFilterParser {
 	
-
+	/**
+	 * Returns whether the stream conditions are satisfied.
+	 * @param streamId (String) Stream id
+	 * @param Social-Event {@link SocialEvent}
+	 * @return
+	 */
 	public static Boolean isSatisfied(String streamId, SocialEvent se){
 		Boolean flag=false;
 		String condition=ServerFilterRegistrar.getCondition(streamId);

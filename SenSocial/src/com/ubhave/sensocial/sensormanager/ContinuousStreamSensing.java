@@ -20,6 +20,10 @@ import com.ubhave.sensormanager.ESSensorManager;
 import com.ubhave.sensormanager.SensorDataListener;
 import com.ubhave.sensormanager.data.SensorData;
 
+/**
+ * ContinuousStreamSensing class enables the process of subscribing to any supported sensor.
+ * This is used for stream sensing process.
+ */
 public class ContinuousStreamSensing {
 
 	final private String TAG = "SNnMB";
@@ -30,7 +34,7 @@ public class ContinuousStreamSensing {
 	private static SharedPreferences sp;
 	private static Editor ed;
 	private static int subscriptionId;
-	private static AllPullSensors aps;
+	private static SensorUtils aps;
 	private static ArrayList<SensorData> sensordata;
 	private static ContinuousStreamSensing instance;
 	private static Map<Integer, SensorData> sensordataCollection;
@@ -49,23 +53,22 @@ public class ContinuousStreamSensing {
 		this.SensorIds=SensorIds;
 		sensorManager = ESSensorManager.getSensorManager(context);
 		sp=context.getSharedPreferences("SSDATA",0);
-		aps=new AllPullSensors(context);
+		aps=new SensorUtils(context);
 		sensordata=new ArrayList<SensorData>();
 		sensordataCollection=new HashMap<Integer, SensorData>();
 	}
 
+	/**
+	 * Starts sensing from all the sensors provided as arguments in constructor
+	 * @throws ESException
+	 */
 	protected void startSensing() throws ESException{
 		SensorDataListener listener = new SensorDataListener() {
 
 			public void onDataSensed(SensorData arg) {
 				System.out.println("on Data Sensed");
-				System.out.println("Data: "+arg);
-				//				sensordata.add(arg);
-				//				if(sensordata.size()==SensorIds.size()){
-				//					Log.d("SNnMB", "Data sensed for all sensor-ids");
-				//					SensorDataHandler.handleStreamData(sensordata, context);
-				//					sensordata.clear();
-				//				}
+				if(arg.getSensorType()==SensorUtils.SENSOR_TYPE_LOCATION)
+					arg=LocationValidator.validateLocation(arg);
 				if( !sensordataCollection.containsKey(arg.getSensorType()) ) 
 					sensordataCollection.put(arg.getSensorType(), arg);
 				else{
@@ -104,7 +107,11 @@ public class ContinuousStreamSensing {
 		ed.commit();
 	}
 
-	protected void stopSensing() throws ESException{
+	/**
+	 * Stops sensing from all the sensors provided as arguments in constructor
+	 * @throws ESException
+	 */
+	public void stopSensing() throws ESException{
 		for(int i=0;i<SensorIds.size();i++){
 			subscriptionId=sp.getInt(aps.getSensorNameById(SensorIds.get(i))+"_subId", 0);
 			if(subscriptionId != 0){
@@ -112,63 +119,4 @@ public class ContinuousStreamSensing {
 			}		
 		}
 	}
-
-	//	public static void startSensingForServer(final String streamId, int sensorId, final String dataType) throws ESException{
-	//		SensorDataListener listener = new SensorDataListener() {
-	//
-	//			public void onDataSensed(SensorData data) {
-	//				SocialEvent se=new SocialEvent();
-	//				DeviceSensorData d=new DeviceSensorData();
-	//				d.setDeviceId(sp.getString("deviceid", null));
-	//				d.setRawData(data);
-	//				d.setStreamId(streamId);
-	//				if(dataType.equalsIgnoreCase("raw")){
-	//					se.setFilteredSensorData(d);
-	//				}
-	//				else{
-	//					//classify it
-	//				}
-	//				ClientServerCommunicator.sendStream(context, se.toJSONString()); 
-	//			}
-	//
-	//			public void onCrossingLowBatteryThreshold(boolean arg0) {
-	//				// can pause sensing
-	//			}
-	//		};
-	//		ed=sp.edit();
-	//		subscriptionId=sensorManager.subscribeToSensorData (sensorId, listener);
-	//		ed.putInt(aps.getSensorNameById(sensorId)+"_subId", subscriptionId);			
-	//		ed.commit();
-	//	}
-	//
-	//	public static void startSensingForDevice(final String streamId, int sensorId, final String dataType) throws ESException{
-	//		SensorDataListener listener = new SensorDataListener() {
-	//
-	//			public void onDataSensed(SensorData data) {
-	//				//arg0.getSensorType();
-	//				SocialEvent se=new SocialEvent();
-	//				DeviceSensorData d=new DeviceSensorData();
-	//				d.setDeviceId(sp.getString("deviceid", null));
-	//				d.setRawData(data);
-	//				d.setStreamId(streamId);
-	//				if(dataType.equalsIgnoreCase("raw")){
-	//					se.setFilteredSensorData(d);
-	//				}
-	//				else{
-	//					//classify it
-	//				}
-	//				SSListenerManager.fireUpdate(se);
-	//
-	//			}
-	//
-	//			public void onCrossingLowBatteryThreshold(boolean arg0) {
-	//				// can pause sensing
-	//			}
-	//		};
-	//		ed=sp.edit();
-	//		subscriptionId=sensorManager.subscribeToSensorData (sensorId, listener);
-	//		ed.putInt(aps.getSensorNameById(sensorId)+"_subId", subscriptionId);			
-	//		ed.commit();
-	//	}
-
 }

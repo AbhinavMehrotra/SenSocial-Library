@@ -1,13 +1,9 @@
 package com.ubhave.sensocial.manager;
 
-import java.util.UUID;
-
 import twitter4j.User;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothClass;
-import android.bluetooth.BluetoothClass.Device;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,20 +16,19 @@ import com.ubhave.sensocial.configuration.ServerConfiguration;
 import com.ubhave.sensocial.configuration.TwitterConfiguration;
 import com.ubhave.sensocial.exceptions.IllegalUserAccess;
 import com.ubhave.sensocial.exceptions.InvalidSensorException;
-import com.ubhave.sensocial.exceptions.InvalidSensorNameException;
 import com.ubhave.sensocial.exceptions.NullPointerException;
 import com.ubhave.sensocial.exceptions.ServerException;
 import com.ubhave.sensocial.exceptions.UnauthorizedUserException;
 import com.ubhave.sensocial.exceptions.XMLFileException;
 import com.ubhave.sensocial.http.IdSenderToDisableTrigger;
 import com.ubhave.sensocial.privacy.PPDGenerator;
-import com.ubhave.sensocial.sensormanager.StartPullSensors;
 import com.ubhave.sensocial.socialnetworks.AuthenticateFacebook;
 import com.ubhave.sensocial.socialnetworks.AuthenticateTwitter;
 import com.ubhave.sensocial.tcp.ClientServerCommunicator;
-import com.ubhave.sensormanager.ESException;
-import com.ubhave.sensormanager.ESSensorManager;
 
+/**
+ * SenSocialManager is a singleton class which acts as the manager for all the other classes.
+ */
 public class SenSocialManager{
 
 	private AuthenticateFacebook AF;
@@ -48,13 +43,25 @@ public class SenSocialManager{
 	public static Context getContext(){
 		return context;
 	}
+	public static void setContext(Context app_context){
+		context=app_context;
+	}
 
+	/**
+	 * Returns the object of SenSocialManager class
+	 * @param context Application context
+	 * @param Boolean Whether this is server-client application
+	 * @param Boolean Whether location tracking is required
+	 * @return SenSocialManager object
+	 * @throws ServerException
+	 */
 	public static SenSocialManager getSenSocialManager(Context context, Boolean isServerClientApp, Boolean isLocationTrackerRequired) throws ServerException {
 		ServerClient=isServerClientApp;
-		LocationTrackerRequired=isLocationTrackerRequired;
+		LocationTrackerRequired=isLocationTrackerRequired;		
 		if(ServerClient || LocationTrackerRequired){
 			ServerConfiguration sc=new ServerConfiguration(context);
 			if(sc.getServerIP().isEmpty() || sc.getServerProjectURL().isEmpty() || sc.getServerPort()==0){
+				Log.e("SNnMB", sc.getServerIP()+", "+sc.getServerProjectURL()+", "+sc.getServerPort());
 				throw new ServerException("Server configuration missing!! Help: create ServerConfiguration object and " +
 						"set port, url, ip.");
 			}
@@ -108,6 +115,10 @@ public class SenSocialManager{
 			Log.i(TAG, "Strating MQTT push notification service!");
 			context.startService(new Intent(context, com.ubhave.sensocial.mqtt.MQTTService.class));
 		}
+		ed=sp.edit();
+		ed.putBoolean("locationtrackerrequired", LocationTrackerRequired);
+		ed.putBoolean("serverclient", ServerClient);
+		ed.commit();
 	}
 
 	/**
@@ -117,7 +128,10 @@ public class SenSocialManager{
 	 * @param activity Activity from which it is called.
 	 * @param FBConfig FacebookConfiguration object. 
 	 */
-	public void authenticateFacebook(Activity activity, FacebookConfiguration FBConfig){
+	public void authenticateFacebook(Activity activity, FacebookConfiguration FBConfig)throws IllegalUserAccess{
+		if(!sp.getString("userid", "null").equals("null") && sp.getBoolean("useridbyfacebook", false)==false && sp.getBoolean("useridbytwitter", false)==false){
+			throw new IllegalUserAccess("Please set the user id before using any method.");
+		}
 		AF=new AuthenticateFacebook(context, FBConfig.getFacebookClientId(), FBConfig.getFacebookClientSecretId());
 		AF.tryLogin(activity);
 	}
@@ -136,6 +150,13 @@ public class SenSocialManager{
 		AF.insideOnActivityResult(currentActivity, requestCode, resultCode, data);
 	}
 
+	/**
+	 * Getter for Facebook user name
+	 * @return
+	 */
+	public String getFacebookUserName(){
+		return sp.getString("name", null);
+	}
 
 	/**
 	 * This method disables Facebook triggers. After calling this method trigger will not be received from Faceboook.
@@ -191,7 +212,20 @@ public class SenSocialManager{
 		}
 	}
 
-	public String setUserId(String userId) throws IllegalUserAccess{
+	/**
+	 * Getter for user-id
+	 * @return String user-id
+	 */
+	public String getUserId(){
+		return sp.getString("userid", null);
+	}
+
+	/**
+	 * Setter for user-id. <br>
+	 * After setting the user-id the client registers itself on the server, if the application is client-server application.
+	 * @return String user-id
+	 */
+	public void setUserId(String userId) throws IllegalUserAccess{
 		String user_id=  generateUserId(userId);
 		if(!sp.getString("userid", "null").equals("null") &&  !sp.getString("userid", "null").equals(user_id)){
 			throw new IllegalUserAccess("User id already set once. Cannot set a new id again");
@@ -206,72 +240,64 @@ public class SenSocialManager{
 		ed.putBoolean("useridbyparam", true);
 		ed.putBoolean("userregistered", true);
 		ed.commit();
-		return user_id;
 	}
 
-	public String setUserIdByFacebook() throws NullPointerException, IllegalUserAccess{
-		if(sp.getString("fbusername", "null").equals("null")){
-			throw new NullPointerException("Facebook object is null. Cannot set user-id by facebook account before their authentication.");
-		}
-		else{
-			String user_id=  generateUserId(sp.getString("fbusername", "null"));	
-			if(!sp.getString("userid", "null").equals("null") &&  !sp.getString("userid", "null").equals(user_id)){
-				throw new IllegalUserAccess("User id already set once. Cannot set a new id again");
-			}
-			if(ServerClient && !sp.getBoolean("userregistered", false)){
-				ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
-				ClientServerCommunicator.registerFacebook(context, sp.getString("name", "null"), user_id,
-						sp.getString("fbusername", "null"),  sp.getString("fbtoken", "null"));
-				context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
-			}
-			Editor ed=sp.edit();
-			ed.putString("userid", user_id);
-			ed.putBoolean("useridbyfacebook", true);
-			ed.putBoolean("userregistered", true);
-			ed.commit();	
-			return user_id;	
-		}
+	/**
+	 * Setter for user-id. via facebook.
+	 */
+	public void setUserIdByFacebook(){
+		Editor ed=sp.edit();
+		ed.putBoolean("useridbyfacebook", true);
+		ed.putBoolean("userregistered", false);
+		ed.commit();
 	}
 
-	public String setUserIdByTwitter() throws NullPointerException, IllegalUserAccess{
-		if(sp.getString("twitterusername", "null").equals("null")){
-			throw new NullPointerException("Twitter object is null. Cannot set user-id by twitter account before their authentication.");
-		}
-		else{
-			String user_id= generateUserId(sp.getString("twitterusername", "null"));	
-			if(!sp.getString("userid", "null").equals("null") &&  !sp.getString("userid", "null").equals(user_id)){
-				throw new IllegalUserAccess("User id already set once. Cannot set a new id again");
-			}
-			if(ServerClient && !sp.getBoolean("userregistered", false)){
-				ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
-				ClientServerCommunicator.registerTwitter(context, sp.getString("name", "null"), user_id,
-						sp.getString("twitterusername", "null"),  sp.getString("twittertoken", "null"));
-				context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
-			}
-			Editor ed=sp.edit();
-			ed.putString("userid", user_id);
-			ed.putBoolean("useridbytwitter", true);
-			ed.putBoolean("userregistered", true);
-			ed.commit();
-			return user_id;
-		}
+	/**
+	 * Setter for user-id. via twitter.
+	 */
+	public void setUserIdByTwitter(){
+		Editor ed=sp.edit();
+		ed.putBoolean("useridbytwitter", true);
+		ed.putBoolean("userregistered", false);
+		ed.commit();
 	}
 
+
+	/**
+	 * Generates unique userid 
+	 * @return String user-id
+	 */
 	private String generateUserId(String id){
 		id="ssuid"+ id.trim();
 		return id;
 	}
 
 	/**
-	 * 
+	 * Getter for use.
 	 * @param userId It is the id(String) which is returned by setUserId methods..
-	 * @return
+	 * @return User object
 	 */
-	@SuppressLint("NewApi")
 	public com.ubhave.sensocial.manager.User getUser(String userId){
 		com.ubhave.sensocial.manager.User user=new com.ubhave.sensocial.manager.User(context, sp.getString("name", null), sp.getString("facebookusername", null), sp.getString("twitterusername", null), 
 				sp.getStringSet("facebookfriends", null), sp.getStringSet("twitterfollowers", null));
 		return user;
+	}
+
+	/**
+	 * Method to register a listener(SensorListener) for the specific configuration to receive sensor data.
+	 * @param listener SensorListener Object
+	 * @param configuration Configuration name for which which listener will receive data
+	 */
+	public void registerListener(SSListener listener, String streamId){
+		SSListenerManager.add(listener, streamId);
+	}
+
+	/**
+	 * Method to unregister a listener(SensorDataListener) to receive sensor data.
+	 * @param listener SensorDataListener object
+	 */
+	public void unregisterListener(SSListener listener) {
+		SSListenerManager.remove(listener);
 	}
 
 
@@ -295,37 +321,37 @@ public class SenSocialManager{
 	//		}
 	//	}
 
-	/**
-	 * Method to start the android background-service. It will automatically start HTTP or MQTT service according to the
-	 * configuration set in the ServerConfiguration. It is mandatory to set ServerConfiguration.
-	 * @param serverConfig ServerConfiguration object.
-	 * @throws NullPointerException If ServerConfiguration is not configured.
-	 */
-	public void startService(ServerConfiguration serverConfig) throws NullPointerException{
-		if(serverConfig==null ){
-			Log.e(TAG, "Service can not be started");
-			throw new NullPointerException("Objects are not initialized");
-		}
-		else{
-			Log.d(TAG, "Starting the service");
-			SenSocialService.startService(context);			
-		}
-	}
-
-	/**
-	 * Method to stop the background service.
-	 * It will stop whichever service is running in the background (MQTT or HTTP).
-	 */
-	public void stopService(){
-		SenSocialService.stopService(context);
-	}
-
-
-	/**
-	 * Method to unsubscribe any sensor for the configured sensors.
-	 * @param sensor String Sensor Name: accelerometer, bluetooth, wifi, microphone, location.
-	 * @throws InvalidSensorNameException Caused when the sensor name is invalid.
-	 */
+	//	/**
+	//	 * Method to start the android background-service. It will automatically start HTTP or MQTT service according to the
+	//	 * configuration set in the ServerConfiguration. It is mandatory to set ServerConfiguration.
+	//	 * @param serverConfig ServerConfiguration object.
+	//	 * @throws NullPointerException If ServerConfiguration is not configured.
+	//	 */
+	//	public void startService(ServerConfiguration serverConfig) throws NullPointerException{
+	//		if(serverConfig==null ){
+	//			Log.e(TAG, "Service can not be started");
+	//			throw new NullPointerException("Objects are not initialized");
+	//		}
+	//		else{
+	//			Log.d(TAG, "Starting the service");
+	//			SenSocialService.startService(context);			
+	//		}
+	//	}
+	//
+	//	/**
+	//	 * Method to stop the background service.
+	//	 * It will stop whichever service is running in the background (MQTT or HTTP).
+	//	 */
+	//	public void stopService(){
+	//		SenSocialService.stopService(context);
+	//	}
+	//
+	//
+	//	/**
+	//	 * Method to unsubscribe any sensor for the configured sensors.
+	//	 * @param sensor String Sensor Name: accelerometer, bluetooth, wifi, microphone, location.
+	//	 * @throws InvalidSensorNameException Caused when the sensor name is invalid.
+	//	 */
 	//	public void stopSensing(String sensor) throws InvalidSensorNameException{
 	//		new StartPullSensors(context).stopIndependentContinuousStreamSensing(sensor);
 	//		//		Editor ed=sp.edit();
@@ -362,23 +388,54 @@ public class SenSocialManager{
 	//	}
 
 
-	/**
-	 * Method to register a listener(SensorListener) for the specific configuration to receive sensor data.
-	 * @param listener SensorListener Object
-	 * @param configuration Configuration name for which which listener will receive data
-	 */
-	public void registerListener(SSListener listener, String streamId){
-		SSListenerManager.add(listener, streamId);
-	}
 
-	/**
-	 * Method to unregister a listener(SensorDataListener) to receive sensor data.
-	 * @param listener SensorDataListener object
-	 */
-	public void unregisterListener(SSListener listener) {
-		SSListenerManager.remove(listener);
-	}
-
+	//	public String setUserIdByFacebook() throws NullPointerException, IllegalUserAccess{
+	//		if(sp.getString("fbusername", "null").equals("null")){
+	//			throw new NullPointerException("Facebook object is null. Cannot set user-id by facebook account before their authentication.");
+	//		}
+	//		else{
+	//			String user_id=  generateUserId(sp.getString("fbusername", "null"));	
+	//			if(!sp.getString("userid", "null").equals("null") &&  !sp.getString("userid", "null").equals(user_id)){
+	//				throw new IllegalUserAccess("User id already set once. Cannot set a new id again");
+	//			}
+	//			if(ServerClient && !sp.getBoolean("userregistered", false)){
+	//				ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
+	//				ClientServerCommunicator.registerFacebook(context, sp.getString("name", "null"), user_id,
+	//						sp.getString("fbusername", "null"),  sp.getString("fbtoken", "null"));
+	//				context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
+	//			}
+	//			Editor ed=sp.edit();
+	//			ed.putString("userid", user_id);
+	//			ed.putBoolean("useridbyfacebook", true);
+	//			ed.putBoolean("userregistered", true);
+	//			ed.commit();	
+	//			return user_id;	
+	//		}
+	//	}
+	//
+	//	public String setUserIdByTwitter() throws NullPointerException, IllegalUserAccess{
+	//		if(sp.getString("twitterusername", "null").equals("null")){
+	//			throw new NullPointerException("Twitter object is null. Cannot set user-id by twitter account before their authentication.");
+	//		}
+	//		else{
+	//			String user_id= generateUserId(sp.getString("twitterusername", "null"));	
+	//			if(!sp.getString("userid", "null").equals("null") &&  !sp.getString("userid", "null").equals(user_id)){
+	//				throw new IllegalUserAccess("User id already set once. Cannot set a new id again");
+	//			}
+	//			if(ServerClient && !sp.getBoolean("userregistered", false)){
+	//				ClientServerCommunicator.registerUser(context,user_id, deviceId, mac);
+	//				ClientServerCommunicator.registerTwitter(context, sp.getString("name", "null"), user_id,
+	//						sp.getString("twitterusername", "null"),  sp.getString("twittertoken", "null"));
+	//				context.startService(new Intent(context, com.ubhave.sensocial.client.tracker.LocationTrackerService.class));
+	//			}
+	//			Editor ed=sp.edit();
+	//			ed.putString("userid", user_id);
+	//			ed.putBoolean("useridbytwitter", true);
+	//			ed.putBoolean("userregistered", true);
+	//			ed.commit();
+	//			return user_id;
+	//		}
+	//	}
 
 
 

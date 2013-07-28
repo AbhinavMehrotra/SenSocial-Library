@@ -17,8 +17,15 @@ import org.w3c.dom.NodeList;
 import android.os.Environment;
 import android.util.Log;
 
+/**
+ * Provide an access to filter.
+ */
 public class FilterSettings {
 
+	/**
+	 * Starts the given configuration
+	 * @param String config name
+	 */
 	public static void startConfiguration(String configName){
 		//set the configuration attribute "sense"="true"
 		try
@@ -66,7 +73,10 @@ public class FilterSettings {
 		}
 	}
 
-	
+	/**
+	 * Stops the given configuration
+	 * @param String config name
+	 */
 	public static void stopConfiguration(String configName){
 		//set the configuration attribute "sense"="false"
 		try
@@ -108,6 +118,10 @@ public class FilterSettings {
 		}
 	}
 
+	/**
+	 * Deletes the given configuration
+	 * @param String config name
+	 */
 	public static void removeConfiguration(String configName){
 		//delete filter-config
 		try
@@ -152,7 +166,10 @@ public class FilterSettings {
 		}
 	}
 
-	
+	/**
+	 * Merges the given filter with the base filter
+	 * @param String new filter name
+	 */
 	public static void mergeFilters(String newFilter){
 		//add new filter-config
 		try

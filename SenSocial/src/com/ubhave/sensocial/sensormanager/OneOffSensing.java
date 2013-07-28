@@ -11,6 +11,10 @@ import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
 import com.ubhave.sensormanager.data.SensorData;
 
+/**
+ * OneOffSensing class enables fetching sensor data for the instance of time.
+ * It extends AsyncTask so that the sensing process is done in the background.
+ */
 public class OneOffSensing extends AsyncTask<Void, Void, ArrayList<SensorData>>
 {
 	final private String TAG = "SNnMB";
@@ -33,12 +37,18 @@ public class OneOffSensing extends AsyncTask<Void, Void, ArrayList<SensorData>>
 			for(int i=0;i<SensorIds.size();i++){
 				Log.d(TAG, "Sampling from Sensor");
 				if(SensorDataCollector.isRegistered(SensorIds.get(i))){
+					Log.e(TAG, "One-Off sensing process, sensor already registered. Found the latest data available for: "+SensorIds.get(i));
+					sensorData.add(SensorDataCollector.getData(SensorIds.get(i)));
+				}
+				else if(SensorDataCollector.isPresent(SensorIds.get(i))){
 					Log.e(TAG, "One-Off sensing process, found the latest data available for: "+SensorIds.get(i));
 					sensorData.add(SensorDataCollector.getData(SensorIds.get(i)));
 				}
 				else{
 					Log.e(TAG, "One-Off sensing process, latest data not available & sensing for: "+SensorIds.get(i));
 					SensorData sd=sensorManager.getDataFromSensor(SensorIds.get(i));
+					if(sd.getSensorType()==SensorUtils.SENSOR_TYPE_LOCATION)
+						sd=LocationValidator.validateLocation(sd);
 					sensorData.add(sd);
 					SensorDataCollector.addData(sd);
 				}

@@ -7,7 +7,7 @@ import com.ubhave.sensocial.server.data.SocialEvent;
 import com.ubhave.sensocial.server.filters.ServerFilterParser;
 import com.ubhave.sensocial.server.filters.ServerFilterRegistrar;
 import com.ubhave.sensocial.server.manager.AggregatorRegistrar;
-import com.ubhave.sensocial.server.manager.SensorListenerManager;
+import com.ubhave.sensocial.server.manager.SSListenerManager;
 
 public class StreamReceiver {
 	public static void onReceive(String userId, String deviceId, String socialEventString){
@@ -17,14 +17,14 @@ public class StreamReceiver {
 			
 			
 			SocialEvent socialEvent= SocialEvent.getSocialEvent(obj);	
-			SensorListenerManager.fireUpdate(socialEvent);	
+			SSListenerManager.fireUpdate(socialEvent);	
 			
 			if(AggregatorRegistrar.isAggregated(streamId)){				
 				streamId=AggregatorRegistrar.getAggregatedStreamId(streamId);
 				System.out.println("This is aggregated stream: "+streamId);
 				obj.put("streamid", streamId);
 				socialEvent= SocialEvent.getSocialEvent(obj);
-				SensorListenerManager.fireUpdate(socialEvent);	
+				SSListenerManager.fireUpdate(socialEvent);	
 				
 				if(ServerFilterRegistrar.isPresent(streamId)){
 					System.out.println("Stream present in server filter");
@@ -32,7 +32,7 @@ public class StreamReceiver {
 					if(ServerFilterParser.isSatisfied(id, socialEvent)){
 						obj.put("streamid", id);
 						socialEvent= SocialEvent.getSocialEvent(obj);
-						SensorListenerManager.fireUpdate(socialEvent);
+						SSListenerManager.fireUpdate(socialEvent);
 					}
 				}
 			}

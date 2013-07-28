@@ -3,7 +3,6 @@ package com.ubhave.sensocial.privacy;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 
 import org.json.JSONArray;
@@ -15,7 +14,9 @@ import android.util.Log;
 public class PPDGenerator {
 
 
-	//we can create PPD via java code
+	/**
+	 * Creates a default PPD xml file with all sensor settings as enabled.
+	 */
 	public static void createDefaultPPD(){
 		try{
 			String server="raw";
@@ -66,7 +67,13 @@ public class PPDGenerator {
 		}
 	}
 
-	public static void startSensing(String ppdSensorName, String ppdLocation, String ppdDataType){
+	/**
+	 * Enables the sensor data flow of the provided sensor and only to the provided location.
+	 * @param ppdSensorName 
+	 * @param ppdLocation
+	 * @param ppdDataType
+	 */
+	public static void enableSensing(String ppdSensorName, String ppdLocation, String ppdDataType){
 		try{
 			File file=new File(Environment.getExternalStorageDirectory(), "ppd.txt");
 			if(!file.exists()){
@@ -101,7 +108,12 @@ public class PPDGenerator {
 
 	}
 
-	public static void stopSensing(String ppdSensorName, String ppdLocation){
+	/**
+	 * Disables the sensor data flow of the provided sensor and only to the provided location.
+	 * @param ppdSensorName
+	 * @param ppdLocation
+	 */
+	public static void disableSensing(String ppdSensorName, String ppdLocation){
 		try{
 			File file=new File(Environment.getExternalStorageDirectory(), "ppd.txt");
 			if(!file.exists()){

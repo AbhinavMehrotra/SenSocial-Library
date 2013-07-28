@@ -4,6 +4,8 @@ import com.ubhave.sensormanager.data.SensorData;
 
 
 public class DeviceSensorData {
+	
+	protected DeviceSensorData(){}
 
 	private SensorData rawData;
 

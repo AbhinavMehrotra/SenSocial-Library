@@ -18,8 +18,21 @@ import android.os.Environment;
 
 import com.ubhave.sensocial.filters.Condition;
 
+/**
+ * GenerateFilter class allows creation of filters for the streams, or aggregators.
+ */
 public class GenerateFilter {
+	//used for not exposing
+	protected GenerateFilter(){};
 
+	/**
+	 * Creates the filter in xml format.
+	 * @param context
+	 * @param conditions
+	 * @param streamConfig
+	 * @param sensorName
+	 * @param sensorDataType
+	 */
 	protected static void createXML(Context context,ArrayList<Condition> conditions, String streamConfig, String sensorName, String sensorDataType){
 		try
 		{

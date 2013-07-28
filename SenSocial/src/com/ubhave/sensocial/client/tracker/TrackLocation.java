@@ -1,18 +1,11 @@
 package com.ubhave.sensocial.client.tracker;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.simple.JSONObject;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -21,11 +14,8 @@ import android.util.Log;
 
 import com.ubhave.dataformatter.DataFormatter;
 import com.ubhave.dataformatter.json.JSONFormatter;
-import com.ubhave.sensocial.manager.SenSocialManager;
-import com.ubhave.sensocial.sensordata.classifier.SensorDataHandler;
-import com.ubhave.sensocial.sensormanager.AllPullSensors;
 import com.ubhave.sensocial.sensormanager.OneOffSensing;
-import com.ubhave.sensocial.sensormanager.SensorDataCollector;
+import com.ubhave.sensocial.sensormanager.SensorUtils;
 import com.ubhave.sensocial.tcp.ClientServerCommunicator;
 import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
@@ -40,11 +30,15 @@ public class TrackLocation {
 	private Timer timer;
 	private Context context;
 	private ESSensorManager sensorManager;
-//	private SensorData sensorData;
 	private String serverUrl;
 	private SharedPreferences sp;
 	private String uuid;
 
+	/**
+	 * Constructor
+	 * @param context Application context
+	 * @throws ESException
+	 */
 	public TrackLocation(Context context) throws ESException{
 		this.context=context;
 		this.timer=new Timer();
@@ -56,6 +50,9 @@ public class TrackLocation {
 		Log.i(TAG, "TrackLocation: ref int-"+UPDATE_INTERVAL);
 	}
 
+	/**
+	 * Starts tracking the location at specified refresh intervals
+	 */
 	public void startTracking() {
 		final Handler handler = new Handler();
 		TimerTask doAsynchronousTask = new TimerTask() {       
@@ -64,16 +61,16 @@ public class TrackLocation {
 				handler.post(new Runnable() {
 					public void run() {       
 						try {
-							AllPullSensors aps=new AllPullSensors(context);
+							SensorUtils aps=new SensorUtils(context);
 							ArrayList<Integer> SensorIds=new ArrayList<Integer>();
-							SensorIds.add(AllPullSensors.SENSOR_TYPE_LOCATION);
+							SensorIds.add(SensorUtils.SENSOR_TYPE_LOCATION);
 							try {
 								new OneOffSensing(context, SensorIds){
 									@Override
 									public void onPostExecute(ArrayList<SensorData> data){
 										Log.d("SNnMB","Stopped sensing for location tracking");
 										if(data!=null){
-											JSONFormatter formatter = DataFormatter.getJSONFormatter(context,AllPullSensors.SENSOR_TYPE_LOCATION);
+											JSONFormatter formatter = DataFormatter.getJSONFormatter(context,SensorUtils.SENSOR_TYPE_LOCATION);
 											JSONObject jsondata=formatter.toJSON(data.get(0));
 											System.out.print("location: "+jsondata.get("latitude"));
 											
@@ -109,9 +106,7 @@ public class TrackLocation {
 	}
 
 //
-//	/**
-//	 * Method to send the ScreenName for Social Network  and the Unique Id.
-//	 */
+//	
 //	private void sendLocationToServer(final String newlatitude, final String newlongitude){
 //		Thread th= new Thread(){
 //			public void run(){

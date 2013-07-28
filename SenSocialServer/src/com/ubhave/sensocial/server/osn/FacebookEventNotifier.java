@@ -9,6 +9,10 @@ import com.ubhave.sensocial.server.mqtt.MQTTClientNotifier;
 
 public class FacebookEventNotifier{
 
+	/**
+	 * Parses the JSON String sent by the Facebook server as a real-time trigger, and takes appropriate actions.
+	 * @param json JSONString sent by the Facebook server
+	 */
 	public static void parseJSON(JSONObject json){
 		try {
 			JSONArray entries= json.getJSONArray("entry");
@@ -30,9 +34,11 @@ public class FacebookEventNotifier{
 						message=fg.getUpdatedData(fields.getString(j), time);
 						//check for friend list update
 						if(message.contains("are now friends") || message.contains("is now friends with")){
+							System.out.println("Update Facebook FriendList");
 							UserRegistrar.updateFacebookFriendList(id);
 						}
 						else{
+							System.out.println("Send Facebook update to client");
 							MQTTClientNotifier.sendFacebookUpdate(id, message,time, fields.getString(j));
 						}
 					}
@@ -48,7 +54,11 @@ public class FacebookEventNotifier{
 		}
 	}
 
-	//check whether the userid is registered
+	/**
+	 * Checks whether the Facebook-id is registered with any user
+	 * @param uid (String) Facebook id
+	 * @return Boolean
+	 */
 	private static Boolean isInteresting(String uid){
 		return UserRegistrar.isFacebookIdPresent(uid);
 	}

@@ -1,5 +1,8 @@
 package com.ubhave.sensocial.server.manager;
 
+/**
+ * GeoRelation enum is used to create Stream Collection
+ */
 public enum GeoRelation {
 	in_this_city("in_this_city"),
 	within_1mile("within_1mile");

@@ -7,11 +7,15 @@ import org.eclipse.paho.client.mqttv3.internal.MemoryPersistence;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.IBinder;
 import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * Background service to keep the connection with MQQT broker
+ */
 public class MQTTService extends Service {
 
 	final private String TAG = "SNnMB";
@@ -44,13 +48,22 @@ public class MQTTService extends Service {
 		try {
 			MQTTManager m = new MQTTManager(getApplicationContext(), clientId);
 			m.connect();
-			m.publishToDevice("android");
-			m.subscribeToDevice();
+			m.publishToDevice("MQTT service started: "+clientId);
+			m.subscribeDevice();
 		} catch (MqttException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         StrictMode.setThreadPolicy(old);
+        if(sp.getBoolean("mqttservicestart", false)){
+        	//service was closed by OS and restarted
+        	MQTTServiceRestartHandler.run(getApplicationContext());
+        }
+        else{
+        	//service started for the first time
+        	Editor ed=sp.edit();
+        	ed.putBoolean("mqttservicestart", true);
+        	ed.commit();
+        }
 		return START_STICKY;
 	}
 
@@ -66,45 +79,4 @@ public class MQTTService extends Service {
 		}
 	}
 
-	/**
-	 * Method to connect to MQTT broker.
-	 */
-	public void connectIt(){
-		try {
-			mqttClient = new MqttClient(BROKER_URL, clientId, new MemoryPersistence());
-			mqttClient.setCallback(new PushCallback(this, clientId));
-			mqttClient.connect();
-			mqttClient.subscribe(TOPIC);
-			Log.d(TAG, "MQTT Connected");
-		} catch (MqttException e) {
-			Toast.makeText(getApplicationContext(), "Something went wrong!" + e.getMessage(), Toast.LENGTH_LONG).show();
-			Log.e(TAG,e.toString());
-		}
-	}
-
-	/**
-	 * Not using this method.
-	 * It was used to check if client is connect to MQTT broker.
-	 * If not then it connects it again.
-	 */
-	public void isConnected(){
-		th= new Thread(){
-			public void run(){
-				try{
-					sleep(120000);
-					while(true){
-						if(!mqttClient.isConnected()){
-							connectIt();
-						}
-						//waits for 2mins
-						wait(120000);
-					}
-
-				} catch (InterruptedException e) {
-					Log.e(TAG,e.toString());
-				}
-			}
-		};
-		th.start();
-	}
 }

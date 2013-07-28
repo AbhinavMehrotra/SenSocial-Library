@@ -14,14 +14,18 @@ import com.ubhave.dataformatter.DataFormatter;
 import com.ubhave.dataformatter.json.JSONFormatter;
 import com.ubhave.sensocial.manager.Location;
 import com.ubhave.sensocial.manager.SenSocialManager;
-import com.ubhave.sensocial.sensormanager.AllPullSensors;
+import com.ubhave.sensocial.sensormanager.SensorUtils;
 import com.ubhave.sensormanager.data.SensorData;
 
+/**
+ * DummyClassifier class provides some basic classification of sensor data.
+ */
 public class DummyClassifier {
 	public static String getClassifiedData(SensorData data){
 		String str=null;
-		if(data.getSensorType()!=AllPullSensors.SENSOR_TYPE_ACCELEROMETER && data.getSensorType()!=AllPullSensors.SENSOR_TYPE_MICROPHONE){
-			str="Data from this sensor cannot be classified"; 
+		if(data.getSensorType()!=SensorUtils.SENSOR_TYPE_ACCELEROMETER && data.getSensorType()!=SensorUtils.SENSOR_TYPE_MICROPHONE
+				&& data.getSensorType()!=SensorUtils.SENSOR_TYPE_LOCATION){
+			str="Data from this sensor cannot be classified- "+data.getSensorType(); 
 		}
 		else{
 			str=classifyData(data);
@@ -30,24 +34,45 @@ public class DummyClassifier {
 		return str;
 	}
 
+	/**
+	 * Returns the classified sensor data
+	 * @param data
+	 * @return
+	 */
 	private static String classifyData(SensorData data){
 		String result = "";
 		JSONFormatter formatter = DataFormatter.getJSONFormatter(SenSocialManager.getContext(), data.getSensorType());
 		String str=formatter.toJSON(data).toString();
 		Log.i("SNnMB", "Data(string) to be classified: "+str);
-		if(data.getSensorType()==AllPullSensors.SENSOR_TYPE_ACCELEROMETER)
+		if(data.getSensorType()==SensorUtils.SENSOR_TYPE_ACCELEROMETER)
 			result=classifyAccelerometer(str);
-		if(data.getSensorType()==AllPullSensors.SENSOR_TYPE_MICROPHONE)
+		if(data.getSensorType()==SensorUtils.SENSOR_TYPE_MICROPHONE)
 			result=classifyMicrophone(str);
+		if(data.getSensorType()==SensorUtils.SENSOR_TYPE_LOCATION)
+			result=classifyLocation(str);
 		return result;
 	}
 
+	/**
+	 * Returns whether all the conditions are satisfied
+	 * @param data
+	 * @param sensorName
+	 * @param operator
+	 * @param value
+	 * @return
+	 */
 	public static Boolean isSatisfied(ArrayList<SensorData> data,String sensorName, String operator,String value){
 		if(sensorName.equalsIgnoreCase("null"))
 			return true;
 		return classifyWithModality(data, sensorName, operator, value);
 	}
 
+	/**
+	 * Returns sensor data of the given sensor id from the sensor 
+	 * @param data
+	 * @param sensorId
+	 * @return
+	 */
 	private static SensorData getData(ArrayList<SensorData> data, int sensorId){
 		for(SensorData s:data){
 			if(s.getSensorType()==sensorId){
@@ -57,12 +82,20 @@ public class DummyClassifier {
 		return null;
 	}
 
+	/**
+	 * Returns whether all the conditions are satisfied
+	 * @param data
+	 * @param sensorName
+	 * @param operator
+	 * @param value
+	 * @return
+	 */
 	private static Boolean classifyWithModality(ArrayList<SensorData> data, String sensorName, String operator,String value){
-		SensorData acc=getData(data, AllPullSensors.SENSOR_TYPE_ACCELEROMETER);
-		SensorData mic=getData(data, AllPullSensors.SENSOR_TYPE_MICROPHONE);
-		SensorData wifi=getData(data, AllPullSensors.SENSOR_TYPE_WIFI);
-		SensorData bt=getData(data, AllPullSensors.SENSOR_TYPE_BLUETOOTH);
-		SensorData loc=getData(data, AllPullSensors.SENSOR_TYPE_LOCATION);
+		SensorData acc=getData(data, SensorUtils.SENSOR_TYPE_ACCELEROMETER);
+		SensorData mic=getData(data, SensorUtils.SENSOR_TYPE_MICROPHONE);
+		SensorData wifi=getData(data, SensorUtils.SENSOR_TYPE_WIFI);
+		SensorData bt=getData(data, SensorUtils.SENSOR_TYPE_BLUETOOTH);
+		SensorData loc=getData(data, SensorUtils.SENSOR_TYPE_LOCATION);
 		Boolean isTrue=false;
 		if(sensorName.equals("accelerometer")){
 			String activity= value;
@@ -119,10 +152,11 @@ public class DummyClassifier {
 		return isTrue;
 	}
 
-
-
-
-
+	/**
+	 * Returns classified microphone data
+	 * @param str
+	 * @return
+	 */
 	private static String classifyMicrophone(String str){
 		ArrayList<Double> ar =new ArrayList<Double>();
 		String temp;
@@ -130,20 +164,7 @@ public class DummyClassifier {
 		double MEAN=6057, SD=5323;
 		int count=0;
 		try {
-			JSONObject obj=new JSONObject(str);
-//			temp=obj.getString("amplitude");
-//			Log.e("SNnMB", "1 Microphone Amplitude: "+ temp);
-//			temp.replace('[', '0');
-//			temp.replace(']', '0');
-//			Log.e("SNnMB", "2 Microphone Amplitude: "+ temp);
-//			String[] tempAr=temp.split(",");
-			
-//			for(int i=0;i<tempAr.length;i++){
-//				ar.add(Double.parseDouble(tempAr[i]));
-//				mean+=Double.parseDouble(tempAr[i]);
-//			}
-//			mean=mean/tempAr.length;
-			
+			JSONObject obj=new JSONObject(str);			
 			JSONArray tempAr=obj.getJSONArray("amplitude");
 			Log.e("SNnMB", "Microphone Amplitude: "+ tempAr);
 			for(int i=0;i<tempAr.length();i++){
@@ -179,7 +200,11 @@ public class DummyClassifier {
 		return "error";
 	}
 
-
+	/**
+	 * Returns classified accelerometer data
+	 * @param str
+	 * @return
+	 */
 	private static String classifyAccelerometer(String str){
 		final double sittingMeanX=-0.287153537028424;
 		final double sittingMeanY=-0.617490947002584;
@@ -254,7 +279,30 @@ public class DummyClassifier {
 		return "error";
 	}
 
-
+	/**
+	 * Extracts the latitude and longitude from location sensor data
+	 * @param str sensor data in json string format
+	 * @return String containing latitude and longitude
+	 */
+	private static String classifyLocation(String str){
+		JSONObject obj;
+		String lat = "0", lon = "0";
+		try {
+			obj = new JSONObject(str);
+			lat=obj.get("latitude").toString();
+			lon=obj.get("longitude").toString();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return "Latitude- "+lat+","+"Longitude- "+lon;
+	}
+	
+	/**
+	 * Returns the distance between two geo points
+	 * @param StartP geo-point
+	 * @param EndP geo-point
+	 * @return double
+	 */
 	private static double calculateDistanceInMiles(Location StartP, Location EndP) {  
 		//Haversine formula-wiki used by google
 		//		double Radius=6371; //kms
@@ -272,7 +320,12 @@ public class DummyClassifier {
 		return Radius * c;  
 	} 
 
-	//bluetoothmac
+	/**
+	 * Returns whether the given bluetooth device is present in the sensor data fetched by bluetooth 
+	 * @param data sensor data fetched by bluetooth
+	 * @param mac bluetooth MAC
+	 * @return Boolean
+	 */
 	private static Boolean isBluetoothPresent(SensorData data, String mac) { 
 		try{
 		JSONFormatter formatter = DataFormatter.getJSONFormatter(SenSocialManager.getContext(), data.getSensorType());

@@ -2,7 +2,6 @@ package com.ubhave.sensocial.server.data;
 
 import org.json.JSONObject;
 
-import com.mongodb.util.JSON;
 import com.ubhave.sensormanager.data.SensorData;
 
 public class SocialEvent {
@@ -11,27 +10,59 @@ public class SocialEvent {
 
 	private DeviceSensorData sensorData;
 
+	/**
+	 * Constructor
+	 */
 	public SocialEvent(){
-		//required to set all elements
+		//by default set all elements as unknown
+		DeviceSensorData dsd=new DeviceSensorData();
+		dsd.setClassifiedData("unknown");
+		dsd.setDeviceId("unknown");
+		dsd.setStreamId("unknown");
+		dsd.setRawData(null);		
+		SocialData sd=new SocialData();
+		sd.setUserName("unknown");
+		sd.setFeedType("unknown");
+		sd.setOSNFeed("unknown");
+		sd.setOSNName("unknown");
+		sd.setTime("unknown");
 	}
-
+	
+	/**
+	 * Constructor
+	 * @param rawData SensorData in raw format
+	 * @param classifiedData SensorData in classified format
+	 * @param streamId Stream id
+	 * @param deviceId Device id
+	 * @param userName User-name
+	 * @param oSNFeed OSN feed
+	 * @param oSNName OSN name
+	 * @param feedType Feed type
+	 * @param time Time at which feed arrived
+	 */
 	public SocialEvent(SensorData rawData, String classifiedData, String streamId, String deviceId,
-			String oSNFeed, String oSNName, String feedType){
+			String userName, String oSNFeed, String oSNName, String feedType, String time){
 		sensorData=new DeviceSensorData();
 		sensorData.setClassifiedData(classifiedData);
 		sensorData.setRawData(rawData);
 		sensorData.setStreamId(streamId);
 		sensorData.setDeviceId(deviceId);
 		socialData=new SocialData();
+		socialData.setUserName(userName);
 		socialData.setOSNFeed(oSNFeed);
 		socialData.setOSNName(oSNName);
 		socialData.setFeedType(feedType);
+		socialData.setTime(time);
 	}
 
-	
+	/**
+	 * Converts JSON String to SocialEvent
+	 * @param JSONObject object
+	 * @return SocialEvent object
+	 */
 	public static SocialEvent getSocialEvent(JSONObject obj){
 		SensorData rawData = null;
-		String classifiedData = "Not found", streamId = "Not found", deviceId = "Not found", oSNFeed = "Not found", oSNName = "Not found", feedType = "Not found";
+		String classifiedData = "Not found", streamId = "Not found", deviceId = "Not found", userName = "Not found", oSNFeed = "Not found", oSNName = "Not found", feedType = "Not found", time= "Not found";
 		try{
 			rawData=(SensorData) obj.get("rawdata");
 		}
@@ -57,6 +88,12 @@ public class SocialEvent {
 			System.out.println("Device id not present or "+e.toString());
 		}
 		try{
+			userName= obj.getString("username");
+		}
+		catch(Exception e){
+			System.out.println("OSN user-name not present or "+e.toString());
+		}
+		try{
 			oSNFeed= obj.getString("osnfeed");
 		}
 		catch(Exception e){
@@ -69,14 +106,20 @@ public class SocialEvent {
 			System.out.println("OSN name not present or "+e.toString());
 		}
 		try{
-			feedType= obj.getString("feedtype");
+			feedType= obj.getString("osnfeedtype");
 		}
 		catch(Exception e){
 			System.out.println("Feed type not present or "+e.toString());
 		}
+		try{
+			time= obj.getString("osntime");
+		}
+		catch(Exception e){
+			System.out.println("Feed time not present or "+e.toString());
+		}
 		
 		
-		return new SocialEvent(rawData, classifiedData, streamId, deviceId, oSNFeed, oSNName, feedType);
+		return new SocialEvent(rawData, classifiedData, streamId, deviceId, userName, oSNFeed, oSNName, feedType, time);
 	}
 
 	/**

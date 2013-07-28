@@ -20,7 +20,7 @@ public class PrivacySettings {
 			ed.commit();
 		}		
 		
-		PPDGenerator.startSensing(ppdSensorName, ppdLocation, ppdDataType);
+		PPDGenerator.enableSensing(ppdSensorName, ppdLocation, ppdDataType);
 		//resume all streams relevant to sensor for the given location
 		ConfigurationHandler.run(context);	
 		return true;
@@ -38,7 +38,7 @@ public class PrivacySettings {
 			ed.commit();
 		}
 		
-		PPDGenerator.stopSensing(ppdSensorName, ppdLocation);
+		PPDGenerator.disableSensing(ppdSensorName, ppdLocation);
 		//stop all streams relevant to sensor for the given location
 		ConfigurationHandler.run(context);
 		return true;

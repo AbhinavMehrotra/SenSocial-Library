@@ -15,11 +15,16 @@ import android.util.Log;
 import com.ubhave.sensocial.filters.Condition;
 import com.ubhave.sensocial.filters.ConfigurationHandler;
 import com.ubhave.sensocial.filters.ModalValue;
-import com.ubhave.sensocial.filters.Modality;
 import com.ubhave.sensocial.filters.ModalityType;
 import com.ubhave.sensocial.filters.Operator;
 import com.ubhave.sensormanager.ESException;
 
+/**
+ * Provides the way to classify required sensors based on their streams, i.e.: OSN sensor or Stream sensor.
+ * Stream sensors are directly subscribed and the data is collected on specific intervals.
+ * But the OSN sensor are sensed vis One-Off-Sensing process which is triggered when there is a new trigger 
+ * from OSNs. This makes the system energy efficient.
+ */
 public class SensorClassifier {
 	/**
 	 * This method create two sets of configurations: OSN dependent(OSNConfigurationSet) 
@@ -29,10 +34,10 @@ public class SensorClassifier {
 	 * Continuous stream dependent configurations require sensor subscription for continuous sensing.
 	 * This method also create two sets of sensors: OSN dependent (OSNSensorSet) 
 	 * & Stream dependent (StreamSensorSet).
-	 * And subscribes/un-subscribes sensors.
-	 * @param filterConfigs
+	 * And subscribes/unsubscribes sensors.
+	 * @param context Application context
+	 * @param filterConfigs Map of configurations names and set of conditions
 	 */
-	@SuppressLint("NewApi")
 	public static void run(Context context, Map<String, Set<String>> filterConfigs) {
 		System.out.println("Sensor classifier: run");
 		System.out.println("Map recieved: "+filterConfigs);
@@ -87,6 +92,11 @@ public class SensorClassifier {
 		}
 	}
 
+	/**
+	 * Returns whether any OSN dependent condition is present in the set of conditions.
+	 * @param conditions Set of conditions
+	 * @return boolean
+	 */
 	private static Boolean isOSNConfig(Set<String> conditions){
 		Boolean flag=false;
 		for(String s:conditions){
@@ -97,7 +107,13 @@ public class SensorClassifier {
 		}
 		return flag;
 	}
-	//This method adds new elements to the OSN configuration and OSN sensor set
+	
+	/**
+	 * This method adds new elements to the OSN configuration and OSN sensor set
+	 * @param context Application context
+	 * @param osnConfigs Map of OSN configurations names and set of conditions
+	 */
+	
 	private static void addOSNConfig(Context context, Map<String, Set<String>> osnConfigs){
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		Editor ed=sp.edit();
@@ -132,7 +148,11 @@ public class SensorClassifier {
 		Log.e("SNnMB","OSN Config Set:"+ sp.getStringSet("OSNConfigurationSet", null));
 	}
 
-	//This method removes unused elements to the OSN configuration and OSN sensor set
+	/**
+	 * This method removes unused elements to the OSN configuration and OSN sensor set
+	 * @param context Application context
+	 * @param osnConfigs Map of OSN configurations names and set of conditions
+	 */
 	private static void removeOSNConfig(Context context, Map<String, Set<String>> osnConfigs){
 		Log.e("SNnMB", "Map osn configs: "+osnConfigs);
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
@@ -174,8 +194,12 @@ public class SensorClassifier {
 		ed.commit();
 	}
 
-	//This method adds new elements to the Stream configuration and Stream sensor set.
-	//It will also subscribe the new sensors
+	/**
+	 * This method adds new elements to the Stream configuration and Stream sensor set.
+	 * It will also subscribe the new sensors
+	 * @param context Application context
+	 * @param osnConfigs Map of stream configurations names and set of conditions
+	 */
 	private static void addAndSubscribeStreamConfig(Context context, Map<String, Set<String>> streamConfigs){
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		Editor ed=sp.edit();
@@ -215,7 +239,7 @@ public class SensorClassifier {
 
 		//check for new sensors and subscribe 
 		ArrayList<Integer> sensorIds=new ArrayList<Integer>();
-		AllPullSensors aps=new AllPullSensors(context);
+		SensorUtils aps=new SensorUtils(context);
 		for(String sensor_name:sensor){
 			sensorIds.add(aps.getSensorIdByName(sensor_name));
 		}
@@ -269,8 +293,12 @@ public class SensorClassifier {
 		ed.commit();
 	}
 
-	//This method removes unused elements to the Stream configuration and Stream sensor set.
-	//It will also un-subscribe the unused sensors
+	/**
+	 * This method removes unused elements to the Stream configuration and Stream sensor set.
+	 * It will also unsubscribe the unused sensors
+	 * @param context Application context
+	 * @param osnConfigs Map of stream configurations names and set of conditions
+	 */
 	private static void removeAndUnsubscribeStreamConfig(Context context, Map<String, Set<String>> streamConfigs){
 		SharedPreferences sp=context.getSharedPreferences("SSDATA", 0);
 		Editor ed=sp.edit();
@@ -312,7 +340,7 @@ public class SensorClassifier {
 		Log.i("SNnMB", "New sensors: "+sensorNew);
 		//check for new sensors and subscribe 
 		ArrayList<Integer> sensorIds=new ArrayList<Integer>();
-		AllPullSensors aps=new AllPullSensors(context);
+		SensorUtils aps=new SensorUtils(context);
 		for(String sensor_name:sp.getStringSet("StreamSensorSet", blankSet)){
 			sensorIds.add(aps.getSensorIdByName(sensor_name));
 		}

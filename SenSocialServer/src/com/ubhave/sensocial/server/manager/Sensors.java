@@ -10,7 +10,11 @@ public class Sensors {
 	public final static int SENSOR_TYPE_WIFI = 5010;
 	public final static int SENSOR_TYPE_TIME=1111;
 	
-	
+	/**
+	 * Returns sensor name for the given sensor id
+	 * @param id (int) Sensor id
+	 * @return (String) Sensor name
+	 */
 	public static String getSensorNameById(int id){
 		String sensor=null;
 		if(id==SENSOR_TYPE_ACCELEROMETER) sensor="accelerometer";
@@ -22,6 +26,11 @@ public class Sensors {
 		return sensor;
 	}
 
+	/**
+	 * Returns sensor-id for the given sensor name
+	 * @param name (String) Sensor name
+	 * @return (int) sensor id
+	 */
 	public static int getSensorIdByName(String name){
 		int sensor=0;
 		if(name.equalsIgnoreCase("accelerometer")) sensor=SENSOR_TYPE_ACCELEROMETER;

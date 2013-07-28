@@ -11,7 +11,6 @@ import com.ubhave.sensocial.server.exception.XMLFileException;
 import com.ubhave.sensocial.server.filters.Condition;
 import com.ubhave.sensocial.server.filters.Filter;
 import com.ubhave.sensocial.server.filters.GenerateFilter;
-import com.ubhave.sensocial.server.filters.Modality;
 import com.ubhave.sensocial.server.filters.ModalityType;
 import com.ubhave.sensocial.server.mqtt.MQTTClientNotifier;
 import com.ubhave.sensocial.server.mqtt.MQTTNotifitions;
@@ -29,6 +28,14 @@ public class Stream {
 	private Aggregator aggregator;
 	private final String TAG = "SNnMB";
 
+	/**
+	 * Constructor
+	 * @param device {@link Device}
+	 * @param sensorId (String) Sensor id of the required data
+	 * @param dataType (String) data type of the required sensor data
+	 * @throws PPDException
+	 * @throws SensorDataTypeException
+	 */
 	protected Stream(Device device, int sensorId, String dataType)throws PPDException,SensorDataTypeException{
 		this.device=device;
 		this.sensorId=sensorId;
@@ -41,7 +48,12 @@ public class Stream {
 	}
 
 
-	//used for aggregated stream
+	/**
+	 * Constructor- used for aggregated stream
+	 * @param aggregator {@link Aggregator}
+	 * @param sensorId (int) Sensor id of the required data
+	 * @param dataType (String) data type of the required sensor data
+	 */
 	protected Stream(Aggregator aggregator, int sensorId, String dataType){
 		this.aggregator=aggregator;
 		this.device=null;
@@ -55,8 +67,8 @@ public class Stream {
 
 
 	/**
-	 * 
-	 * @return 
+	 * Sets filter on the stream
+	 * @return {@link Filter}
 	 * @throws PPDException If there exists any activity of which the associated sensor 
 	 * (or SensorData from this sensor on client) is not declared in PPD.
 	 */
@@ -80,7 +92,11 @@ public class Stream {
 		return newStream; 
 	}
 
-
+	/**
+	 * Starts the stream
+	 * @throws PPDException
+	 * @throws XMLFileException
+	 */
 	public void startStream() throws PPDException, XMLFileException{
 		Set<Stream> allStreams= new HashSet<Stream>();
 		if(this.isAggregated)
@@ -116,7 +132,9 @@ public class Stream {
 		//		MQTTClientNotifier.sendStreamNotification(device.getDeviceId(), MQTTNotifitions.start_stream, this.getStreamId());
 	}
 
-
+	/**
+	 * Pauses the stream
+	 */
 	public void pauseStream(){
 		//stop streaming without deleting filter
 		//notify clients to set configuration attribute "sense"="false"
@@ -124,35 +142,67 @@ public class Stream {
 
 	}
 
-	public void unpauseStream(String streamConfig){
+	/**
+	 * Un-pauses the stream
+	 */
+	public void unpauseStream(){
 		//start without sending new filter
 		//notify clients to set configuration attribute "sense"="true"
 		MQTTClientNotifier.sendStreamNotification(device.getDeviceId(), MQTTNotifitions.unpause_stream, this.getStreamId());
 	}
 
+	/**
+	 * Returns the device on which the stream is created
+	 * @return {@link Device} Object
+	 */
 	public Device getDevice() {
 		return device;
 	}
 
+	/**
+	 * Getter for sensor id of the required sensor data
+	 * @return int Sensor id
+	 */
 	public int getSensorId() {
 		return sensorId;
 	}
 
+	/**
+	 * Getter for data type of the required sensor data
+	 * @return
+	 */
 	public String getDataType() {
 		return dataType;
 	}
 
+	/**
+	 * Getter for Filter associated with this stream
+	 * @return {@link Filter} Object
+	 */
 	public Filter getFilter() {
 		return filter;
 	}
 
+	/**
+	 * Getter for stream id
+	 * @return {@link String} Stream id
+	 */
 	public String getStreamId() {
 		return streamId;
 	}
 
+	/**
+	 * Return whether the stream is aggregated
+	 * @return {@link Boolean}
+	 */
 	public Boolean isAggregated() {
 		return isAggregated;
 	}
+	
+	/**
+	 * Returns the Aggregator of the stream
+	 * @return {@link Aggregator} Object
+	 */
 	public Aggregator getAggregator() {
 		return aggregator;
 	}

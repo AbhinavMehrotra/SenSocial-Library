@@ -5,6 +5,10 @@ import java.util.HashMap;
 
 import com.ubhave.sensocial.server.database.UserRegistrar;
 
+/**
+ * User class represents the user of the application and the device.
+ * 
+ */
 public class User {
 
 	private String name;
@@ -16,6 +20,17 @@ public class User {
 	private ArrayList<String> twFollowers;
 	private HashMap<String, ArrayList<Double>> location;
 	
+	/**
+	 * Constructor
+	 * @param name (String) Usre name
+	 * @param userid (String) User id
+	 * @param fbName (String) Facebook name or id
+	 * @param twName (String) Twitter name or id
+	 * @param deviceIds (ArrayList<String>) List of device ids
+	 * @param fbFriends (ArrayList<String>) List of Facebook friends 
+	 * @param twFollowers (ArrayList<String>) List of Twitter followers
+	 * @param location (HashMap<String, ArrayList<Double>>) Map of location and devices
+	 */
 	public User(String name, String id, String fbName, String twName, ArrayList<String> deviceIds, 
 			ArrayList<String> fbFriends, ArrayList<String> twFollowers, HashMap<String, ArrayList<Double>> location){
 		this.name=name;
@@ -30,22 +45,42 @@ public class User {
 	}
 
 	
+	/**
+	 * Getter for user name 
+	 * @return (String) User name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Getter for Facebook name 
+	 * @return (String) Facebook name
+	 */
 	public String getFbName() {
 		return fbName;
 	}
 
+	/**
+	 * Getter for Twitter name 
+	 * @return (String) Twitter name
+	 */
 	public String getTwName() {
 		return twName;
 	}
 
+	/**
+	 * Getter for user id 
+	 * @return (String) User id
+	 */
 	public String getId() {
 		return id;
 	}
 
+	/**
+	 * Getter for user's device list 
+	 * @return (ArrayList<Device>) List of devices
+	 */
 	public ArrayList<Device> getDevices() {
 		ArrayList<Device> devices= new ArrayList<Device>();
 		Location l;
@@ -61,10 +96,18 @@ public class User {
 		return devices;
 	}
 
+	/**
+	 * Getter for users Facebook friends list 
+	 * @return (ArrayList<String>) List of Facebook friends
+	 */
 	public ArrayList<String> getFacebookFriends() {
 		return fbFriends;
 	}
 
+	/**
+	 * Getter for Twitter followers list 
+	 * @return (ArrayList<String>) List of Twitter followers
+	 */
 	public ArrayList<String> getTwitterFollowers() {
 		return twFollowers;
 	}

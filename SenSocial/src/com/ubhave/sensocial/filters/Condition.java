@@ -1,11 +1,20 @@
 package com.ubhave.sensocial.filters;
 
+/**
+ * Condition class provide creation of filter-conditions
+ */
 public class Condition {
 	String modalityType="";
 	String operator="";
 	String modalValue="";
 	String condition="";
 
+	/**
+	 * Constructor
+	 * @param String modality-type
+	 * @param String operator
+	 * @param String modalValue
+	 */
 	public Condition(String modalityType, String operator, String modalValue){
 		this.modalityType=modalityType;
 		this.modalValue=modalValue;
@@ -13,10 +22,10 @@ public class Condition {
 		this.condition= modalityType+operator+modalValue;
 	}
 
-	public Condition(){
-
-	}
-
+	/**
+	 * Constructor
+	 * @param String Condition-String
+	 */
 	public Condition(String fullConditionString){
 		//parse the string and set all values
 		if(fullConditionString.equalsIgnoreCase("null")){
@@ -35,6 +44,7 @@ public class Condition {
 	}
 
 	/**
+	 * Getter for modality type
 	 * @return the modalityType
 	 */
 	public String getModalityType() {
@@ -42,6 +52,7 @@ public class Condition {
 	}
 
 	/**
+	 * Getter for operator
 	 * @return the operator
 	 */
 	public String getOperator() {
@@ -49,6 +60,7 @@ public class Condition {
 	}
 
 	/**
+	 * Getter for modal value
 	 * @return the modalValue
 	 */
 	public String getModalValue() {
@@ -56,6 +68,7 @@ public class Condition {
 	}
 
 	/**
+	 * Getter for condition string
 	 * @return the condition
 	 */
 	public String getConditionString() {

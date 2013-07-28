@@ -3,9 +3,13 @@ package com.ubhave.sensocial.server.osn;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,13 +19,22 @@ import com.ubhave.sensocial.server.database.UserRegistrar;
 public class FacebookGetters {
 
 	String userId;
-	String token="CAACEdEose0cBAJxzdE8OA4XG5oVNnhjE9eBT04AgM7FCReTpGhZBIQBK6ntmT2GDxY8jMKYVDJ4IZBQVtZAZB24VL105X4IRnLi4hV4XKZBbakjq6W7oZBeFKlbi7lllFEFoDfKEMcAPfbARhqCcVlGwiORbjDeYsZD";
-
+	String token; 
+	
+	/**
+	 * Constructor
+	 * @param userId(String) Facebook id 
+	 */
 	public FacebookGetters(String userId) {
 		this.userId=userId;
 		this.token=UserRegistrar.getFacebookToken(userId); 
+		System.out.println("Token: "+ this.token);
 	}
 
+	/**
+	 * Gets List of Facebook friends of user from the Facebook server
+	 * @return ArrayList<String> Facebook friends
+	 */
 	public ArrayList<String> getFriends(){
 		ArrayList<String> friends = new ArrayList<String>();
 		try {
@@ -44,16 +57,29 @@ public class FacebookGetters {
 		return friends;
 	}
 
+	/**
+	 * Gets the dats updated by any user on Facebook.
+	 * Request is sent to the Facebook server to provide the data.
+	 * @param changedField (String) Changed field on users account
+	 * @param updationTime (String) Time of update
+	 * @return (String) Data updated by the user on Facebook.
+	 */
 	public String getUpdatedData(String changedField, long updationTime){
 		String data="";
 		try {
 			//feed: story, statuses: message
 			String path="https://graph.facebook.com/"+this.userId+"/"+changedField+"?access_token="+this.token;  //+"&fields=username"
 			URL url = new URL(path);
-			InputStream Istream=url.openConnection().getInputStream();
+
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("webcache.cs.bham.ac.uk", 3128));
+			HttpsURLConnection conn = (HttpsURLConnection) new URL(path).openConnection(proxy);
+			
+			//HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+			conn.connect();
+			InputStream Istream=conn.getInputStream();
 			BufferedReader r = new BufferedReader(new InputStreamReader(Istream));
 			JSONObject json= new JSONObject(r.readLine());
-			json=json.getJSONObject(changedField);
+			//json=json.getJSONObject(changedField);
 			JSONArray ar= new JSONArray();
 			ar=json.getJSONArray("data");	
 			JSONObject obj;
@@ -117,7 +143,8 @@ public class FacebookGetters {
 			}
 
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			System.out.println("Facebook connection timed-out. Check your internet connection.\n"+ e.toString());
+			return "message unavailable";
 		}
 		return data;
 	}

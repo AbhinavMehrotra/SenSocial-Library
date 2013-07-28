@@ -13,14 +13,18 @@ import org.eclipse.paho.client.mqttv3.internal.MemoryPersistence;
 public class MQTTManager {
 
 	private final String TAG = "SNnMB";
-	private final static String BROKER_URL="tcp://broker.mqttdashboard.com:1883";
-//	private final static String BROKER_URL="tcp://mqtt.cs.bham.ac.uk:1883";
+	private final static String BROKER_URL="tcp://mqtt.cs.bham.ac.uk:1883";
 	private MqttClient mqttClient;
 	private String clientId;
 	private String topic;
 	private int keepAliveInterval=60*5;
 	private MqttConnectOptions opt;
 	
+	/**
+	 * Constructor
+	 * @param deviceId (String) Device id
+	 * @throws MqttException
+	 */
 	public MQTTManager(String deviceId) throws MqttException {
 		clientId="SensocialServer";
 		topic="topic"+deviceId;
@@ -28,12 +32,15 @@ public class MQTTManager {
 		System.out.println("topic: "+topic);
 		opt.setKeepAliveInterval(keepAliveInterval);
 		opt.setConnectionTimeout(10);
-//		opt.setUserName("axm_mos");
-//		opt.setPassword("Mos2013".toCharArray());
+		opt.setUserName("axm_mos");
+		opt.setPassword("Mos2013".toCharArray());
 		mqttClient = new MqttClient(BROKER_URL, clientId, new MemoryPersistence());
 		mqttClient.setCallback(new MQTTCallback(BROKER_URL, clientId, topic));
 	}
 	
+	/**
+	 * Creates connection with the MQTT broker
+	 */
 	public void connect(){
 		try {
 			mqttClient.connect(opt);
@@ -44,6 +51,9 @@ public class MQTTManager {
 		}
 	}
 	
+	/**
+	 * Subscribes to the device with its topic
+	 */
 	public void subscribeToDevice(){
 		try {
 			mqttClient.subscribe(this.topic);
@@ -53,17 +63,25 @@ public class MQTTManager {
  		}
 	}
 
+	/**
+	 * Publishes message for the client
+	 * @param message (String) Message that needs to be published
+	 * @throws MqttPersistenceException
+	 * @throws MqttException
+	 */
 	public void publishToDevice(String message) throws MqttPersistenceException, MqttException{
 			MqttTopic topic=mqttClient.getTopic(this.topic);
 			System.out.println("In publish: topic="+topic);
 			MqttMessage msg= new MqttMessage(message.getBytes());
 			topic.publish(msg);
-			System.out.print("Published");
+			System.out.println("Published");
 			mqttClient.disconnect();
 	}
 	
 	
-	//inner class for callback
+	/**
+	 * Callback class to receive message
+	 */
 	public class MQTTCallback implements MqttCallback{
 
 		final private String TAG = "SNnMB";
